@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuickLedger 捷記四象</string>
+    <string name="title_activity_main">QuickLedger 捷記四象</string>
+    <string name="package_name">com.quickledger.app</string>
+    <string name="custom_url_scheme">com.quickledger.app</string>
+</resources>

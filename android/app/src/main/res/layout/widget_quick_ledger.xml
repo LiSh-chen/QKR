@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:background="#0F172A"
+    android:columnCount="2"
+    android:rowCount="2">
+
+    <Button
+        android:id="@+id/btn_q1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="2dp"
+        android:text="必要\n日常"
+        android:textSize="10sp"
+        android:textColor="#FFFFFF"
+        android:background="#059669" />
+
+    <Button
+        android:id="@+id/btn_q2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="2dp"
+        android:text="必要\n臨時"
+        android:textSize="10sp"
+        android:textColor="#FFFFFF"
+        android:background="#2563EB" />
+
+    <Button
+        android:id="@+id/btn_q3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="2dp"
+        android:text="非必要\n日常"
+        android:textSize="10sp"
+        android:textColor="#FFFFFF"
+        android:background="#D97706" />
+
+    <Button
+        android:id="@+id/btn_q4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"
+        android:layout_margin="2dp"
+        android:text="非必要\n臨時"
+        android:textSize="10sp"
+        android:textColor="#FFFFFF"
+        android:background="#DC2626" />
+</GridLayout>
