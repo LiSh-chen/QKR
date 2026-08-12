@@ -1,0 +1,6 @@
+{
+  "name": "極低摩擦力記帳",
+  "description": "極低摩擦力記帳 APP (QuickLedger) — 採用四象限分類、Widget 快速記帳、每日推播結算與模糊概算補登機制，極致降低記帳認知負擔。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
