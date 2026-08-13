@@ -246,7 +246,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200"
+      className="min-h-screen bg-amber-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans transition-colors duration-200"
       style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
     >
       {/* Main Container */}
@@ -309,26 +309,28 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* Floating Quick Action Button */}
-      <div
-        className="fixed right-4 z-40"
-        style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}
-      >
-        <motion.button
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.92 }}
-          onClick={() => handleOpenQuickModal('floating_btn')}
-          className="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-2xl shadow-emerald-900/40 border-2 border-white/20 flex items-center justify-center transition-all group"
-          title="快速記帳"
-          id="floating-quick-action-btn"
+      {/* Floating Quick Action Button — hidden on the quick-entry tab itself (redundant there) */}
+      {activeTab !== 'quick' && (
+        <div
+          className="fixed right-4 z-40"
+          style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}
         >
-          <Plus className="w-7 h-7 group-hover:rotate-90 transition-transform" />
-        </motion.button>
-      </div>
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => handleOpenQuickModal('floating_btn')}
+            className="w-14 h-14 bg-orange-600 hover:bg-orange-500 text-white rounded-full shadow-2xl shadow-orange-900/40 border-2 border-white/20 flex items-center justify-center transition-all group"
+            title="快速記帳"
+            id="floating-quick-action-btn"
+          >
+            <Plus className="w-7 h-7 group-hover:rotate-90 transition-transform" />
+          </motion.button>
+        </div>
+      )}
 
       {/* Bottom Quick Nav (primary navigation, always visible) */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 pt-1.5 flex items-center justify-around shadow-lg"
+        className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 px-2 pt-1.5 flex items-center justify-around shadow-lg"
         style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
       >
         {NAV_ITEMS.map((tab) => {

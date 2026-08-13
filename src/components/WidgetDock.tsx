@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LayoutGrid, Smartphone, Share2, CheckCircle2, AlertCircle, PlusCircle, X } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Delete, X } from 'lucide-react';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { QuadrantType, Transaction } from '../types';
 import { triggerHapticFeedback, playClickSound } from '../lib/storage';
@@ -12,12 +12,21 @@ interface WidgetDockProps {
   currentStreak: number;
 }
 
-export const WidgetDock: React.FC<WidgetDockProps> = ({
-  onDirectSave,
-  onOpenQuickModal,
-  todayTotal,
-  currentStreak,
-}) => {
+// Quadrant visual styling: solid filled, glossy "pressable" buttons
+const QUADRANT_BUTTON_STYLE: Record<QuadrantType, string> = {
+  NECESSARY_DAILY:
+    'bg-gradient-to-b from-emerald-400 to-emerald-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_8px_rgba(5,150,105,0.45)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]',
+  NECESSARY_URGENT:
+    'bg-gradient-to-b from-sky-400 to-blue-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_8px_rgba(37,99,235,0.45)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]',
+  UNNECESSARY_DAILY:
+    'bg-gradient-to-b from-amber-400 to-orange-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_8px_rgba(217,119,6,0.45)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]',
+  UNNECESSARY_URGENT:
+    'bg-gradient-to-b from-rose-400 to-red-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_8px_rgba(220,38,38,0.45)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]',
+};
+
+const KEYPAD_KEYS = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'C', '0', '⌫'] as const;
+
+export const WidgetDock: React.FC<WidgetDockProps> = ({ onDirectSave, onOpenQuickModal, todayTotal }) => {
   const [amountStr, setAmountStr] = useState('');
   const [noteStr, setNoteStr] = useState('');
   const [showError, setShowError] = useState(false);
@@ -27,27 +36,38 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
     durationSec: string;
   } | null>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null);
   const startTimeRef = useRef<number | null>(null);
 
-  const handleAmountChange = (val: string) => {
-    setAmountStr(val);
-    if (!startTimeRef.current && val) {
-      startTimeRef.current = performance.now();
-    }
+  const clearFeedback = () => {
     if (showError) setShowError(false);
     if (lastResult) setLastResult(null);
   };
 
-  const handlePresetAdd = (addNum: number) => {
+  const handleKeyPress = (key: (typeof KEYPAD_KEYS)[number]) => {
     triggerHapticFeedback('light');
     playClickSound(800);
-    if (!startTimeRef.current) startTimeRef.current = performance.now();
+    clearFeedback();
 
-    const currentNum = parseFloat(amountStr) || 0;
-    setAmountStr((currentNum + addNum).toString());
-    if (showError) setShowError(false);
-    if (lastResult) setLastResult(null);
+    if (!startTimeRef.current && key !== 'C') {
+      startTimeRef.current = performance.now();
+    }
+
+    if (key === 'C') {
+      setAmountStr('');
+      startTimeRef.current = null;
+      return;
+    }
+
+    if (key === '⌫') {
+      setAmountStr((prev) => prev.slice(0, -1));
+      return;
+    }
+
+    // Digit key — cap length to avoid absurd amounts, no leading zeros
+    setAmountStr((prev) => {
+      const next = prev === '0' ? key : prev + key;
+      return next.length > 7 ? prev : next;
+    });
   };
 
   const handleQuadrantDirectClick = (qKey: QuadrantType) => {
@@ -57,11 +77,9 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
       triggerHapticFeedback('medium');
       playClickSound(500);
       setShowError(true);
-      if (inputRef.current) inputRef.current.focus();
       return;
     }
 
-    // Measure completion duration
     const start = startTimeRef.current || performance.now();
     const durationMs = Math.max(120, Math.round(performance.now() - start));
     const durationSec = (durationMs / 1000).toFixed(2);
@@ -71,7 +89,6 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
 
     const qConfig = QUADRANT_CONFIGS[qKey];
 
-    // Save transaction directly
     onDirectSave({
       amount: amountNum,
       quadrant: qKey,
@@ -83,14 +100,8 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
       duration_ms: durationMs,
     });
 
-    // Show success result with completion time
-    setLastResult({
-      amount: amountNum,
-      quadrantTitle: qConfig.title,
-      durationSec,
-    });
+    setLastResult({ amount: amountNum, quadrantTitle: qConfig.title, durationSec });
 
-    // Reset inputs
     setAmountStr('');
     setNoteStr('');
     setShowError(false);
@@ -98,197 +109,104 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-700/60 relative overflow-hidden">
-      <div className="relative z-10 space-y-5">
-        {/* Header Title & Today Spend */}
-        <div className="flex items-center justify-between border-b border-slate-700/60 pb-3">
-          <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <LayoutGrid className="w-5 h-5 text-emerald-400" />
-              直連快捷記帳
-            </h2>
-            <p className="text-xs text-slate-300 mt-0.5">
-              直接輸入金額，點擊象限立即記帳
-            </p>
-          </div>
-          <div className="text-right">
-            <span className="text-xs text-slate-400">今日支出</span>
-            <div className="text-lg font-black text-white font-mono">${todayTotal.toLocaleString()}</div>
-          </div>
+    <div className="bg-gradient-to-br from-stone-900 via-stone-800 to-orange-950 text-white rounded-3xl p-3.5 shadow-xl border border-orange-900/40 relative overflow-hidden">
+      <div className="relative z-10 space-y-2.5">
+        {/* Compact top bar: today's total + inline feedback */}
+        <div className="flex items-center justify-between px-0.5">
+          <span className="text-[11px] text-orange-200/70">今日支出</span>
+          <span className="text-base font-black font-mono text-white">${todayTotal.toLocaleString()}</span>
         </div>
 
-        {/* Saved Success Notification Banner */}
+        {/* Success / Error feedback (overlays, doesn't push layout) */}
         <AnimatePresence>
           {lastResult && (
             <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8 }}
-              className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 rounded-2xl p-3 flex items-center justify-between gap-3 shadow-lg"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-[11px]"
             >
-              <div className="flex items-center gap-2 text-xs">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <div>
-                  <span className="font-bold text-white">${lastResult.amount}</span>
-                  <span className="ml-1 text-emerald-300">({lastResult.quadrantTitle})</span>
-                  <span className="ml-2 font-mono text-[11px] bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-300 border border-emerald-700">
-                    記帳耗時 {lastResult.durationSec} 秒
-                  </span>
-                </div>
+              <div className="flex items-center gap-1.5 truncate">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="font-bold text-white">${lastResult.amount}</span>
+                <span className="text-emerald-300 truncate">({lastResult.quadrantTitle})</span>
+                <span className="font-mono text-emerald-400 shrink-0">{lastResult.durationSec}s</span>
               </div>
-              <button
-                onClick={() => setLastResult(null)}
-                className="text-emerald-400 hover:text-white text-xs p-1"
-              >
-                <X className="w-4 h-4" />
+              <button onClick={() => setLastResult(null)} className="text-emerald-400 hover:text-white shrink-0">
+                <X className="w-3.5 h-3.5" />
               </button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Direct Amount & Note Input Section */}
-        <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-700/80 space-y-3">
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-semibold">
-              <label className="text-slate-300">1. 輸入金額：</label>
-              {showError && (
-                <span className="text-rose-400 font-bold text-xs flex items-center gap-1 animate-pulse">
-                  <AlertCircle className="w-3.5 h-3.5" /> 請先輸入金額
-                </span>
-              )}
-            </div>
-
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 font-bold text-lg font-mono">
-                $
-              </span>
-              <input
-                ref={inputRef}
-                type="number"
-                inputMode="decimal"
-                value={amountStr}
-                onChange={(e) => handleAmountChange(e.target.value)}
-                placeholder="0"
-                className={`w-full pl-8 pr-10 py-3 bg-slate-950 text-white font-mono font-bold text-xl rounded-xl border focus:outline-none transition-colors ${
-                  showError
-                    ? 'border-rose-500 focus:border-rose-400'
-                    : 'border-slate-700 focus:border-emerald-500'
-                }`}
-                id="main-direct-amount-input"
-              />
-              {amountStr && (
-                <button
-                  onClick={() => {
-                    setAmountStr('');
-                    setShowError(false);
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Quick Amount Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pt-1 no-scrollbar">
-              {[50, 100, 150, 200, 500].map((addVal) => (
-                <button
-                  key={addVal}
-                  onClick={() => handlePresetAdd(addVal)}
-                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs font-bold border border-slate-700 transition-colors whitespace-nowrap"
-                >
-                  +${addVal}
-                </button>
-              ))}
-              {amountStr && (
-                <button
-                  onClick={() => setAmountStr('')}
-                  className="px-2.5 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-mono text-xs font-bold border border-rose-800 transition-colors whitespace-nowrap"
-                >
-                  清空
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Optional Note */}
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-400">2. 備註 (選填)：</label>
-            <input
-              type="text"
-              value={noteStr}
-              onChange={(e) => setNoteStr(e.target.value)}
-              placeholder="例如：便當、美式咖啡、計程車"
-              className="w-full px-3 py-2 bg-slate-950 text-slate-200 text-xs rounded-xl border border-slate-800 focus:border-emerald-500 focus:outline-none"
-              id="main-direct-note-input"
-            />
-          </div>
+        {/* Calculator-style amount display */}
+        <div
+          className={`relative bg-black/40 rounded-2xl border px-4 py-2.5 flex items-center justify-between transition-colors ${
+            showError ? 'border-rose-500' : 'border-orange-900/50'
+          }`}
+        >
+          <span className="text-orange-400 font-bold text-xl font-mono">$</span>
+          <span className="flex-1 text-right text-3xl font-mono font-bold text-white tabular-nums truncate">
+            {amountStr || '0'}
+          </span>
+          {showError && (
+            <span className="absolute -top-2 right-3 bg-rose-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+              <AlertCircle className="w-2.5 h-2.5" /> 請先輸入金額
+            </span>
+          )}
         </div>
 
-        {/* 2x2 Direct Quadrant Action Buttons — laid out to mirror the actual quadrant axes:
+        {/* Note (single compact line) */}
+        <input
+          type="text"
+          value={noteStr}
+          onChange={(e) => setNoteStr(e.target.value)}
+          placeholder="備註（選填）：例如便當、咖啡"
+          className="w-full px-3 py-1.5 bg-black/30 text-stone-200 text-xs rounded-xl border border-orange-900/40 focus:border-amber-500 focus:outline-none placeholder:text-stone-500"
+          id="main-direct-note-input"
+        />
+
+        {/* Numeric keypad */}
+        <div className="grid grid-cols-3 gap-1.5">
+          {KEYPAD_KEYS.map((key) => (
+            <motion.button
+              key={key}
+              whileTap={{ scale: 0.94 }}
+              onClick={() => handleKeyPress(key)}
+              className={`h-10 rounded-xl font-bold text-base flex items-center justify-center transition-colors ${
+                key === 'C'
+                  ? 'bg-gradient-to-b from-rose-500/90 to-rose-700/90 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
+                  : key === '⌫'
+                    ? 'bg-gradient-to-b from-amber-500/90 to-orange-600/90 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
+                    : 'bg-gradient-to-b from-stone-700 to-stone-800 hover:from-stone-600 hover:to-stone-700 text-stone-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
+              }`}
+              id={`keypad-btn-${key}`}
+            >
+              {key === '⌫' ? <Delete className="w-4 h-4" /> : key}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* 2x2 Quadrant grid — mirrors the actual axes:
             top row = 必要 (necessary), bottom row = 非必要 (unnecessary)
             left col = 日常 (daily),   right col = 臨時 (urgent) */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-300">
-            3. 點擊分類象限，直接完成記帳：
-          </label>
-
-          <div className="relative">
-            {/* Axis labels */}
-            <div className="flex justify-between text-[9px] font-bold text-slate-500 px-1 mb-1">
-              <span>&larr; 日常</span>
-              <span>臨時 &rarr;</span>
-            </div>
-            <div className="flex items-stretch gap-1">
-              <div className="flex flex-col justify-around items-center text-[9px] font-bold text-slate-500 shrink-0 w-3">
-                <span className="[writing-mode:vertical-rl] rotate-180">必要 ↑</span>
-                <span className="[writing-mode:vertical-rl] rotate-180">非必要 ↓</span>
-              </div>
-              <div className="grid grid-cols-2 grid-rows-2 gap-2 flex-1">
-                {QUADRANT_LIST.map((qKey) => {
-                  const q = QUADRANT_CONFIGS[qKey];
-                  return (
-                    <motion.button
-                      key={qKey}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => handleQuadrantDirectClick(qKey)}
-                      className="aspect-square sm:aspect-auto sm:min-h-[92px] p-2.5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/60 text-center transition-all group flex flex-col items-center justify-center gap-1 shadow-md"
-                      id={`quadrant-direct-btn-${qKey}`}
-                    >
-                      <span
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: q.color }}
-                      />
-                      <span className="text-xs font-bold text-slate-100 group-hover:text-emerald-300 transition-colors leading-tight">
-                        {q.title}
-                      </span>
-                      <p className="text-[9px] text-slate-400 leading-tight line-clamp-2">
-                        {q.subTitle}
-                      </p>
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Streak & Mobile App Tips */}
-        <div className="bg-slate-900/70 p-3 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
-          <div className="flex items-center gap-2">
-            <span>連續記帳天數：</span>
-            <span className="font-bold text-amber-400 font-mono text-sm">{currentStreak} 天 🔥</span>
-          </div>
-
-          <div className="flex items-center gap-2 text-[11px] text-slate-400">
-            <Smartphone className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>支援 Android 桌面 / 鎖定畫面 Widget 直連號召</span>
-          </div>
+        <div className="grid grid-cols-2 grid-rows-2 gap-1.5">
+          {QUADRANT_LIST.map((qKey) => {
+            const q = QUADRANT_CONFIGS[qKey];
+            return (
+              <motion.button
+                key={qKey}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleQuadrantDirectClick(qKey)}
+                className={`h-12 rounded-xl text-center transition-all flex flex-col items-center justify-center leading-none ${QUADRANT_BUTTON_STYLE[qKey]}`}
+                id={`quadrant-direct-btn-${qKey}`}
+              >
+                <span className="text-[11px] font-bold text-white drop-shadow-sm">{q.title}</span>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
     </div>
   );
 };
-
-
-
