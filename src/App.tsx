@@ -262,6 +262,7 @@ export default function App() {
           >
             {activeTab === 'quick' && (
               <WidgetDock
+                transactions={transactions}
                 onDirectSave={handleSaveTransaction}
                 onOpenQuickModal={(src, amt, q) => handleOpenQuickModal(src, amt, q)}
                 todayTotal={todayTotal}
@@ -345,7 +346,7 @@ export default function App() {
                 playClickSound(700);
               }}
               className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-bold transition-colors ${
-                isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                isActive ? 'text-orange-600 dark:text-orange-400' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'
               }`}
               id={`tab-${tab.id}`}
             >

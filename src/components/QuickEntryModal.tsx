@@ -181,17 +181,17 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 100 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden max-h-[92vh] flex flex-col"
+          className="w-full max-w-lg bg-white dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden max-h-[92vh] flex flex-col"
           id="quick-entry-modal"
         >
           {/* Header & SLA Timer */}
-          <div className="px-5 pt-4 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80">
+          <div className="px-5 pt-4 pb-3 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between bg-stone-50/80 dark:bg-stone-900/80">
             <div className="flex items-center gap-2">
               <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <Zap className="w-5 h-5 animate-pulse" />
               </span>
               <div>
-                <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <h3 className="text-base font-bold text-stone-800 dark:text-stone-100 flex items-center gap-2">
                   極速 2x2 記帳
                   {isLumpSum && (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200 font-medium">
@@ -204,7 +204,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     </span>
                   )}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-stone-500 dark:text-stone-400">
                   {selectedQuadrant
                     ? `已直連預選象限：${QUADRANT_CONFIGS[selectedQuadrant].title} （輸入金額即可一鍵送出）`
                     : `來源：${initialSource.includes('widget') || initialSource.includes('quick_dock') ? '0.1秒極速直連板' : '手動快捷鍵'}`}
@@ -215,7 +215,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-full text-stone-400 hover:text-stone-600 hover:bg-stone-200 dark:hover:bg-stone-800 transition-colors"
               id="close-quick-modal-btn"
             >
               <X className="w-5 h-5" />
@@ -224,10 +224,10 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
           <div className="p-5 overflow-y-auto space-y-4">
             {/* Amount Display & Input */}
-            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col items-center justify-center relative">
-              <span className="text-xs font-medium text-slate-400 mb-1">輸入金額 ($ NTD)</span>
+            <div className="bg-stone-50 dark:bg-stone-800/60 p-4 rounded-2xl border border-stone-200 dark:border-stone-700/60 flex flex-col items-center justify-center relative">
+              <span className="text-xs font-medium text-stone-400 mb-1">輸入金額 ($ NTD)</span>
               <div className="flex items-baseline justify-center gap-1 w-full">
-                <span className="text-2xl font-bold text-slate-400">$</span>
+                <span className="text-2xl font-bold text-stone-400">$</span>
                 <input
                   ref={inputRef}
                   type="number"
@@ -241,18 +241,18 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     }
                   }}
                   placeholder="0"
-                  className="text-4xl font-extrabold text-slate-900 dark:text-white bg-transparent text-center focus:outline-none w-48 font-mono tracking-tight"
+                  className="text-4xl font-extrabold text-stone-900 dark:text-white bg-transparent text-center focus:outline-none w-48 font-mono tracking-tight"
                   id="amount-input-field"
                 />
               </div>
 
               {/* Date & Note Inputs */}
-              <div className="w-full mt-3 pt-3 border-t border-slate-200/80 dark:border-slate-700/80 flex flex-wrap sm:flex-nowrap gap-2 text-xs">
+              <div className="w-full mt-3 pt-3 border-t border-stone-200/80 dark:border-stone-700/80 flex flex-wrap sm:flex-nowrap gap-2 text-xs">
                 <input
                   type="date"
                   value={entryDate}
                   onChange={(e) => setEntryDate(e.target.value)}
-                  className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-700 dark:text-slate-200 font-mono text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                  className="bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-stone-700 dark:text-stone-200 font-mono text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
                 />
                 <input
                   type="text"
@@ -266,13 +266,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     }
                   }}
                   placeholder="備註（選填，如：午餐便當）..."
-                  className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 outline-none"
+                  className="flex-1 bg-white dark:bg-stone-900 border border-stone-300 dark:border-stone-700 rounded-lg px-3 py-1.5 text-stone-700 dark:text-stone-200 focus:ring-2 focus:ring-emerald-500 outline-none"
                 />
               </div>
 
               {/* Frequent Preset Chips */}
-              <div className="w-full mt-3.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                <div className="text-[11px] font-bold text-slate-400 mb-1.5 flex items-center gap-1">
+              <div className="w-full mt-3.5 pt-2.5 border-t border-stone-200/60 dark:border-stone-700/60">
+                <div className="text-[11px] font-bold text-stone-400 mb-1.5 flex items-center gap-1">
                   <Zap className="w-3 h-3 text-amber-500" /> 高頻常用速點捷徑：
                 </div>
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px]">
@@ -293,7 +293,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setNote(preset.note);
                         triggerHapticFeedback('light');
                       }}
-                      className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 text-slate-700 dark:text-slate-300 font-medium transition-colors shadow-2xs"
+                      className="whitespace-nowrap px-2.5 py-1 rounded-lg bg-white dark:bg-stone-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 border border-stone-200 dark:border-stone-700 hover:border-emerald-400 text-stone-700 dark:text-stone-300 font-medium transition-colors shadow-2xs"
                     >
                       {preset.label}
                     </button>
@@ -314,12 +314,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 今日 $0 支出（一鍵紀錄）
               </button>
 
-              <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-300 select-none">
+              <label className="flex items-center gap-2 cursor-pointer text-stone-600 dark:text-stone-300 select-none">
                 <input
                   type="checkbox"
                   checked={isLumpSum}
                   onChange={(e) => setIsLumpSum(e.target.checked)}
-                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-stone-300"
                 />
                 <span>模糊概算補登 (不分象限)</span>
               </label>
@@ -334,7 +334,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 className={`w-full py-3.5 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all ${
                   isAmountValid && selectedQuadrant
                     ? 'bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white shadow-emerald-600/30 cursor-pointer'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-none border border-slate-200 dark:border-slate-700'
+                    : 'bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 cursor-not-allowed shadow-none border border-stone-200 dark:border-stone-700'
                 }`}
                 id="confirm-quick-save-btn"
               >
@@ -355,7 +355,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             {!isLumpSum ? (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                  <span className="text-xs font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider flex items-center gap-1">
                     象限分類（點擊可切換或直接送出）：
                   </span>
                   {!selectedQuadrant && (
@@ -380,7 +380,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         className={`p-3.5 rounded-2xl border text-left flex flex-col justify-between transition-all min-h-[90px] relative overflow-hidden cursor-pointer ${
                           isSelected
                             ? `${q.activeColor} shadow-md ring-2 ring-emerald-500 scale-[1.01]`
-                            : `${q.bgColor} ${q.borderColor} ${q.hoverColor} text-slate-800 dark:text-slate-100 opacity-80 hover:opacity-100`
+                            : `${q.bgColor} ${q.borderColor} ${q.hoverColor} text-stone-800 dark:text-stone-100 opacity-80 hover:opacity-100`
                         }`}
                         id={`quadrant-btn-${qKey}`}
                       >
@@ -393,7 +393,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                               </span>
                             )}
                           </span>
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/60 dark:bg-black/30 border border-slate-200 dark:border-slate-700">
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/60 dark:bg-black/30 border border-stone-200 dark:border-stone-700">
                             {q.axisX} · {q.axisY}
                           </span>
                         </div>
@@ -431,14 +431,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             )}
 
             {/* Quick Virtual Keypad */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
               <div className="grid grid-cols-3 gap-1.5">
                 {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'CLEAR', '0', 'DEL'].map((k) => (
                   <button
                     key={k}
                     type="button"
                     onClick={() => handleKeypadPress(k)}
-                    className="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 font-mono font-bold text-slate-800 dark:text-slate-100 text-base active:scale-95 transition-transform"
+                    className="py-3 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 font-mono font-bold text-stone-800 dark:text-stone-100 text-base active:scale-95 transition-transform"
                   >
                     {k === 'DEL' ? '⌫' : k === 'CLEAR' ? 'C' : k}
                   </button>

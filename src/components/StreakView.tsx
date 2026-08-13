@@ -122,49 +122,49 @@ export const StreakView: React.FC<StreakViewProps> = ({
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
             <Flame className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400">當前連續 Streak</div>
-            <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
+            <div className="text-xs text-stone-400">當前連續 Streak</div>
+            <div className="text-lg font-bold font-mono text-stone-900 dark:text-white">
               {streakStats.currentStreak} 天
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
             <Trophy className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400">歷史最高天數</div>
-            <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
+            <div className="text-xs text-stone-400">歷史最高天數</div>
+            <div className="text-lg font-bold font-mono text-stone-900 dark:text-white">
               {streakStats.longestStreak} 天
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400">$0 支出天數</div>
-            <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
+            <div className="text-xs text-stone-400">$0 支出天數</div>
+            <div className="text-lg font-bold font-mono text-stone-900 dark:text-white">
               {streakStats.zeroSpendDaysCount} 天
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3">
+        <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs text-slate-400">總累積打卡天數</div>
-            <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
+            <div className="text-xs text-stone-400">總累積打卡天數</div>
+            <div className="text-lg font-bold font-mono text-stone-900 dark:text-white">
               {streakStats.totalLogDays} 天
             </div>
           </div>
@@ -172,7 +172,7 @@ export const StreakView: React.FC<StreakViewProps> = ({
       </div>
 
       {/* Speed SLA Hall of Fame Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-3xl border border-indigo-500/30 shadow-lg space-y-3">
+      <div className="bg-gradient-to-r from-stone-900 via-indigo-950 to-stone-900 text-white p-5 rounded-3xl border border-indigo-500/30 shadow-lg space-y-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-indigo-500/20 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
@@ -187,15 +187,15 @@ export const StreakView: React.FC<StreakViewProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
+              <p className="text-xs text-stone-300 mt-0.5">
                 每次喚起記帳均由高精準度 SLA 記時器監控，解鎖成就印記並地圖連擊打卡！
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between bg-slate-800/80 px-4 py-2 rounded-2xl border border-slate-700">
+          <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between bg-stone-800/80 px-4 py-2 rounded-2xl border border-stone-700">
             <div>
-              <div className="text-[10px] text-slate-400">個人最快紀錄 (PB)</div>
+              <div className="text-[10px] text-stone-400">個人最快紀錄 (PB)</div>
               <div className="text-lg font-black font-mono text-amber-400">
                 {speedPB ? `${(speedPB / 1000).toFixed(2)}s` : '無紀錄'}
               </div>
@@ -205,23 +205,23 @@ export const StreakView: React.FC<StreakViewProps> = ({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs pt-1">
-          <div className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-            <span className="text-slate-400 text-[11px]">神速稱號徽章</span>
+          <div className="bg-stone-800/60 p-3 rounded-2xl border border-stone-700/60">
+            <span className="text-stone-400 text-[11px]">神速稱號徽章</span>
             <div className="font-bold text-white mt-1 flex items-center gap-1.5">
               <span>{pbRank ? pbRank.badge : '⏱️'}</span>
               <span>{pbRank ? pbRank.title : '未解鎖'}</span>
             </div>
           </div>
 
-          <div className="bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-            <span className="text-slate-400 text-[11px]">&le; 2.0s 極速完成筆數</span>
+          <div className="bg-stone-800/60 p-3 rounded-2xl border border-stone-700/60">
+            <span className="text-stone-400 text-[11px]">&le; 2.0s 極速完成筆數</span>
             <div className="font-bold font-mono text-emerald-400 text-sm mt-1">
               {fastTxsCount} 筆 (含 {lightningTxsCount} 筆 &le; 1s)
             </div>
           </div>
 
-          <div className="col-span-2 sm:col-span-1 bg-slate-800/60 p-3 rounded-2xl border border-slate-700/60">
-            <span className="text-slate-400 text-[11px]">打卡地圖極速印記</span>
+          <div className="col-span-2 sm:col-span-1 bg-stone-800/60 p-3 rounded-2xl border border-stone-700/60">
+            <span className="text-stone-400 text-[11px]">打卡地圖極速印記</span>
             <div className="font-bold text-indigo-300 mt-1 flex items-center gap-1">
               <span>⚡️ 月曆金標連擊</span>
             </div>
@@ -230,11 +230,11 @@ export const StreakView: React.FC<StreakViewProps> = ({
       </div>
 
       {/* 30-Day Streak Calendar Grid */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-stone-900 p-5 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h3 className="font-bold text-slate-900 dark:text-white text-base">近 30 天習慣打卡地圖</h3>
+            <h3 className="font-bold text-stone-900 dark:text-white text-base">近 30 天習慣打卡地圖</h3>
           </div>
           {onOpenQuickModal && (
             <button
@@ -256,7 +256,7 @@ export const StreakView: React.FC<StreakViewProps> = ({
               .sort((a, b) => (a.duration_ms || 9999) - (b.duration_ms || 9999))[0];
             const hasSpeedStamp = fastestDayTx && fastestDayTx.duration_ms && fastestDayTx.duration_ms <= 2000;
 
-            let bgClass = 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 border-slate-200 dark:border-slate-700';
+            let bgClass = 'bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500 border-stone-200 dark:border-stone-700';
 
             if (hasTx) {
               if (isZero) {
@@ -282,7 +282,7 @@ export const StreakView: React.FC<StreakViewProps> = ({
                 {/* Speed Stamp Icon */}
                 {hasSpeedStamp && (
                   <span
-                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-[10px] font-black shadow-md border border-white"
+                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-400 text-stone-900 flex items-center justify-center text-[10px] font-black shadow-md border border-white"
                     title={`⚡️ 極速印記: ${(fastestDayTx.duration_ms! / 1000).toFixed(2)}s`}
                   >
                     ⚡
@@ -299,7 +299,7 @@ export const StreakView: React.FC<StreakViewProps> = ({
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-3 text-xs text-stone-500 dark:text-stone-400 border-t border-stone-100 dark:border-stone-800">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-emerald-500" /> 一般消費
           </span>
@@ -310,16 +310,16 @@ export const StreakView: React.FC<StreakViewProps> = ({
             <span className="w-3 h-3 rounded-full bg-amber-500" /> 模糊補登
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-700" /> 未記帳
+            <span className="w-3 h-3 rounded-full bg-stone-200 dark:bg-stone-700" /> 未記帳
           </span>
         </div>
       </div>
 
       {/* Achievement Badges */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-stone-900 p-5 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-4">
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-amber-500" />
-          <h3 className="font-bold text-slate-900 dark:text-white text-base">連續 Streak 勳章牆</h3>
+          <h3 className="font-bold text-stone-900 dark:text-white text-base">連續 Streak 勳章牆</h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -328,8 +328,8 @@ export const StreakView: React.FC<StreakViewProps> = ({
               key={b.id}
               className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${
                 b.achieved
-                  ? 'bg-amber-500/10 border-amber-500/30 text-slate-900 dark:text-white'
-                  : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/60 opacity-60'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-stone-900 dark:text-white'
+                  : 'bg-stone-50 dark:bg-stone-800/40 border-stone-200 dark:border-stone-700/60 opacity-60'
               }`}
             >
               <span className="text-3xl">{b.icon}</span>
@@ -338,7 +338,7 @@ export const StreakView: React.FC<StreakViewProps> = ({
                   {b.title}
                   {b.achieved && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{b.desc}</p>
+                <p className="text-xs text-stone-500 dark:text-stone-400">{b.desc}</p>
               </div>
             </div>
           ))}
