@@ -245,7 +245,10 @@ export default function App() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200 pb-24">
+    <div
+      className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200"
+      style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+    >
       {/* Main Container */}
       <main className="max-w-5xl mx-auto px-4 pt-4">
         {/* Tab Views Content */}
@@ -307,7 +310,10 @@ export default function App() {
       </main>
 
       {/* Floating Quick Action Button */}
-      <div className="fixed bottom-20 right-4 z-40">
+      <div
+        className="fixed right-4 z-40"
+        style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}
+      >
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
@@ -321,7 +327,10 @@ export default function App() {
       </div>
 
       {/* Bottom Quick Nav (primary navigation, always visible) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1.5 flex items-center justify-around shadow-lg">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 pt-1.5 flex items-center justify-around shadow-lg"
+        style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
+      >
         {NAV_ITEMS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

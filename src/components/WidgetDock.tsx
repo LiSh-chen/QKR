@@ -225,40 +225,51 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           </div>
         </div>
 
-        {/* 2x2 Direct Quadrant Action Buttons */}
+        {/* 2x2 Direct Quadrant Action Buttons — laid out to mirror the actual quadrant axes:
+            top row = 必要 (necessary), bottom row = 非必要 (unnecessary)
+            left col = 日常 (daily),   right col = 臨時 (urgent) */}
         <div className="space-y-2">
           <label className="text-xs font-semibold text-slate-300">
             3. 點擊分類象限，直接完成記帳：
           </label>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {QUADRANT_LIST.map((qKey) => {
-              const q = QUADRANT_CONFIGS[qKey];
-              return (
-                <motion.button
-                  key={qKey}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => handleQuadrantDirectClick(qKey)}
-                  className="p-3.5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/60 text-left transition-all group flex items-center justify-between shadow-md"
-                  id={`quadrant-direct-btn-${qKey}`}
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: q.color }} />
-                      <span className="text-sm font-bold text-slate-100 group-hover:text-emerald-300 transition-colors">
+          <div className="relative">
+            {/* Axis labels */}
+            <div className="flex justify-between text-[9px] font-bold text-slate-500 px-1 mb-1">
+              <span>&larr; 日常</span>
+              <span>臨時 &rarr;</span>
+            </div>
+            <div className="flex items-stretch gap-1">
+              <div className="flex flex-col justify-around items-center text-[9px] font-bold text-slate-500 shrink-0 w-3">
+                <span className="[writing-mode:vertical-rl] rotate-180">必要 ↑</span>
+                <span className="[writing-mode:vertical-rl] rotate-180">非必要 ↓</span>
+              </div>
+              <div className="grid grid-cols-2 grid-rows-2 gap-2 flex-1">
+                {QUADRANT_LIST.map((qKey) => {
+                  const q = QUADRANT_CONFIGS[qKey];
+                  return (
+                    <motion.button
+                      key={qKey}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => handleQuadrantDirectClick(qKey)}
+                      className="aspect-square sm:aspect-auto sm:min-h-[92px] p-2.5 rounded-2xl bg-slate-800/90 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/60 text-center transition-all group flex flex-col items-center justify-center gap-1 shadow-md"
+                      id={`quadrant-direct-btn-${qKey}`}
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: q.color }}
+                      />
+                      <span className="text-xs font-bold text-slate-100 group-hover:text-emerald-300 transition-colors leading-tight">
                         {q.title}
                       </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 pl-4">
-                      {q.subTitle}
-                    </p>
-                  </div>
-                  <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2.5 py-1.5 rounded-xl border border-emerald-800 group-hover:bg-emerald-600 group-hover:text-white transition-all whitespace-nowrap">
-                    點此記帳 &rarr;
-                  </span>
-                </motion.button>
-              );
-            })}
+                      <p className="text-[9px] text-slate-400 leading-tight line-clamp-2">
+                        {q.subTitle}
+                      </p>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
