@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, AlertCircle, Delete, X, History, Check } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Delete, X, History, Check, PiggyBank } from 'lucide-react';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { QuadrantType, Transaction } from '../types';
 import { triggerHapticFeedback, playClickSound } from '../lib/storage';
@@ -30,7 +30,6 @@ const KEYPAD_KEYS = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'C', '0', '⌫
 export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSave, todayTotal }) => {
   const [amountStr, setAmountStr] = useState('');
   const [noteStr, setNoteStr] = useState('');
-  const [isLumpSum, setIsLumpSum] = useState(false);
   const [showError, setShowError] = useState(false);
   const [lastResult, setLastResult] = useState<{ label: string; durationSec?: string } | null>(null);
   const [selectedRecentIds, setSelectedRecentIds] = useState<Set<string>>(new Set());
@@ -87,15 +86,20 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
     startTimeRef.current = null;
   };
 
-  const handleQuadrantDirectClick = (qKey: QuadrantType) => {
+  const requireValidAmount = (): number | null => {
     const amountNum = parseFloat(amountStr);
-
     if (isNaN(amountNum) || amountNum <= 0) {
       triggerHapticFeedback('medium');
       playClickSound(500);
       setShowError(true);
-      return;
+      return null;
     }
+    return amountNum;
+  };
+
+  const handleQuadrantDirectClick = (qKey: QuadrantType) => {
+    const amountNum = requireValidAmount();
+    if (amountNum === null) return;
 
     const start = startTimeRef.current || performance.now();
     const durationMs = Math.max(120, Math.round(performance.now() - start));
@@ -121,14 +125,9 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
     resetEntryState();
   };
 
-  const handleLumpSumConfirm = () => {
-    const amountNum = parseFloat(amountStr);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      triggerHapticFeedback('medium');
-      playClickSound(500);
-      setShowError(true);
-      return;
-    }
+  const handleLumpSumClick = () => {
+    const amountNum = requireValidAmount();
+    if (amountNum === null) return;
 
     const start = startTimeRef.current || performance.now();
     const durationMs = Math.max(120, Math.round(performance.now() - start));
@@ -142,7 +141,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
       note: noteStr.trim() || '模糊概算記帳',
       is_lump_sum: true,
       is_zero_spend: false,
-      entry_method: 'widget',
+      entry_method: 'lump_sum',
       entry_date: new Date().toISOString().split('T')[0],
       duration_ms: durationMs,
     });
@@ -187,31 +186,31 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
   };
 
   return (
-    <div className="bg-gradient-to-br from-stone-900 via-stone-800 to-orange-950 text-white rounded-3xl p-3.5 shadow-xl border border-orange-900/40 relative overflow-hidden">
-      <div className="relative z-10 space-y-2.5">
+    <div className="h-full flex flex-col bg-gradient-to-br from-amber-50 via-orange-50 to-orange-100 dark:from-stone-900 dark:via-stone-800 dark:to-orange-950 text-stone-900 dark:text-white rounded-3xl p-3 shadow-xl border border-orange-200 dark:border-orange-900/40 relative overflow-hidden">
+      <div className="relative z-10 flex flex-col h-full min-h-0 gap-1.5">
         {/* Compact top bar: today's total */}
-        <div className="flex items-center justify-between px-0.5">
-          <span className="text-[11px] text-orange-200/70">今日支出</span>
-          <span className="text-base font-black font-mono text-white">${todayTotal.toLocaleString()}</span>
+        <div className="flex items-center justify-between px-0.5 shrink-0">
+          <span className="text-[11px] text-orange-700/80 dark:text-orange-200/70">今日支出</span>
+          <span className="text-base font-black font-mono text-stone-900 dark:text-white">${todayTotal.toLocaleString()}</span>
         </div>
 
         {/* Success / Error feedback */}
         <AnimatePresence>
           {lastResult && (
             <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-[11px]"
+              initial={{ opacity: 0, y: -6, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -6, height: 0 }}
+              className="bg-emerald-50 dark:bg-emerald-950/90 border border-emerald-400 dark:border-emerald-500/50 text-emerald-800 dark:text-emerald-200 rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-[11px] shrink-0 overflow-hidden"
             >
               <div className="flex items-center gap-1.5 truncate">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="font-bold text-white truncate">{lastResult.label}</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="font-bold text-stone-900 dark:text-white truncate">{lastResult.label}</span>
                 {lastResult.durationSec && (
-                  <span className="font-mono text-emerald-400 shrink-0">{lastResult.durationSec}s</span>
+                  <span className="font-mono text-emerald-700 dark:text-emerald-400 shrink-0">{lastResult.durationSec}s</span>
                 )}
               </div>
-              <button onClick={() => setLastResult(null)} className="text-emerald-400 hover:text-white shrink-0">
+              <button onClick={() => setLastResult(null)} className="text-emerald-600 dark:text-emerald-400 hover:text-stone-900 dark:hover:text-white shrink-0">
                 <X className="w-3.5 h-3.5" />
               </button>
             </motion.div>
@@ -220,12 +219,12 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
 
         {/* Calculator-style amount display */}
         <div
-          className={`relative bg-black/40 rounded-2xl border px-4 py-2.5 flex items-center justify-between transition-colors ${
-            showError ? 'border-rose-500' : 'border-orange-900/50'
+          className={`relative bg-white/70 dark:bg-black/40 rounded-2xl border px-4 py-2 flex items-center justify-between transition-colors shrink-0 ${
+            showError ? 'border-rose-500' : 'border-orange-300 dark:border-orange-900/50'
           }`}
         >
-          <span className="text-orange-400 font-bold text-xl font-mono">$</span>
-          <span className="flex-1 text-right text-3xl font-mono font-bold text-white tabular-nums truncate">
+          <span className="text-orange-600 dark:text-orange-400 font-bold text-lg font-mono">$</span>
+          <span className="flex-1 text-right text-2xl font-mono font-bold text-stone-900 dark:text-white tabular-nums truncate">
             {amountStr || '0'}
           </span>
           {showError && (
@@ -235,90 +234,74 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
           )}
         </div>
 
-        {/* Note + lump-sum toggle */}
-        <div className="flex items-center gap-1.5">
-          <input
-            type="text"
-            value={noteStr}
-            onChange={(e) => setNoteStr(e.target.value)}
-            placeholder="備註（選填）：例如便當、咖啡"
-            className="flex-1 min-w-0 px-3 py-1.5 bg-black/30 text-stone-200 text-xs rounded-xl border border-orange-900/40 focus:border-amber-500 focus:outline-none placeholder:text-stone-500"
-            id="main-direct-note-input"
-          />
-          <label className="flex items-center gap-1 shrink-0 text-[10px] text-stone-300 px-2 py-1.5 rounded-xl bg-black/20 border border-orange-900/30 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={isLumpSum}
-              onChange={(e) => {
-                setIsLumpSum(e.target.checked);
-                clearFeedback();
-              }}
-              className="w-3.5 h-3.5 rounded text-amber-500"
-              id="lump-sum-toggle"
-            />
-            概算
-          </label>
-        </div>
+        {/* Note (single compact line, no extra controls) */}
+        <input
+          type="text"
+          value={noteStr}
+          onChange={(e) => setNoteStr(e.target.value)}
+          placeholder="備註（選填）：例如便當、咖啡"
+          className="w-full px-3 py-1 bg-white/60 dark:bg-black/30 text-stone-700 dark:text-stone-200 text-xs rounded-xl border border-orange-300 dark:border-orange-900/40 focus:border-amber-500 focus:outline-none placeholder:text-stone-400 dark:placeholder:text-stone-500 shrink-0"
+          id="main-direct-note-input"
+        />
 
         {/* Numeric keypad */}
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-1 shrink-0">
           {KEYPAD_KEYS.map((key) => (
             <motion.button
               key={key}
               whileTap={{ scale: 0.94 }}
               onClick={() => handleKeyPress(key)}
-              className={`h-10 rounded-xl font-bold text-base flex items-center justify-center transition-colors ${
+              className={`h-9 rounded-xl font-bold text-sm flex items-center justify-center transition-colors ${
                 key === 'C'
                   ? 'bg-gradient-to-b from-rose-500/90 to-rose-700/90 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
                   : key === '⌫'
                     ? 'bg-gradient-to-b from-amber-500/90 to-orange-600/90 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)]'
-                    : 'bg-gradient-to-b from-stone-700 to-stone-800 hover:from-stone-600 hover:to-stone-700 text-stone-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
+                    : 'bg-gradient-to-b from-white to-orange-100 hover:from-orange-50 hover:to-orange-200 text-stone-800 dark:from-stone-700 dark:to-stone-800 dark:hover:from-stone-600 dark:hover:to-stone-700 dark:text-stone-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] border border-orange-200 dark:border-transparent'
               }`}
               id={`keypad-btn-${key}`}
             >
-              {key === '⌫' ? <Delete className="w-4 h-4" /> : key}
+              {key === '⌫' ? <Delete className="w-3.5 h-3.5" /> : key}
             </motion.button>
           ))}
         </div>
 
-        {/* Either the 2x2 quadrant grid, or the lump-sum confirm button */}
-        {isLumpSum ? (
+        {/* 2x2 Quadrant grid + a dedicated lump-sum button (always visible, no toggle) */}
+        <div className="grid grid-cols-2 gap-1 shrink-0">
+          {QUADRANT_LIST.map((qKey) => {
+            const q = QUADRANT_CONFIGS[qKey];
+            return (
+              <motion.button
+                key={qKey}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleQuadrantDirectClick(qKey)}
+                className={`h-10 rounded-xl text-center transition-all flex flex-col items-center justify-center leading-none ${QUADRANT_BUTTON_STYLE[qKey]}`}
+                id={`quadrant-direct-btn-${qKey}`}
+              >
+                <span className="text-[11px] font-bold text-white drop-shadow-sm">{q.title}</span>
+              </motion.button>
+            );
+          })}
           <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={handleLumpSumConfirm}
-            className="w-full h-12 rounded-xl font-bold text-sm bg-gradient-to-b from-stone-400 to-stone-500 text-stone-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_3px_8px_rgba(0,0,0,0.35)]"
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLumpSumClick}
+            className="col-span-2 h-9 rounded-xl text-center transition-all flex items-center justify-center gap-1.5 bg-gradient-to-b from-stone-300 to-stone-400 text-stone-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_3px_8px_rgba(0,0,0,0.35)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]"
             id="lump-sum-confirm-btn"
           >
-            確認補登 ${amountStr || '0'}（模糊概算，不分象限）
+            <PiggyBank className="w-3.5 h-3.5" />
+            <span className="text-[11px] font-bold">模糊概算補登（不分象限）</span>
           </motion.button>
-        ) : (
-          <div className="grid grid-cols-2 grid-rows-2 gap-1.5">
-            {QUADRANT_LIST.map((qKey) => {
-              const q = QUADRANT_CONFIGS[qKey];
-              return (
-                <motion.button
-                  key={qKey}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleQuadrantDirectClick(qKey)}
-                  className={`h-12 rounded-xl text-center transition-all flex flex-col items-center justify-center leading-none ${QUADRANT_BUTTON_STYLE[qKey]}`}
-                  id={`quadrant-direct-btn-${qKey}`}
-                >
-                  <span className="text-[11px] font-bold text-white drop-shadow-sm">{q.title}</span>
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
+        </div>
 
-        {/* Yesterday's records — quick reuse (multi-select) */}
+        {/* Yesterday's records — quick reuse (multi-select). Its own scroll region only,
+            so a long list here never causes the whole page to scroll. */}
         {recentCandidates.length > 0 && (
-          <div className="pt-1.5 border-t border-orange-900/30 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-orange-200/70">
+          <div className="pt-1 border-t border-orange-200 dark:border-orange-900/30 flex-1 min-h-0 flex flex-col gap-1">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-orange-700/80 dark:text-orange-200/70 shrink-0">
               <History className="w-3 h-3" />
               <span>昨日紀錄快速複用（可多選）</span>
             </div>
 
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 overflow-y-auto flex-1 min-h-0 content-start">
               {recentCandidates.map((t) => {
                 const isSelected = selectedRecentIds.has(t.id);
                 const qColor = t.quadrant ? QUADRANT_CONFIGS[t.quadrant].color : '#A8A29E';
@@ -327,10 +310,10 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
                   <button
                     key={t.id}
                     onClick={() => toggleRecentSelect(t.id)}
-                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-medium border transition-all ${
+                    className={`flex items-center gap-1 px-2 py-1 rounded-xl text-[10px] font-medium border transition-all shrink-0 ${
                       isSelected
                         ? 'bg-amber-500/90 border-amber-400 text-stone-900 font-bold'
-                        : 'bg-black/25 border-orange-900/40 text-stone-200'
+                        : 'bg-white/60 dark:bg-black/25 border-orange-300 dark:border-orange-900/40 text-stone-700 dark:text-stone-200'
                     }`}
                     id={`recent-reuse-chip-${t.id}`}
                   >
@@ -339,7 +322,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
                     ) : (
                       <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: qColor }} />
                     )}
-                    <span className="truncate max-w-[90px]">{label}</span>
+                    <span className="truncate max-w-[80px]">{label}</span>
                     <span className="font-mono shrink-0">${t.amount}</span>
                   </button>
                 );
@@ -354,7 +337,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({ transactions, onDirectSa
                   exit={{ opacity: 0, height: 0 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleApplySelectedRecent}
-                  className="w-full py-2 rounded-xl bg-gradient-to-b from-amber-400 to-orange-600 text-white font-bold text-xs shadow-md"
+                  className="w-full py-1.5 rounded-xl bg-gradient-to-b from-amber-400 to-orange-600 text-white font-bold text-xs shadow-md shrink-0"
                   id="apply-selected-recent-btn"
                 >
                   套用所選 {selectedRecentTx.length} 筆（共 ${selectedRecentTotal}）

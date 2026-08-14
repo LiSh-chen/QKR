@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Filter, Trash2, Edit3, Smartphone, Bell, CornerDownLeft, Sparkles, AlertCircle, Download, CheckSquare, Square, Zap } from 'lucide-react';
-import { Transaction, QuadrantType, EntryMethod } from '../types';
+import { Search, Trash2, Bell, CornerDownLeft, AlertCircle, Download, CheckSquare, Square, Zap, CalendarRange } from 'lucide-react';
+import { Transaction, EntryMethod } from '../types';
 import { QUADRANT_CONFIGS } from '../constants/quadrants';
 
 interface TransactionListProps {
@@ -10,6 +10,8 @@ interface TransactionListProps {
   onBatchDelete?: (ids: string[]) => void;
   onOpenQuickModal: () => void;
 }
+
+type PeriodPreset = 'all' | 'today' | 'this_week' | 'this_month' | 'custom';
 
 export const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
@@ -21,6 +23,33 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const [selectedQuadrantFilter, setSelectedQuadrantFilter] = useState<string>('ALL');
   const [selectedMethodFilter, setSelectedMethodFilter] = useState<string>('ALL');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [periodPreset, setPeriodPreset] = useState<PeriodPreset>('all');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+
+  const periodRange = useMemo(() => {
+    const now = new Date();
+    const toStr = (d: Date) => d.toISOString().split('T')[0];
+
+    if (periodPreset === 'today') {
+      const s = toStr(now);
+      return { start: s, end: s };
+    }
+    if (periodPreset === 'this_week') {
+      const dow = now.getDay(); // 0 = Sunday
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - ((dow + 6) % 7));
+      return { start: toStr(monday), end: toStr(now) };
+    }
+    if (periodPreset === 'this_month') {
+      const first = new Date(now.getFullYear(), now.getMonth(), 1);
+      return { start: toStr(first), end: toStr(now) };
+    }
+    if (periodPreset === 'custom') {
+      return { start: customStart || null, end: customEnd || null };
+    }
+    return { start: null, end: null };
+  }, [periodPreset, customStart, customEnd]);
 
   const filteredTx = transactions.filter((tx) => {
     // Search
@@ -40,7 +69,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     const matchesMethod =
       selectedMethodFilter === 'ALL' || tx.entry_method === selectedMethodFilter;
 
-    return matchesSearch && matchesQuadrant && matchesMethod;
+    // Period
+    const matchesPeriod =
+      (!periodRange.start || (tx.entry_date && tx.entry_date >= periodRange.start)) &&
+      (!periodRange.end || (tx.entry_date && tx.entry_date <= periodRange.end));
+
+    return matchesSearch && matchesQuadrant && matchesMethod && matchesPeriod;
   });
 
   const isAllSelected = filteredTx.length > 0 && filteredTx.every((tx) => selectedIds.includes(tx.id));
@@ -131,6 +165,55 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   return (
     <div className="space-y-4">
+      {/* Period Filter */}
+      <div className="bg-white dark:bg-stone-900 p-3.5 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-2">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-stone-700 dark:text-stone-200">
+          <CalendarRange className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+          <span>週期篩選</span>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {([
+            ['all', '全部'],
+            ['today', '今天'],
+            ['this_week', '本週'],
+            ['this_month', '本月'],
+            ['custom', '自訂區間'],
+          ] as [PeriodPreset, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setPeriodPreset(key)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                periodPreset === key
+                  ? 'bg-orange-600 text-white shadow-sm'
+                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
+              }`}
+              id={`period-preset-${key}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {periodPreset === 'custom' && (
+          <div className="flex items-center gap-2 pt-1">
+            <input
+              type="date"
+              value={customStart}
+              onChange={(e) => setCustomStart(e.target.value)}
+              className="flex-1 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
+              id="period-custom-start"
+            />
+            <span className="text-xs text-stone-400">至</span>
+            <input
+              type="date"
+              value={customEnd}
+              onChange={(e) => setCustomEnd(e.target.value)}
+              className="flex-1 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
+              id="period-custom-end"
+            />
+          </div>
+        )}
+      </div>
+
       {/* Search & Filter Control Bar */}
       <div className="bg-white dark:bg-stone-900 p-4 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row items-center gap-3">

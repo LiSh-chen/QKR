@@ -246,11 +246,15 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-amber-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans transition-colors duration-200"
-      style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+      className="flex flex-col bg-amber-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans transition-colors duration-200 overflow-hidden"
+      style={{ height: '100dvh' }}
     >
       {/* Main Container */}
-      <main className="max-w-5xl mx-auto px-4 pt-4">
+      <main
+        className={`flex-1 min-h-0 w-full max-w-5xl mx-auto px-4 pt-3 ${
+          activeTab === 'quick' || activeTab === 'streak' ? 'overflow-hidden flex flex-col pb-3' : 'overflow-y-auto pb-4'
+        }`}
+      >
         {/* Tab Views Content */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -259,6 +263,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
+            className={activeTab === 'quick' || activeTab === 'streak' ? 'flex-1 min-h-0 flex flex-col' : ''}
           >
             {activeTab === 'quick' && (
               <WidgetDock
@@ -329,9 +334,9 @@ export default function App() {
         </div>
       )}
 
-      {/* Bottom Quick Nav (primary navigation, always visible) */}
+      {/* Bottom Quick Nav (primary navigation, always visible, in normal flow so 'quick' tab correctly sizes above it) */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 px-2 pt-1.5 flex items-center justify-around shadow-lg"
+        className="shrink-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 px-2 pt-1.5 flex items-center justify-around shadow-lg"
         style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
       >
         {NAV_ITEMS.map((tab) => {

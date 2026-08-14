@@ -185,8 +185,32 @@ export function calculateStreakStats(transactions: Transaction[]): StreakStats {
   };
 }
 
-// --- Sound / Haptic Effects Simulation ---
+// --- Sound / Haptic Effects ---
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Capacitor } from '@capacitor/core';
+
 export function triggerHapticFeedback(type: 'light' | 'medium' | 'success' = 'light'): void {
+  // Respect the user's toggle in Settings
+  if (!loadUserSettings().haptic_feedback_enabled) return;
+
+  if (Capacitor.isNativePlatform()) {
+    // Real native vibration via the Capacitor Haptics plugin (works reliably on Android,
+    // unlike the web Vibration API which Android's WebView does not support).
+    try {
+      if (type === 'success') {
+        Haptics.notification({ type: NotificationType.Success });
+      } else if (type === 'medium') {
+        Haptics.impact({ style: ImpactStyle.Medium });
+      } else {
+        Haptics.impact({ style: ImpactStyle.Light });
+      }
+    } catch {
+      // no-op
+    }
+    return;
+  }
+
+  // Browser fallback (e.g. `npm run dev`)
   if (typeof window !== 'undefined' && 'vibrate' in navigator) {
     try {
       if (type === 'light') navigator.vibrate(10);
@@ -199,6 +223,9 @@ export function triggerHapticFeedback(type: 'light' | 'medium' | 'success' = 'li
 }
 
 export function playClickSound(freq: number = 800): void {
+  // Respect the user's toggle in Settings
+  if (!loadUserSettings().sound_effects_enabled) return;
+
   try {
     const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AudioCtx) return;

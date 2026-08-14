@@ -28,7 +28,7 @@ export function getSeedTransactions(): Transaction[] {
 
   const nowIso = new Date().toISOString();
 
-  return [
+  const recentTransactions: Transaction[] = [
     {
       id: 'tx_seed_yesterday_lunch',
       amount: 120,
@@ -150,4 +150,59 @@ export function getSeedTransactions(): Transaction[] {
       updated_at: nowIso,
     },
   ];
+
+  return [...recentTransactions, ...generateHistoricalMonthlyData(today)];
+}
+
+/**
+ * Synthesizes ~6 months of prior spending history (a handful of transactions per
+ * quadrant per month, with gently varying totals) purely so charts that visualize
+ * month-over-month trends (2x2 分析 > 歷史趨勢) have something real to render.
+ * Seeded/deterministic (no Math.random) so re-loading the app gives stable demo data.
+ */
+function generateHistoricalMonthlyData(today: Date): Transaction[] {
+  const items: Transaction[] = [];
+  const quadrantMonthlyPlan: Array<{
+    quadrant: Transaction['quadrant'];
+    note: string;
+    baseAmounts: number[]; // one entry per synthetic transaction that month
+  }> = [
+    { quadrant: 'NECESSARY_DAILY', note: '每月固定生活開銷', baseAmounts: [3200, 1800, 950] },
+    { quadrant: 'NECESSARY_URGENT', note: '臨時必要支出', baseAmounts: [1200, 600] },
+    { quadrant: 'UNNECESSARY_DAILY', note: '日常小確幸', baseAmounts: [450, 380, 290] },
+    { quadrant: 'UNNECESSARY_URGENT', note: '衝動或聚會消費', baseAmounts: [900, 500] },
+  ];
+
+  // 2..7 months ago (skip current + last month, which are already covered by recent seed data)
+  for (let monthsAgo = 2; monthsAgo <= 7; monthsAgo++) {
+    const monthDate = new Date(today.getFullYear(), today.getMonth() - monthsAgo, 15);
+    const y = monthDate.getFullYear();
+    const m = monthDate.getMonth();
+    // Gentle month-to-month variation so the stacked bar chart isn't perfectly flat
+    const variation = 1 + ((monthsAgo % 3) - 1) * 0.15;
+
+    quadrantMonthlyPlan.forEach((plan, planIdx) => {
+      plan.baseAmounts.forEach((base, txIdx) => {
+        const day = 3 + planIdx * 6 + txIdx * 4 + (monthsAgo % 5);
+        const safeDay = Math.min(day, 27);
+        const entryDate = new Date(y, m, safeDay, 9 + txIdx * 3, 20);
+        const amount = Math.round((base * variation) / 5) * 5;
+
+        items.push({
+          id: `tx_hist_${y}_${m}_${planIdx}_${txIdx}`,
+          amount,
+          quadrant: plan.quadrant,
+          note: plan.note,
+          is_lump_sum: false,
+          is_zero_spend: false,
+          entry_method: 'manual',
+          entry_date: entryDate.toISOString().split('T')[0],
+          created_at: entryDate.toISOString(),
+          updated_at: entryDate.toISOString(),
+        });
+      });
+    });
+  }
+
+  return items;
 }
