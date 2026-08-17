@@ -4,10 +4,10 @@
  */
 
 export type QuadrantType =
-  | 'NECESSARY_DAILY'    // 必要 × 日常
-  | 'NECESSARY_URGENT'   // 必要 × 臨時
-  | 'UNNECESSARY_DAILY'  // 非必要 × 日常
-  | 'UNNECESSARY_URGENT';// 非必要 × 臨時
+  | 'NECESSARY_DAILY'    // 必要 × 固定
+  | 'NECESSARY_URGENT'   // 必要 × 偶發
+  | 'UNNECESSARY_DAILY'  // 非必要 × 固定
+  | 'UNNECESSARY_URGENT';// 非必要 × 偶發
 
 export type EntryMethod =
   | 'widget'                   // 桌面/鎖定畫面 Widget 快速喚起
@@ -52,7 +52,7 @@ export interface QuadrantMeta {
   title: string;
   subTitle: string;
   examples: string[];
-  axisX: '日常' | '臨時';
+  axisX: '固定' | '偶發';
   axisY: '必要' | '非必要';
   color: string;
   bgColor: string;

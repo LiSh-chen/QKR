@@ -3,10 +3,10 @@ import { QuadrantMeta, QuadrantType } from '../types';
 export const QUADRANT_CONFIGS: Record<QuadrantType, QuadrantMeta> = {
   NECESSARY_DAILY: {
     type: 'NECESSARY_DAILY',
-    title: '必要 × 日常',
-    subTitle: '生存與生活基礎開銷',
+    title: '必要 × 固定',
+    subTitle: '規律發生的生活基礎開銷',
     examples: ['三餐飲食', '房租水電', '通勤交通', '日常用品'],
-    axisX: '日常',
+    axisX: '固定',
     axisY: '必要',
     color: '#059669', // Emerald
     bgColor: 'bg-emerald-50 dark:bg-emerald-950/40',
@@ -19,10 +19,10 @@ export const QUADRANT_CONFIGS: Record<QuadrantType, QuadrantMeta> = {
   },
   NECESSARY_URGENT: {
     type: 'NECESSARY_URGENT',
-    title: '必要 × 臨時',
-    subTitle: '突發且不可避免的開支',
+    title: '必要 × 偶發',
+    subTitle: '偶然發生但不可避免的開支',
     examples: ['看診醫藥', '突發修繕', '公務規費', '臨時維修'],
-    axisX: '臨時',
+    axisX: '偶發',
     axisY: '必要',
     color: '#2563EB', // Blue
     bgColor: 'bg-blue-50 dark:bg-blue-950/40',
@@ -35,10 +35,10 @@ export const QUADRANT_CONFIGS: Record<QuadrantType, QuadrantMeta> = {
   },
   UNNECESSARY_DAILY: {
     type: 'UNNECESSARY_DAILY',
-    title: '非必要 × 日常',
-    subTitle: '習慣性微小的娛樂或享受',
+    title: '非必要 × 固定',
+    subTitle: '習慣性重複的小確幸或享受',
     examples: ['手搖飲/咖啡', '訂閱服務', '日常零食', '手遊微課'],
-    axisX: '日常',
+    axisX: '固定',
     axisY: '非必要',
     color: '#D97706', // Amber
     bgColor: 'bg-amber-50 dark:bg-amber-950/40',
@@ -51,10 +51,10 @@ export const QUADRANT_CONFIGS: Record<QuadrantType, QuadrantMeta> = {
   },
   UNNECESSARY_URGENT: {
     type: 'UNNECESSARY_URGENT',
-    title: '非必要 × 臨時',
+    title: '非必要 × 偶發',
     subTitle: '偶發高額或衝動消費',
     examples: ['奢侈名牌', '大餐聚會', '旅遊娛樂', '衝動購物'],
-    axisX: '臨時',
+    axisX: '偶發',
     axisY: '非必要',
     color: '#DC2626', // Red
     bgColor: 'bg-rose-50 dark:bg-rose-950/40',

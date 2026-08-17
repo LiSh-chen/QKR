@@ -247,12 +247,14 @@ export default function App() {
   return (
     <div
       className="flex flex-col bg-amber-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans transition-colors duration-200 overflow-hidden"
-      style={{ height: '100dvh' }}
+      style={{ height: '100dvh', paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
       {/* Main Container */}
       <main
         className={`flex-1 min-h-0 w-full max-w-5xl mx-auto px-4 pt-3 ${
-          activeTab === 'quick' || activeTab === 'streak' ? 'overflow-hidden flex flex-col pb-3' : 'overflow-y-auto pb-4'
+          activeTab === 'quick' || activeTab === 'streak' || activeTab === 'history'
+            ? 'overflow-hidden flex flex-col pb-3'
+            : 'overflow-y-auto pb-4'
         }`}
       >
         {/* Tab Views Content */}
@@ -263,7 +265,11 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className={activeTab === 'quick' || activeTab === 'streak' ? 'flex-1 min-h-0 flex flex-col' : ''}
+            className={
+              activeTab === 'quick' || activeTab === 'streak' || activeTab === 'history'
+                ? 'flex-1 min-h-0 flex flex-col'
+                : ''
+            }
           >
             {activeTab === 'quick' && (
               <WidgetDock

@@ -164,7 +164,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="h-full flex flex-col gap-3 min-h-0">
+      {/* Sticky header: period filter + search/filter bar (does NOT scroll with the list) */}
+      <div className="shrink-0 space-y-3">
       {/* Period Filter */}
       <div className="bg-white dark:bg-stone-900 p-3.5 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-2">
         <div className="flex items-center gap-1.5 text-xs font-bold text-stone-700 dark:text-stone-200">
@@ -235,10 +237,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className="bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
             >
               <option value="ALL">所有分類</option>
-              <option value="NECESSARY_DAILY">必要 × 日常</option>
-              <option value="NECESSARY_URGENT">必要 × 臨時</option>
-              <option value="UNNECESSARY_DAILY">非必要 × 日常</option>
-              <option value="UNNECESSARY_URGENT">非必要 × 臨時</option>
+              <option value="NECESSARY_DAILY">必要 × 固定</option>
+              <option value="NECESSARY_URGENT">必要 × 偶發</option>
+              <option value="UNNECESSARY_DAILY">非必要 × 固定</option>
+              <option value="UNNECESSARY_URGENT">非必要 × 偶發</option>
               <option value="LUMP_SUM">僅概算補登</option>
               <option value="ZERO">僅 $0 支出</option>
             </select>
@@ -299,9 +301,11 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </div>
         )}
       </div>
+      </div>
+      {/* end sticky header */}
 
-      {/* Transaction List Cards */}
-      <div className="space-y-2.5">
+      {/* Transaction List Cards — its own scroll region, independent of the filters above */}
+      <div className="flex-1 min-h-0 overflow-y-auto space-y-2.5 pb-1">
         <AnimatePresence>
           {filteredTx.length === 0 ? (
             <div className="bg-white dark:bg-stone-900 p-8 rounded-3xl border border-stone-200 dark:border-stone-800 text-center text-stone-400 space-y-2">
