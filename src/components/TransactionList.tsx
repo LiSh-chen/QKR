@@ -164,12 +164,17 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col gap-3 min-h-0">
+    <div className="h-full flex flex-col gap-3 min-h-0 nb-ruled rounded-3xl p-3 relative">
+      <div className="nb-binder" />
+      <div className="nb-holes">
+        <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
+      </div>
+      <div className="ml-4 flex-1 min-h-0 flex flex-col gap-3">
       {/* Sticky header: period filter + search/filter bar (does NOT scroll with the list) */}
       <div className="shrink-0 space-y-3">
       {/* Period Filter */}
-      <div className="bg-white dark:bg-stone-900 p-3.5 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-2">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-stone-700 dark:text-stone-200">
+      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-3.5 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm space-y-2">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-[#5a4a2a] dark:text-[#d4c49a]">
           <CalendarRange className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
           <span>週期篩選</span>
         </div>
@@ -187,7 +192,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
                 periodPreset === key
                   ? 'bg-orange-600 text-white shadow-sm'
-                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
+                  : 'bg-[#e8dcc0] dark:bg-[#3a3120] text-[#5a4a2a] dark:text-[#d4c49a]'
               }`}
               id={`period-preset-${key}`}
             >
@@ -201,15 +206,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               type="date"
               value={customStart}
               onChange={(e) => setCustomStart(e.target.value)}
-              className="flex-1 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
+              className="flex-1 bg-[#f5efdc] dark:bg-[#2e2818] border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-[#5a4a2a] dark:text-[#d4c49a] focus:outline-none"
               id="period-custom-start"
             />
-            <span className="text-xs text-stone-400">至</span>
+            <span className="text-xs text-[#8a7a5a]">至</span>
             <input
               type="date"
               value={customEnd}
               onChange={(e) => setCustomEnd(e.target.value)}
-              className="flex-1 bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
+              className="flex-1 bg-[#f5efdc] dark:bg-[#2e2818] border border-stone-200 dark:border-stone-700 rounded-xl px-2.5 py-1.5 text-xs text-[#5a4a2a] dark:text-[#d4c49a] focus:outline-none"
               id="period-custom-end"
             />
           </div>
@@ -217,16 +222,16 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       </div>
 
       {/* Search & Filter Control Bar */}
-      <div className="bg-white dark:bg-stone-900 p-4 rounded-3xl border border-stone-200 dark:border-stone-800 shadow-sm space-y-3">
+      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-4 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#8a7a5a] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="搜尋記帳備註或金額..."
-              className="w-full bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full bg-[#f5efdc] dark:bg-[#2e2818]/80 border border-stone-200 dark:border-stone-700/80 rounded-2xl pl-10 pr-4 py-2 text-xs text-[#3a2e18] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
@@ -234,7 +239,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             <select
               value={selectedQuadrantFilter}
               onChange={(e) => setSelectedQuadrantFilter(e.target.value)}
-              className="bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
+              className="bg-[#f5efdc] dark:bg-[#2e2818] border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-[#5a4a2a] dark:text-[#d4c49a] focus:outline-none"
             >
               <option value="ALL">所有分類</option>
               <option value="NECESSARY_DAILY">必要 × 固定</option>
@@ -248,7 +253,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             <select
               value={selectedMethodFilter}
               onChange={(e) => setSelectedMethodFilter(e.target.value)}
-              className="bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-stone-700 dark:text-stone-200 focus:outline-none"
+              className="bg-[#f5efdc] dark:bg-[#2e2818] border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-[#5a4a2a] dark:text-[#d4c49a] focus:outline-none"
             >
               <option value="ALL">所有來源</option>
               <option value="widget">Widget / 捷徑</option>
@@ -271,15 +276,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
         {/* Multi-select Batch Toolbar */}
         {filteredTx.length > 0 && (
-          <div className="flex items-center justify-between pt-2 border-t border-stone-100 dark:border-stone-800/80 text-xs text-stone-600 dark:text-stone-300">
+          <div className="flex items-center justify-between pt-2 border-t border-[#a08a5c]/50 dark:border-[#8a7a5a]/40/80 text-xs text-[#5a4a2a] dark:text-[#d4c49a]">
             <button
               onClick={toggleSelectAll}
-              className="flex items-center gap-1.5 font-semibold text-stone-700 dark:text-stone-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="flex items-center gap-1.5 font-semibold text-[#5a4a2a] dark:text-[#d4c49a] hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               {isAllSelected ? (
                 <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <Square className="w-4 h-4 text-stone-400" />
+                <Square className="w-4 h-4 text-[#8a7a5a]" />
               )}
               <span>{isAllSelected ? '取消全選' : '全選所有紀錄'}</span>
             </button>
@@ -308,7 +313,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       <div className="flex-1 min-h-0 overflow-y-auto space-y-2.5 pb-1">
         <AnimatePresence>
           {filteredTx.length === 0 ? (
-            <div className="bg-white dark:bg-stone-900 p-8 rounded-3xl border border-stone-200 dark:border-stone-800 text-center text-stone-400 space-y-2">
+            <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-8 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 text-center text-[#8a7a5a] space-y-2">
               <AlertCircle className="w-8 h-8 mx-auto text-stone-300" />
               <p className="text-sm font-medium">沒有找到符合條件的記帳紀錄</p>
               <button
@@ -333,7 +338,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   className={`p-4 rounded-2xl border shadow-sm flex items-center justify-between gap-3 transition-all ${
                     isSelected
                       ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
-                      : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
+                      : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60 hover:border-stone-300 dark:hover:border-stone-700'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -370,7 +375,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-stone-900 dark:text-white text-sm truncate">
+                        <span className="font-bold text-[#3a2e18] dark:text-white text-sm truncate">
                           {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
                         </span>
                         {qConfig && (
@@ -381,14 +386,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         {getMethodBadge(tx.entry_method)}
                       </div>
 
-                      <div className="text-[11px] text-stone-400 mt-0.5 font-mono">
+                      <div className="text-[11px] text-[#8a7a5a] mt-0.5 font-mono">
                         {tx.entry_date}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className={`font-mono font-extrabold text-base ${tx.is_zero_spend ? 'text-teal-600 dark:text-teal-400' : 'text-stone-900 dark:text-white'}`}>
+                    <span className={`font-mono font-extrabold text-base ${tx.is_zero_spend ? 'text-teal-600 dark:text-teal-400' : 'text-[#3a2e18] dark:text-white'}`}>
                       ${tx.amount.toLocaleString()}
                     </span>
 
@@ -405,6 +410,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             })
           )}
         </AnimatePresence>
+      </div>
       </div>
     </div>
   );

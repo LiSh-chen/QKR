@@ -246,7 +246,7 @@ export default function App() {
 
   return (
     <div
-      className="flex flex-col bg-amber-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 font-sans transition-colors duration-200 overflow-hidden"
+      className="flex flex-col bg-[#dcd0ad] dark:bg-[#181410] text-[#3a2e18] dark:text-[#e8dcc0] font-sans transition-colors duration-200 overflow-hidden"
       style={{ height: '100dvh', paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
       {/* Main Container */}
@@ -331,7 +331,8 @@ export default function App() {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={() => handleOpenQuickModal('floating_btn')}
-            className="w-14 h-14 bg-orange-600 hover:bg-orange-500 text-white rounded-full shadow-2xl shadow-orange-900/40 border-2 border-white/20 flex items-center justify-center transition-all group"
+            className="w-14 h-14 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[2.5px] border-[#4a3a20] dark:border-[#c9b98a] text-[#4a3a20] dark:text-[#e8dcc0] rounded-full shadow-2xl flex items-center justify-center transition-all group"
+            style={{ boxShadow: '3px 3px 0 rgba(60,40,10,0.3)' }}
             title="快速記帳"
             id="floating-quick-action-btn"
           >
@@ -340,10 +341,10 @@ export default function App() {
         </div>
       )}
 
-      {/* Bottom Quick Nav (primary navigation, always visible, in normal flow so 'quick' tab correctly sizes above it) */}
+      {/* Bottom Nav — notebook index / divider tabs */}
       <nav
-        className="shrink-0 z-30 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-t border-stone-200 dark:border-stone-800 px-2 pt-1.5 flex items-center justify-around shadow-lg"
-        style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
+        className="shrink-0 z-30 bg-[#c9bb92] dark:bg-[#2a2418] px-1.5 pt-2 flex items-end justify-around"
+        style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.15)' }}
       >
         {NAV_ITEMS.map((tab) => {
           const Icon = tab.icon;
@@ -356,8 +357,10 @@ export default function App() {
                 triggerHapticFeedback('light');
                 playClickSound(700);
               }}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-bold transition-colors ${
-                isActive ? 'text-orange-600 dark:text-orange-400' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'
+              className={`font-hand flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-bold transition-all rounded-t-xl border-[1.5px] border-b-0 ${
+                isActive
+                  ? 'bg-[#fdf8ec] dark:bg-[#221d12] text-orange-700 dark:text-orange-300 border-[#4a3a20] dark:border-[#c9b98a] -translate-y-1'
+                  : 'bg-[#d8cba8] dark:bg-[#3a3120] text-[#7a6a4a] dark:text-[#b8a878] border-transparent'
               }`}
               id={`tab-${tab.id}`}
             >

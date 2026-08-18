@@ -1,3 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap');
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --nb-paper: #f1e9d2;
+  --nb-paper-line: #c9b98a66;
+  --nb-paper-dark: #2a2418;
+  --nb-paper-line-dark: #4a3f2666;
+  --nb-ink: #3a2e18;
+  --nb-ink-dark: #e8dcc0;
+  --nb-margin: #c0392b;
+}
+
+.font-hand {
+  font-family: 'Kalam', cursive;
+}
+
+.nb-ruled {
+  background-color: var(--nb-paper);
+  background-image: repeating-linear-gradient(var(--nb-paper), var(--nb-paper) 23px, var(--nb-paper-line) 24px);
+}
+.dark .nb-ruled {
+  background-color: var(--nb-paper-dark);
+  background-image: repeating-linear-gradient(var(--nb-paper-dark), var(--nb-paper-dark) 23px, var(--nb-paper-line-dark) 24px);
+}
+
+/* Hand-drawn wobble blob radius — apply with a rotate() transform for extra imperfection */
+.nb-blob-1 { border-radius: 50% 48% 52% 50% / 52% 50% 48% 50%; }
+.nb-blob-2 { border-radius: 48% 52% 50% 50% / 50% 48% 52% 50%; }
+.nb-blob-3 { border-radius: 52% 48% 50% 52% / 48% 52% 50% 50%; }
+.nb-blob-4 { border-radius: 50% 50% 48% 52% / 52% 48% 50% 50%; }
+.nb-blob-pill { border-radius: 180px 10px 180px 10px / 10px 180px 10px 180px; }
+.nb-blob-sticky-a { border-radius: 7px 3px 7px 3px; }
+.nb-blob-sticky-b { border-radius: 3px 7px 3px 7px; }
+
+.nb-binder {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  bottom: 12px;
+  width: 1.5px;
+  background: var(--nb-margin);
+  opacity: 0.4;
+}
+.nb-holes {
+  position: absolute;
+  left: 6.5px;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.nb-hole {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e3d7b4;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.dark .nb-hole {
+  background: #5a4f36;
+}
+
+.nb-tape {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 22px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
