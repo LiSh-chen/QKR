@@ -5,7 +5,24 @@
     android:padding="4dp"
     android:background="@drawable/widget_background"
     android:columnCount="2"
-    android:rowCount="2">
+    android:rowCount="3">
+
+    <Button
+        android:id="@+id/btn_voice"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnSpan="2"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="0.85"
+        android:layout_margin="3dp"
+        android:text="🎤 語音記帳"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:shadowColor="#40000000"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:background="@drawable/widget_btn_voice" />
 
     <Button
         android:id="@+id/btn_q1"
@@ -14,7 +31,7 @@
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
         android:layout_margin="3dp"
-        android:text="必要\n日常"
+        android:text="必要\n固定"
         android:textSize="10sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
@@ -30,7 +47,7 @@
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
         android:layout_margin="3dp"
-        android:text="必要\n臨時"
+        android:text="必要\n偶發"
         android:textSize="10sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
@@ -46,7 +63,7 @@
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
         android:layout_margin="3dp"
-        android:text="非必要\n日常"
+        android:text="非必要\n固定"
         android:textSize="10sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
@@ -62,7 +79,7 @@
         android:layout_columnWeight="1"
         android:layout_rowWeight="1"
         android:layout_margin="3dp"
-        android:text="非必要\n臨時"
+        android:text="非必要\n偶發"
         android:textSize="10sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"

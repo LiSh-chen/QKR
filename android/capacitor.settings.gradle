@@ -10,3 +10,6 @@ project(':capacitor-haptics').projectDir = new File('../node_modules/@capacitor/
 
 include ':capacitor-local-notifications'
 project(':capacitor-local-notifications').projectDir = new File('../node_modules/@capacitor/local-notifications/android')
+
+include ':capacitor-community-speech-recognition'
+project(':capacitor-community-speech-recognition').projectDir = new File('../node_modules/@capacitor-community/speech-recognition/android')

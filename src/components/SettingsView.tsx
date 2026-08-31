@@ -76,7 +76,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 nb-ruled rounded-3xl p-3.5 relative">
+    <div className="space-y-6 nb-ruled rounded-3xl p-3.5 relative min-h-full">
       <div className="nb-binder" />
       <div className="nb-holes">
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />

@@ -122,7 +122,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         playClickSound(900);
         calc.pressDigit(value);
       }}
-      className="font-hand aspect-[1.3] nb-blob-1 bg-[#fefaf0] dark:bg-[#3a3120] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-sm"
+      className="font-hand h-7 nb-blob-1 bg-[#fefaf0] dark:bg-[#3a3120] border-[1.4px] border-[#4a3a20] dark:border-[#c9b98a] flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-xs"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-keypad-${label}`}
     >
@@ -138,7 +138,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         playClickSound(1000);
         calc.pressOperator(op);
       }}
-      className="font-hand aspect-[1.3] nb-blob-2 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.6px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-base"
+      className="font-hand h-7 nb-blob-2 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.4px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-sm"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-op-${label}`}
     >
@@ -228,7 +228,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(500);
                   calc.clear();
                 }}
-                className="font-hand aspect-[1.3] nb-blob-3 bg-[#f5d6d6] dark:bg-[#4a2626] border-[1.6px] border-[#a33] dark:border-[#d47878] flex items-center justify-center font-bold text-[#7a1f1f] dark:text-[#f0a8a8] text-sm"
+                className="font-hand h-7 nb-blob-3 bg-[#f5d6d6] dark:bg-[#4a2626] border-[1.4px] border-[#a33] dark:border-[#d47878] flex items-center justify-center font-bold text-[#7a1f1f] dark:text-[#f0a8a8] text-xs"
                 style={{ transform: 'rotate(-1.5deg)' }}
                 id="quick-modal-keypad-C"
               >
@@ -244,7 +244,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(700);
                   calc.pressBackspace();
                 }}
-                className="font-hand nb-blob-4 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.6px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-xs py-1.5"
+                className="font-hand h-7 nb-blob-4 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.4px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-xs"
                 style={{ transform: 'rotate(-1deg)' }}
                 id="quick-modal-backspace"
               >
@@ -256,7 +256,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(1000);
                   calc.pressEquals();
                 }}
-                className="font-hand col-span-3 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.7px] border-[#2e5c26] dark:border-[#7ab86e] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-sm py-1.5"
+                className="font-hand col-span-3 h-7 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.5px] border-[#2e5c26] dark:border-[#7ab86e] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-xs"
                 style={{ transform: 'rotate(0.5deg)' }}
                 id="quick-modal-equals"
               >
@@ -273,7 +273,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   <button
                     key={qKey}
                     onClick={() => handleQuadrantClick(qKey)}
-                    className={`font-hand relative h-9 ${s.radius} text-center transition-all flex items-center justify-center`}
+                    className={`font-hand relative h-8 ${s.radius} text-center transition-all flex items-center justify-center`}
                     style={{ backgroundColor: s.bg, border: `1.6px solid ${s.border}`, transform: `rotate(${s.rotate})`, boxShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
                     id={`quick-modal-quadrant-${qKey}`}
                   >

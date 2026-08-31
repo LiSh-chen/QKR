@@ -11,15 +11,18 @@ import { QuadrantType } from '../types';
 // Fixed, stable notification ids so re-scheduling replaces rather than stacks up
 const DAILY_REMINDER_ID = 1001;
 const ROUTINE_REMINDER_BASE_ID = 2000; // + hash of tx id
+const CLASSIFY_REMINDER_BASE_ID = 20000; // + hash of tx id (kept apart from the routine-reminder id range)
 
 export const ACTION_TYPE_DAILY = 'DAILY_REMINDER_ACTIONS';
 export const ACTION_TYPE_ROUTINE = 'ROUTINE_REMINDER_ACTIONS';
+export const ACTION_TYPE_CLASSIFY = 'CLASSIFY_REMINDER_ACTIONS';
 
 export interface NotificationTapResult {
-  kind: 'daily_zero' | 'daily_open' | 'routine_accept' | 'routine_adjust';
+  kind: 'daily_zero' | 'daily_open' | 'routine_accept' | 'routine_adjust' | 'classify_open';
   amount?: number;
   quadrant?: QuadrantType | null;
   note?: string;
+  txId?: string;
 }
 
 /** Ask the user for OS notification permission (required on Android 13+). */
@@ -53,6 +56,10 @@ export async function registerNotificationActionTypes(): Promise<void> {
             { id: 'accept', title: '直接同意採用' },
             { id: 'adjust', title: '快速調整' },
           ],
+        },
+        {
+          id: ACTION_TYPE_CLASSIFY,
+          actions: [{ id: 'classify', title: '立即分類' }],
         },
       ],
     });
@@ -152,6 +159,40 @@ function hashString(str: string): number {
   return hash;
 }
 
+/**
+ * "稍後分類" reminder — fired a couple of hours after a voice-captured (or
+ * otherwise deferred) transaction was saved without a quadrant, nudging the
+ * user to go back and pick one. Cancel it once the item gets classified.
+ */
+export async function scheduleClassificationReminder(tx: { id: string; amount: number; note?: string }): Promise<void> {
+  const idSuffix = Math.abs(hashString(tx.id)) % 10000;
+  try {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: CLASSIFY_REMINDER_BASE_ID + idSuffix,
+          title: '有一筆記帳還沒分類',
+          body: `[${tx.note || '未命名項目'} $${tx.amount}] 選好是哪個象限了嗎？點擊立即分類。`,
+          schedule: { at: new Date(Date.now() + 2 * 60 * 60 * 1000) }, // 2 hours later
+          actionTypeId: ACTION_TYPE_CLASSIFY,
+          extra: { txId: tx.id, amount: tx.amount, note: tx.note || '' },
+        },
+      ],
+    });
+  } catch (e) {
+    console.warn('scheduleClassificationReminder failed', e);
+  }
+}
+
+export async function cancelClassificationReminder(txId: string): Promise<void> {
+  const idSuffix = Math.abs(hashString(txId)) % 10000;
+  try {
+    await LocalNotifications.cancel({ notifications: [{ id: CLASSIFY_REMINDER_BASE_ID + idSuffix }] });
+  } catch (e) {
+    console.warn('cancelClassificationReminder failed', e);
+  }
+}
+
 /** Wire up a single listener that turns any notification tap/action into app behaviour. */
 export function addNotificationActionListener(
   onResult: (result: NotificationTapResult) => void
@@ -166,6 +207,16 @@ export function addNotificationActionListener(
       } else {
         onResult({ kind: 'daily_open' });
       }
+      return;
+    }
+
+    if (notif.id >= CLASSIFY_REMINDER_BASE_ID && notif.id < CLASSIFY_REMINDER_BASE_ID + 10000) {
+      onResult({
+        kind: 'classify_open',
+        txId: (extra as any).txId,
+        amount: extra.amount,
+        note: extra.note,
+      });
       return;
     }
 

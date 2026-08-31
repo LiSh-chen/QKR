@@ -13,6 +13,7 @@ import {
   loadTransactions,
   saveTransactions,
   addTransaction,
+  updateTransaction,
   deleteTransaction,
   loadUserSettings,
   saveUserSettings,
@@ -26,6 +27,7 @@ import { QUADRANT_LIST } from './constants/quadrants';
 
 // Components
 import { QuickEntryModal } from './components/QuickEntryModal';
+import { VoiceEntryModal } from './components/VoiceEntryModal';
 import { WidgetDock } from './components/WidgetDock';
 import { QuadrantMatrixView } from './components/QuadrantMatrixView';
 import { StreakView } from './components/StreakView';
@@ -37,6 +39,8 @@ import {
   registerNotificationActionTypes,
   scheduleDailyReminder,
   scheduleRoutineReminder,
+  scheduleClassificationReminder,
+  cancelClassificationReminder,
   addNotificationActionListener,
   NotificationTapResult,
 } from './lib/notifications';
@@ -57,6 +61,12 @@ export default function App() {
   const [quickModalInitialQuadrant, setQuickModalInitialQuadrant] = useState<QuadrantType | null>(null);
   const [quickModalInitialNote, setQuickModalInitialNote] = useState('');
 
+  // Voice Entry Modal state ('classify' mode targets one pending unclassified transaction)
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [pendingClassifyTx, setPendingClassifyTx] = useState<{ id: string; amount: number; note?: string } | null>(
+    null
+  );
+
   // Routine Reminder dismissal / already-notified state (avoid re-firing the same candidate)
   const [dismissedRoutineIds, setDismissedRoutineIds] = useState<string[]>([]);
   const [notifiedRoutineId, setNotifiedRoutineId] = useState<string | null>(null);
@@ -74,6 +84,11 @@ export default function App() {
     const checkUrlAndOpenModal = (urlString: string) => {
       try {
         const url = new URL(urlString);
+        if (url.host === 'voice' || url.pathname.includes('voice')) {
+          setPendingClassifyTx(null);
+          setIsVoiceModalOpen(true);
+          return;
+        }
         const quadrantParam = url.searchParams.get('quadrant') as QuadrantType | null;
         if (quadrantParam && QUADRANT_LIST.includes(quadrantParam)) {
           handleOpenQuickModal('widget', '', quadrantParam);
@@ -161,6 +176,12 @@ export default function App() {
           result.note
         );
         break;
+      case 'classify_open':
+        if (result.txId) {
+          setPendingClassifyTx({ id: result.txId, amount: result.amount || 0, note: result.note });
+          setIsVoiceModalOpen(true);
+        }
+        break;
     }
   };
 
@@ -168,6 +189,18 @@ export default function App() {
   const handleSaveTransaction = (txData: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>) => {
     const newTx = addTransaction(txData);
     setTransactions((prev) => [newTx, ...prev]);
+
+    if (newTx.needs_classification) {
+      scheduleClassificationReminder({ id: newTx.id, amount: newTx.amount, note: newTx.note });
+    }
+  };
+
+  // Finalize a "稍後分類" transaction once the user picks its quadrant
+  const handleClassifyExisting = (txId: string, quadrant: QuadrantType) => {
+    const updated = updateTransaction(txId, { quadrant, needs_classification: false });
+    setTransactions(updated);
+    cancelClassificationReminder(txId);
+    setPendingClassifyTx(null);
   };
 
   // Handle Delete
@@ -276,6 +309,14 @@ export default function App() {
                 transactions={transactions}
                 onDirectSave={handleSaveTransaction}
                 onOpenQuickModal={(src, amt, q) => handleOpenQuickModal(src, amt, q)}
+                onOpenVoiceModal={() => {
+                  setPendingClassifyTx(null);
+                  setIsVoiceModalOpen(true);
+                }}
+                onOpenClassify={(tx) => {
+                  setPendingClassifyTx(tx);
+                  setIsVoiceModalOpen(true);
+                }}
                 todayTotal={todayTotal}
                 currentStreak={streakStats.currentStreak}
               />
@@ -380,6 +421,18 @@ export default function App() {
         initialAmount={quickModalInitialAmount}
         initialQuadrant={quickModalInitialQuadrant}
         initialNote={quickModalInitialNote}
+      />
+
+      {/* Voice Entry Modal (also reused for the "稍後分類" reminder follow-up) */}
+      <VoiceEntryModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => {
+          setIsVoiceModalOpen(false);
+          setPendingClassifyTx(null);
+        }}
+        onSaveNew={handleSaveTransaction}
+        onClassifyExisting={handleClassifyExisting}
+        pendingClassifyTx={pendingClassifyTx}
       />
     </div>
   );

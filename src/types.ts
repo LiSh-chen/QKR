@@ -14,15 +14,18 @@ export type EntryMethod =
   | 'notification_quick_input' // 推播通知欄快速輸入
   | 'notification_zero'        // 推播通知欄一鍵 $0 支出
   | 'lump_sum'                 // 模糊概算補登
+  | 'voice'                    // 語音記帳
+  | 'recent_reuse'             // 昨日紀錄快速複用
   | 'manual';                  // 主 App 手動記帳
 
 export interface Transaction {
   id: string;
   amount: number;
-  quadrant: QuadrantType | null; // null when is_lump_sum = true or unclassified
+  quadrant: QuadrantType | null; // null when is_lump_sum = true, or when needs_classification = true
   note?: string;
   is_lump_sum: boolean;         // 模糊概算補登
   is_zero_spend: boolean;       // 今日 $0 支出紀錄
+  needs_classification?: boolean; // true: 已記金額/備註，但象限「稍後分類」尚未選擇
   entry_method: EntryMethod;
   entry_date: string;           // YYYY-MM-DD
   created_at: string;           // ISO timestamp

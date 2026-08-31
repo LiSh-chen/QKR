@@ -59,8 +59,7 @@ export const StreakView: React.FC<StreakViewProps> = ({ streakStats, transaction
       <div className="ml-4 flex flex-col h-full min-h-0 gap-2.5">
         {/* Header Banner */}
         <div
-          className="bg-[#f5dca0] dark:bg-[#5c451c] border-2 border-[#7a5314] dark:border-[#d4b878] p-3.5 nb-blob-1 relative overflow-hidden shrink-0"
-          style={{ transform: 'rotate(-0.3deg)' }}
+          className="bg-[#f5dca0] dark:bg-[#5c451c] border-2 border-[#7a5314] dark:border-[#d4b878] p-3.5 rounded-3xl relative overflow-hidden shrink-0"
         >
           <div className="absolute right-1 bottom-0 opacity-15 pointer-events-none">
             <Flame className="w-20 h-20 text-[#7a5314]" />
@@ -103,7 +102,7 @@ export const StreakView: React.FC<StreakViewProps> = ({ streakStats, transaction
         </div>
 
         {/* 28-Day Streak Calendar (real calendar-page layout with weekday header) */}
-        <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-3.5 nb-blob-3 border-2 border-[#4a3a20] dark:border-[#c9b98a] flex-1 min-h-0 flex flex-col gap-2">
+        <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-3.5 rounded-3xl border-2 border-[#4a3a20] dark:border-[#c9b98a] flex-1 min-h-0 flex flex-col gap-2">
           <div className="flex items-center justify-between shrink-0">
             <div className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4 text-orange-700 dark:text-orange-300" />
