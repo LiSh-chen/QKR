@@ -117,6 +117,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
         is_zero_spend: false,
         entry_method: 'voice',
         entry_date: new Date().toISOString().split('T')[0],
+        voice_raw_text: liveText || undefined,
       });
     }
     onClose();
@@ -137,6 +138,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
       is_zero_spend: false,
       entry_method: 'voice',
       entry_date: new Date().toISOString().split('T')[0],
+      voice_raw_text: liveText || undefined,
     });
     onClose();
   };
@@ -157,6 +159,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
       needs_classification: true,
       entry_method: 'voice',
       entry_date: new Date().toISOString().split('T')[0],
+      voice_raw_text: liveText || undefined,
     });
     onClose();
   };

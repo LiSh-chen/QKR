@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Trash2, Bell, CornerDownLeft, AlertCircle, Download, CheckSquare, Square, Zap, CalendarRange } from 'lucide-react';
+import { Search, Trash2, Bell, CornerDownLeft, AlertCircle, Download, CheckSquare, Square, Zap, CalendarRange, Mic, History } from 'lucide-react';
 import { Transaction, EntryMethod } from '../types';
 import { QUADRANT_CONFIGS } from '../constants/quadrants';
 
@@ -152,6 +152,18 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         return (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-medium">
             <CornerDownLeft className="w-3 h-3" /> 概算補登
+          </span>
+        );
+      case 'voice':
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-medium">
+            <Mic className="w-3 h-3" /> 語音記帳
+          </span>
+        );
+      case 'recent_reuse':
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300 font-medium">
+            <History className="w-3 h-3" /> 昨日複用
           </span>
         );
       default:
@@ -378,6 +390,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         <span className="font-bold text-[#3a2e18] dark:text-white text-sm truncate">
                           {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
                         </span>
+                        {tx.voice_raw_text && (
+                          <Mic
+                            className="w-3 h-3 text-rose-500 dark:text-rose-400 shrink-0"
+                            title={`語音原句：「${tx.voice_raw_text}」`}
+                          />
+                        )}
                         {qConfig && (
                           <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${qConfig.badgeBg}`}>
                             {qConfig.title}

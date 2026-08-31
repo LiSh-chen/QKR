@@ -26,6 +26,7 @@ export interface Transaction {
   is_lump_sum: boolean;         // 模糊概算補登
   is_zero_spend: boolean;       // 今日 $0 支出紀錄
   needs_classification?: boolean; // true: 已記金額/備註，但象限「稍後分類」尚未選擇
+  voice_raw_text?: string;      // 語音記帳時，STT 辨識出的完整原始語句（供事後核對備查）
   entry_method: EntryMethod;
   entry_date: string;           // YYYY-MM-DD
   created_at: string;           // ISO timestamp
