@@ -4,7 +4,7 @@ import { X, Mic, Loader2, Clock3, PiggyBank } from 'lucide-react';
 import { QuadrantType, Transaction } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { playClickSound, triggerHapticFeedback } from '../lib/storage';
-import { startListening, parseVoiceText } from '../lib/voiceEntry';
+import { startListening, stopListening, parseVoiceText } from '../lib/voiceEntry';
 
 interface VoiceEntryModalProps {
   isOpen: boolean;
@@ -68,6 +68,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
     if (startedRef.current) return;
     startedRef.current = true;
     setStage('listening');
+    setLiveText('');
     triggerHapticFeedback('light');
 
     await startListening({
@@ -89,6 +90,25 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
         startedRef.current = false;
       },
     });
+  };
+
+  const handleStopListening = () => {
+    triggerHapticFeedback('medium');
+    // Recognition keeps running in the background; this just tells it "that's
+    // everything I said" so the final transcript comes back right away instead
+    // of waiting for the OS's own (sometimes slow, sometimes premature) silence
+    // detection to decide when speech has ended.
+    stopListening();
+  };
+
+  // If the modal is closed mid-recording, stop the recognizer so it doesn't
+  // keep listening in the background after the sheet is gone.
+  const handleClose = () => {
+    if (stage === 'listening') {
+      stopListening();
+      startedRef.current = false;
+    }
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -193,7 +213,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                 </h3>
               </div>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18] dark:hover:text-white transition-colors shrink-0"
                 id="close-voice-modal-btn"
               >
@@ -204,9 +224,11 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
             {stage === 'idle' && (
               <div className="flex flex-col items-center gap-3 py-4">
                 <p className="font-hand text-xs text-[#7a6a4a] dark:text-[#b8a878] text-center">
-                  按下麥克風，說出品項跟金額
+                  按下麥克風開始錄音，說出品項跟金額
                   <br />
                   例如「買牛奶90塊」或「花90塊買牛奶」
+                  <br />
+                  說完後再按一次麥克風結束
                 </p>
                 <motion.button
                   whileTap={{ scale: 0.92 }}
@@ -221,16 +243,20 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
 
             {stage === 'listening' && (
               <div className="flex flex-col items-center gap-3 py-4">
-                <motion.div
-                  animate={{ scale: [1, 1.12, 1] }}
+                <motion.button
+                  whileTap={{ scale: 0.92 }}
+                  onClick={handleStopListening}
+                  animate={{ scale: [1, 1.08, 1] }}
                   transition={{ repeat: Infinity, duration: 1.1 }}
                   className="w-16 h-16 rounded-full bg-gradient-to-b from-rose-400 to-rose-600 border-[2px] border-rose-800 flex items-center justify-center shadow-lg"
+                  id="stop-voice-listening-btn"
                 >
                   <Mic className="w-7 h-7 text-white" />
-                </motion.div>
+                </motion.button>
                 <p className="font-hand text-sm text-[#3a2e18] dark:text-white text-center min-h-[20px]">
                   {liveText || '聆聽中...請說話'}
                 </p>
+                <p className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878]">說完了嗎？點一下麥克風結束錄音</p>
               </div>
             )}
 

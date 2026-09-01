@@ -44,16 +44,22 @@ interface StartListeningOptions {
 
 let listeningActive = false;
 const LISTENING_TIMEOUT_MS = 15000; // safety net in case the plugin never fires 'listeningState: stopped'
+// The native 'stopped' event fires the instant speech ENDS, but the actual final
+// transcript (from onResults) is computed slightly after that and arrives as one
+// more 'partialResults' event. Finalizing immediately on 'stopped' — as an earlier
+// version of this file did — would race ahead of that final, most-accurate result
+// (or catch it with nothing at all), which is exactly what caused "didn't hear
+// anything" even when the mic worked and picked up speech correctly.
+const FINALIZE_GRACE_MS = 900;
 
 /**
  * Start a single voice-capture session.
  *
  * IMPORTANT (plugin quirk): when `partialResults: true`, `SpeechRecognition.start()`
  * resolves almost immediately WITHOUT the final transcript — the real result only
- * ever arrives through the `partialResults` event stream, finalized when the
- * `listeningState` event reports `status: 'stopped'`. Treating start()'s resolved
- * value as the answer (as an earlier version of this file did) meant every call
- * looked like "didn't hear anything", even though the mic was working fine.
+ * ever arrives through the `partialResults` event stream. Treating start()'s
+ * resolved value as the answer (as an earlier version of this file did) meant
+ * every call looked like "didn't hear anything", even though the mic was working.
  */
 export async function startListening({ onPartialResult, onFinalResult, onError }: StartListeningOptions): Promise<void> {
   if (!isNative()) {
@@ -70,25 +76,14 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
   let latestText = '';
   let settled = false;
   let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
-
-  const partialListener = await SpeechRecognition.addListener('partialResults', (data: { matches: string[] }) => {
-    if (data.matches && data.matches.length > 0) {
-      latestText = data.matches[0];
-      onPartialResult?.(latestText);
-    }
-  });
-
-  const stateListener = await SpeechRecognition.addListener('listeningState', (data: { status: 'started' | 'stopped' }) => {
-    if (data.status === 'stopped') {
-      finish();
-    }
-  });
+  let graceHandle: ReturnType<typeof setTimeout> | null = null;
 
   const finish = () => {
     if (settled) return;
     settled = true;
     listeningActive = false;
     if (timeoutHandle) clearTimeout(timeoutHandle);
+    if (graceHandle) clearTimeout(graceHandle);
     partialListener.remove();
     stateListener.remove();
     if (latestText.trim()) {
@@ -97,6 +92,26 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
       onError('沒有聽清楚，請靠近麥克風再說一次。');
     }
   };
+
+  const partialListener = await SpeechRecognition.addListener('partialResults', (data: { matches: string[] }) => {
+    if (data.matches && data.matches.length > 0) {
+      latestText = data.matches[0];
+      onPartialResult?.(latestText);
+      // A result arrived while we were in the post-"stopped" grace window (i.e. this
+      // IS the final onResults transcript) — no need to keep waiting, finalize now.
+      if (graceHandle) {
+        clearTimeout(graceHandle);
+        finish();
+      }
+    }
+  });
+
+  const stateListener = await SpeechRecognition.addListener('listeningState', (data: { status: 'started' | 'stopped' }) => {
+    if (data.status === 'stopped' && !settled && !graceHandle) {
+      // Don't finalize yet — give the real onResults transcript a moment to arrive.
+      graceHandle = setTimeout(finish, FINALIZE_GRACE_MS);
+    }
+  });
 
   timeoutHandle = setTimeout(() => {
     if (!settled) {
@@ -113,10 +128,10 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
       partialResults: true,
       popup: false,
     });
-    // Note: intentionally NOT using the resolved value here — see doc comment above.
-    // Some platforms may still resolve start() only once listening truly ends,
-    // so also treat that resolution as a legitimate finish signal:
-    finish();
+    // Do NOT finalize here — per the native plugin's own behavior, this resolves
+    // the instant listening *begins* when partialResults is true, not when it
+    // ends. Finalizing must wait for an explicit stop (manual tap -> stopListening(),
+    // below) or the 'listeningState: stopped' + grace-window flow above.
   } catch (e: any) {
     if (!settled) {
       settled = true;
