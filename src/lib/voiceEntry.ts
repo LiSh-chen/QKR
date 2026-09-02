@@ -43,14 +43,19 @@ interface StartListeningOptions {
 }
 
 let listeningActive = false;
-const LISTENING_TIMEOUT_MS = 15000; // safety net in case the plugin never fires 'listeningState: stopped'
+const LISTENING_TIMEOUT_MS = 15000; // safety net in case the plugin never fires 'listeningState: stopped' at all
 // The native 'stopped' event fires the instant speech ENDS, but the actual final
 // transcript (from onResults) is computed slightly after that and arrives as one
-// more 'partialResults' event. Finalizing immediately on 'stopped' — as an earlier
-// version of this file did — would race ahead of that final, most-accurate result
-// (or catch it with nothing at all), which is exactly what caused "didn't hear
-// anything" even when the mic worked and picked up speech correctly.
+// more 'partialResults' event. Finalizing immediately on 'stopped' would race
+// ahead of that final, most-accurate result (or catch it with nothing at all).
 const FINALIZE_GRACE_MS = 900;
+// After the user manually taps "stop", force a finalize this soon even if the
+// native stop→onEndOfSpeech→onResults chain never reports back — on some
+// devices/OS versions that chain can silently stall, which is what made the
+// stop button feel completely unresponsive ("still recording").
+const MANUAL_STOP_FORCE_MS = 2500;
+
+let activeSessionStop: (() => void) | null = null;
 
 /**
  * Start a single voice-capture session.
@@ -58,8 +63,8 @@ const FINALIZE_GRACE_MS = 900;
  * IMPORTANT (plugin quirk): when `partialResults: true`, `SpeechRecognition.start()`
  * resolves almost immediately WITHOUT the final transcript — the real result only
  * ever arrives through the `partialResults` event stream. Treating start()'s
- * resolved value as the answer (as an earlier version of this file did) meant
- * every call looked like "didn't hear anything", even though the mic was working.
+ * resolved value as the answer meant every call looked like "didn't hear anything",
+ * even though the mic was working.
  */
 export async function startListening({ onPartialResult, onFinalResult, onError }: StartListeningOptions): Promise<void> {
   if (!isNative()) {
@@ -77,13 +82,20 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
   let settled = false;
   let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
   let graceHandle: ReturnType<typeof setTimeout> | null = null;
+  let forceStopHandle: ReturnType<typeof setTimeout> | null = null;
+
+  const cleanupTimers = () => {
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+    if (graceHandle) clearTimeout(graceHandle);
+    if (forceStopHandle) clearTimeout(forceStopHandle);
+  };
 
   const finish = () => {
     if (settled) return;
     settled = true;
     listeningActive = false;
-    if (timeoutHandle) clearTimeout(timeoutHandle);
-    if (graceHandle) clearTimeout(graceHandle);
+    activeSessionStop = null;
+    cleanupTimers();
     partialListener.remove();
     stateListener.remove();
     if (latestText.trim()) {
@@ -101,6 +113,7 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
       // IS the final onResults transcript) — no need to keep waiting, finalize now.
       if (graceHandle) {
         clearTimeout(graceHandle);
+        graceHandle = null;
         finish();
       }
     }
@@ -112,6 +125,16 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
       graceHandle = setTimeout(finish, FINALIZE_GRACE_MS);
     }
   });
+
+  // Exposed so stopListening() can force this exact session to end, regardless
+  // of whether the native stop→stopped→onResults chain reports back in time.
+  activeSessionStop = () => {
+    if (settled) return;
+    SpeechRecognition.stop().catch(() => {});
+    if (!forceStopHandle) {
+      forceStopHandle = setTimeout(finish, MANUAL_STOP_FORCE_MS);
+    }
+  };
 
   timeoutHandle = setTimeout(() => {
     if (!settled) {
@@ -130,13 +153,14 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
     });
     // Do NOT finalize here — per the native plugin's own behavior, this resolves
     // the instant listening *begins* when partialResults is true, not when it
-    // ends. Finalizing must wait for an explicit stop (manual tap -> stopListening(),
-    // below) or the 'listeningState: stopped' + grace-window flow above.
+    // ends. Finalizing must wait for an explicit stop (manual tap, above) or the
+    // 'listeningState: stopped' + grace-window flow above.
   } catch (e: any) {
     if (!settled) {
       settled = true;
       listeningActive = false;
-      if (timeoutHandle) clearTimeout(timeoutHandle);
+      activeSessionStop = null;
+      cleanupTimers();
       partialListener.remove();
       stateListener.remove();
       onError(e?.message || '語音辨識發生錯誤，請再試一次。');
@@ -144,13 +168,21 @@ export async function startListening({ onPartialResult, onFinalResult, onError }
   }
 }
 
-export async function stopListening(): Promise<void> {
-  if (!isNative() || !listeningActive) return;
-  try {
-    await SpeechRecognition.stop();
-  } catch {
-    // no-op
+/** Manually end the current listening session (tap-to-stop). Safe to call multiple times. */
+export function stopListening(): void {
+  if (!isNative()) return;
+  // Always attempt this — never gate on a flag that could be stale, since a
+  // silently-skipped stop is exactly what made the button feel unresponsive.
+  if (activeSessionStop) {
+    activeSessionStop();
+  } else {
+    SpeechRecognition.stop().catch(() => {});
   }
+}
+
+export interface ParsedVoiceItem {
+  amount: number;
+  note: string;
 }
 
 export interface ParsedVoiceEntry {
@@ -304,4 +336,90 @@ export function parseVoiceText(rawText: string): ParsedVoiceEntry {
   }
 
   return { amount: null, note: text, rawText: text };
+}
+
+// Connector words people use when rattling off several items in one breath —
+// stripped the same way filler verbs are, from whichever end of each segment
+// they land on.
+const CONNECTOR_WORDS = ['再來', '還有', '跟', '和', '加上', '以及', '然後', '再', '又'];
+const SEGMENT_TRIM_WORDS = [...FILLER_WORDS, ...CONNECTOR_WORDS].sort((a, b) => b.length - a.length);
+
+const SEGMENT_EDGE_PUNCTUATION = /^[，,、。.!！?？\s]+|[，,、。.!！?？\s]+$/g;
+
+function trimSegmentEdges(s: string): string {
+  let result = s.trim();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    const beforePunct = result;
+    result = result.replace(SEGMENT_EDGE_PUNCTUATION, '');
+    if (result !== beforePunct) changed = true;
+    for (const w of SEGMENT_TRIM_WORDS) {
+      if (result.startsWith(w)) {
+        result = result.slice(w.length).trim();
+        changed = true;
+      }
+      if (result.endsWith(w)) {
+        result = result.slice(0, result.length - w.length).trim();
+        changed = true;
+      }
+    }
+  }
+  return result;
+}
+
+/**
+ * Parses a sentence that may describe MULTIPLE purchases in one breath, e.g.
+ * "牛奶90塊，麵包50塊，還有咖啡65元" -> three separate items. Each item's note
+ * is taken as the text between the end of the previous amount (or the start of
+ * the sentence) and the start of its own amount+unit — i.e. the natural
+ * "item, then its price" speaking order.
+ *
+ * Falls back to the single-item parseVoiceText() behavior when 0 or 1
+ * amount+unit tokens are found, so existing single-item flows are unaffected.
+ */
+export function parseVoiceTextMulti(rawText: string): { items: ParsedVoiceItem[]; rawText: string } {
+  const text = rawText.trim();
+  const matches = [...text.matchAll(AMOUNT_WITH_UNIT_PATTERN)];
+
+  if (matches.length <= 1) {
+    const single = parseVoiceText(text);
+    return {
+      items: single.amount !== null ? [{ amount: single.amount, note: single.note }] : [],
+      rawText: text,
+    };
+  }
+
+  const items: ParsedVoiceItem[] = [];
+  let cursor = 0;
+
+  for (const match of matches) {
+    if (match.index === undefined) continue;
+    const numeralToken = match[1];
+    const amount = /^[0-9.]+$/.test(numeralToken) ? parseFloat(numeralToken) : chineseNumeralToNumber(numeralToken);
+    const segment = trimSegmentEdges(text.slice(cursor, match.index));
+    cursor = match.index + match[0].length;
+
+    if (amount !== null && !isNaN(amount)) {
+      items.push({ amount, note: segment || `品項 ${items.length + 1}` });
+    }
+  }
+
+  // The last item in a spoken list often drops the unit word entirely
+  // ("停車費50塊，電影票兩百八") — check the leftover trailing text for one
+  // more bare (unit-less) colloquial amount before giving up on it.
+  const trailing = text.slice(cursor);
+  if (trailing.trim()) {
+    const bareMatch = trailing.match(BARE_TRAILING_AMOUNT_PATTERN);
+    if (bareMatch && bareMatch.index !== undefined) {
+      const numeralToken = bareMatch[1];
+      const amount = /^[0-9.]+$/.test(numeralToken) ? parseFloat(numeralToken) : chineseNumeralToNumber(numeralToken);
+      const segment = trimSegmentEdges(trailing.slice(0, bareMatch.index));
+      if (amount !== null && !isNaN(amount) && segment) {
+        items.push({ amount, note: segment });
+      }
+    }
+  }
+
+  return { items, rawText: text };
 }
