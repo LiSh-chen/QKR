@@ -13,7 +13,6 @@ interface WidgetDockProps {
   onOpenVoiceModal: () => void;
   onOpenClassify: (tx: { id: string; amount: number; note?: string }) => void;
   todayTotal: number;
-  currentStreak: number;
 }
 
 // Sticky-note look per quadrant: fill / border / text color / tape rotation / card rotation
@@ -41,6 +40,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   const [showError, setShowError] = useState(false);
   const [lastResult, setLastResult] = useState<{ label: string; durationSec?: string } | null>(null);
   const [selectedRecentIds, setSelectedRecentIds] = useState<Set<string>>(new Set());
+  const [showRecentPicker, setShowRecentPicker] = useState(false);
 
   const startTimeRef = useRef<number | null>(null);
 
@@ -57,7 +57,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
     return transactions
       .filter((t) => t.entry_date === yesterdayStr && !t.is_zero_spend && t.amount > 0)
       .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
-      .slice(0, 6);
+      .slice(0, 10);
   }, [transactions]);
 
   const clearFeedback = () => {
@@ -173,6 +173,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
 
     setLastResult({ label: `已套用 ${selectedRecentTx.length} 筆（共 $${selectedRecentTotal}）` });
     setSelectedRecentIds(new Set());
+    setShowRecentPicker(false);
   };
 
   const digitKey = (label: string, value: Parameters<typeof calc.pressDigit>[0], idx: number) => (
@@ -185,7 +186,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressDigit(value);
       }}
-      className="font-hand h-7 nb-blob-1 bg-[#fefaf0] dark:bg-[#3a3120] border-[1.4px] border-[#4a3a20] dark:border-[#c9b98a] flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-xs"
+      className="font-hand h-9 nb-blob-1 bg-[#fefaf0] dark:bg-[#3a3120] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-sm active:scale-95 transition-transform"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-btn-${label}`}
     >
@@ -203,7 +204,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressOperator(op);
       }}
-      className="font-hand h-7 nb-blob-2 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.4px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-sm"
+      className="font-hand h-9 nb-blob-2 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.6px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-base active:scale-95 transition-transform"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-op-${label}`}
     >
@@ -218,26 +219,27 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full min-h-0 gap-1 ml-4">
-        {/* Compact top bar: today's total + voice entry trigger */}
+      <div className="relative z-10 flex flex-col h-full min-h-0 gap-2 ml-4">
+        {/* Compact top bar: today's total */}
         <div className="flex items-center justify-between px-0.5 shrink-0">
           <span className="text-[11px] text-[#8a7a5a] dark:text-[#b8a878]">今日支出</span>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-black font-mono text-[#4a3a20] dark:text-white">${todayTotal.toLocaleString()}</span>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                triggerHapticFeedback('light');
-                onOpenVoiceModal();
-              }}
-              className="w-7 h-7 rounded-full bg-gradient-to-b from-orange-400 to-orange-600 border-[1.5px] border-orange-800 flex items-center justify-center shrink-0"
-              title="語音記帳"
-              id="widget-voice-entry-btn"
-            >
-              <Mic className="w-3.5 h-3.5 text-white" />
-            </motion.button>
-          </div>
+          <span className="text-base font-black font-mono text-[#4a3a20] dark:text-white">${todayTotal.toLocaleString()}</span>
         </div>
+
+        {/* Voice entry — a clearly-labeled pill, not just a bare icon, so its purpose is obvious at a glance */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            triggerHapticFeedback('light');
+            onOpenVoiceModal();
+          }}
+          className="font-hand w-full h-10 flex items-center justify-center gap-2 bg-gradient-to-b from-orange-400 to-orange-600 border-[1.8px] border-orange-800 text-white shrink-0"
+          style={{ borderRadius: '180px 16px 180px 16px / 16px 180px 16px 180px' }}
+          id="widget-voice-entry-btn"
+        >
+          <Mic className="w-4 h-4" />
+          <span className="text-sm font-bold">🎙️ 語音記帳（用講的）</span>
+        </motion.button>
 
         {/* Pending "稍後分類" reminder */}
         {pendingClassifyTxs.length > 0 && (
@@ -246,10 +248,10 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               const t = pendingClassifyTxs[0];
               onOpenClassify({ id: t.id, amount: t.amount, note: t.note });
             }}
-            className="font-hand flex items-center gap-1.5 px-2.5 py-1 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.4px] border-dashed border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] text-[10px] font-bold shrink-0 rounded-lg"
+            className="font-hand flex items-center gap-1.5 px-2.5 py-1.5 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.4px] border-dashed border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] text-xs font-bold shrink-0 rounded-lg"
             id="widget-pending-classify-banner"
           >
-            <Clock3 className="w-3 h-3 shrink-0" />
+            <Clock3 className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">還有 {pendingClassifyTxs.length} 筆待分類（點擊立即處理）</span>
           </button>
         )}
@@ -261,15 +263,15 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               initial={{ opacity: 0, y: -6, height: 0 }}
               animate={{ opacity: 1, y: 0, height: 'auto' }}
               exit={{ opacity: 0, y: -6, height: 0 }}
-              className="font-hand bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] text-[#2e5c26] dark:text-[#a8dba0] rounded-xl px-3 py-1 flex items-center justify-between gap-2 text-[11px] shrink-0 overflow-hidden"
+              className="font-hand bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] text-[#2e5c26] dark:text-[#a8dba0] rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-xs shrink-0 overflow-hidden"
             >
               <div className="flex items-center gap-1.5 truncate">
-                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span className="font-bold truncate">{lastResult.label}</span>
                 {lastResult.durationSec && <span className="font-mono shrink-0">{lastResult.durationSec}s</span>}
               </div>
               <button onClick={() => setLastResult(null)} className="shrink-0">
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             </motion.div>
           )}
@@ -277,13 +279,13 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
 
         {/* Receipt-style amount display */}
         <div
-          className={`relative bg-[#fdf8ec] dark:bg-[#221d12] border-2 px-3 py-1.5 flex items-center justify-between shrink-0 transition-colors ${
+          className={`relative bg-[#fdf8ec] dark:bg-[#221d12] border-2 px-3 py-2 flex items-center justify-between shrink-0 transition-colors ${
             showError ? 'border-rose-500' : 'border-[#3a2e18] dark:border-[#c9b98a]'
           }`}
           style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px', transform: 'rotate(-0.4deg)', boxShadow: '2px 2px 0 rgba(60,40,10,0.15)' }}
         >
-          <span className="text-[#b08d57] dark:text-[#d4b878] font-bold text-sm font-hand">$</span>
-          <span className="flex-1 text-right text-xl font-hand font-bold text-[#3a2e18] dark:text-white tabular-nums truncate">
+          <span className="text-[#b08d57] dark:text-[#d4b878] font-bold text-base font-hand">$</span>
+          <span className="flex-1 text-right text-2xl font-hand font-bold text-[#3a2e18] dark:text-white tabular-nums truncate">
             {calc.display || '0'}
           </span>
           {showError && (
@@ -293,18 +295,18 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           )}
         </div>
 
-        {/* Note (single compact line) */}
+        {/* Note — bigger tap target so it isn't accidentally missed or fat-fingered */}
         <input
           type="text"
           value={noteStr}
           onChange={(e) => setNoteStr(e.target.value)}
           placeholder="備註：便當、咖啡..."
-          className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] dark:text-[#d4c49a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] dark:border-[#8a7a5a] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
+          className="font-hand w-full px-3 py-2 bg-[#fdf8ec]/60 dark:bg-black/20 text-[#5a4a2a] dark:text-[#d4c49a] text-sm rounded-xl border-[1.5px] border-dashed border-[#a08a5c] dark:border-[#8a7a5a] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
           id="main-direct-note-input"
         />
 
         {/* Full calculator keypad: digits + operators + 00 + C + backspace + equals */}
-        <div className="grid grid-cols-4 gap-1 shrink-0 mt-0.5">
+        <div className="grid grid-cols-4 gap-1.5 shrink-0">
           {digitKey('7', '7', 0)}
           {digitKey('8', '8', 1)}
           {digitKey('9', '9', 2)}
@@ -330,7 +332,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               calc.clear();
               startTimeRef.current = null;
             }}
-            className="font-hand h-7 nb-blob-3 bg-[#f5d6d6] dark:bg-[#4a2626] border-[1.4px] border-[#a33] dark:border-[#d47878] flex items-center justify-center font-bold text-[#7a1f1f] dark:text-[#f0a8a8] text-xs"
+            className="font-hand h-9 nb-blob-3 bg-[#f5d6d6] dark:bg-[#4a2626] border-[1.6px] border-[#a33] dark:border-[#d47878] flex items-center justify-center font-bold text-[#7a1f1f] dark:text-[#f0a8a8] text-sm active:scale-95 transition-transform"
             style={{ transform: 'rotate(-1.5deg)' }}
             id="keypad-btn-C"
           >
@@ -339,7 +341,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           {opKey('+', '+', 9)}
         </div>
 
-        <div className="grid grid-cols-4 gap-1 shrink-0">
+        <div className="grid grid-cols-4 gap-1.5 shrink-0">
           <button
             onClick={() => {
               triggerHapticFeedback('light');
@@ -347,11 +349,11 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressBackspace();
             }}
-            className="font-hand h-7 nb-blob-4 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.4px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-xs"
+            className="font-hand h-9 nb-blob-4 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.6px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-xs active:scale-95 transition-transform"
             style={{ transform: 'rotate(-1deg)' }}
             id="keypad-btn-backspace"
           >
-            <Delete className="w-3 h-3 mx-auto" />
+            <Delete className="w-4 h-4 mx-auto" />
           </button>
           <button
             onClick={() => {
@@ -360,7 +362,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressEquals();
             }}
-            className="font-hand col-span-3 h-7 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.5px] border-[#2e5c26] dark:border-[#7ab86e] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-xs"
+            className="font-hand col-span-3 h-9 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] dark:border-[#7ab86e] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-sm active:scale-95 transition-transform"
             style={{ transform: 'rotate(0.5deg)' }}
             id="keypad-btn-equals"
           >
@@ -369,7 +371,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         </div>
 
         {/* 2x2 Quadrant sticky notes + a dedicated lump-sum button */}
-        <div className="grid grid-cols-2 gap-1.5 shrink-0">
+        <div className="grid grid-cols-2 gap-2 shrink-0">
           {QUADRANT_LIST.map((qKey) => {
             const q = QUADRANT_CONFIGS[qKey];
             const s = QUADRANT_STICKY_STYLE[qKey];
@@ -378,90 +380,113 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                 key={qKey}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuadrantDirectClick(qKey)}
-                className={`font-hand relative h-8 ${s.radius} text-center transition-all flex items-center justify-center`}
+                className={`font-hand relative h-10 ${s.radius} text-center transition-all flex items-center justify-center`}
                 style={{
                   backgroundColor: s.bg,
-                  border: `1.5px solid ${s.border}`,
+                  border: `1.6px solid ${s.border}`,
                   transform: `rotate(${s.rotate})`,
                   boxShadow: '2px 2px 4px rgba(0,0,0,0.2)',
                 }}
                 id={`quadrant-direct-btn-${qKey}`}
               >
                 <div className="nb-tape" style={{ transform: `translateX(-50%) rotate(${s.rotate})` }} />
-                <span className="text-[10px] font-bold" style={{ color: s.text }}>
+                <span className="text-xs font-bold" style={{ color: s.text }}>
                   {q.title}
                 </span>
               </motion.button>
             );
           })}
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLumpSumClick}
-            className="font-hand col-span-2 h-7 flex items-center justify-center gap-1.5 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.5px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0]"
-            style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px', transform: 'rotate(0.5deg)' }}
-            id="lump-sum-confirm-btn"
-          >
-            <PiggyBank className="w-3 h-3" />
-            <span className="text-[10px] font-bold">模糊概算補登（不分象限）</span>
-          </motion.button>
         </div>
 
-        {/* Yesterday's records — quick reuse (multi-select). Given the real emphasis here,
-            this section gets the bulk of the remaining space and larger, easier-to-read chips. */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={handleLumpSumClick}
+          className="font-hand w-full h-9 flex items-center justify-center gap-1.5 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0] shrink-0"
+          style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
+          id="lump-sum-confirm-btn"
+        >
+          <PiggyBank className="w-4 h-4" />
+          <span className="text-xs font-bold">模糊概算補登（不分象限）</span>
+        </motion.button>
+
+        {/* Recent-reuse: a single button — tapping opens a picker instead of always
+            showing the full list, so this doesn't compete for space day-to-day. */}
         {recentCandidates.length > 0 && (
-          <div className="pt-1.5 border-t-[1.5px] border-dashed border-[#a08a5c] dark:border-[#8a7a5a] flex-1 min-h-0 flex flex-col gap-1.5">
-            <div className="font-hand flex items-center gap-1.5 text-xs font-bold text-[#7a6a4a] dark:text-[#b8a878] shrink-0">
-              <History className="w-3.5 h-3.5" />
-              <span>昨日紀錄快速複用（可多選）</span>
-            </div>
-
-            <div className="flex flex-col gap-1.5 overflow-y-auto flex-1 min-h-0 content-start">
-              {recentCandidates.map((t, i) => {
-                const isSelected = selectedRecentIds.has(t.id);
-                const qColor = t.quadrant ? QUADRANT_CONFIGS[t.quadrant].color : '#A8A29E';
-                const label = t.note || (t.quadrant ? QUADRANT_CONFIGS[t.quadrant].title : '模糊概算');
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => toggleRecentSelect(t.id)}
-                    className={`font-hand w-full flex items-center gap-2 px-3 py-2 text-sm font-medium border-[1.5px] transition-all shrink-0 ${
-                      isSelected
-                        ? 'bg-amber-400 border-amber-600 text-stone-900 font-bold'
-                        : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0]'
-                    }`}
-                    style={{ borderRadius: i % 2 === 0 ? '4px 12px 4px 12px' : '12px 4px 12px 4px', transform: `rotate(${i % 2 === 0 ? '-0.6deg' : '0.6deg'})` }}
-                    id={`recent-reuse-chip-${t.id}`}
-                  >
-                    {isSelected ? (
-                      <Check className="w-4 h-4 shrink-0" />
-                    ) : (
-                      <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: qColor }} />
-                    )}
-                    <span className="truncate flex-1 text-left">{label}</span>
-                    <span className="font-mono font-bold shrink-0">${t.amount}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <AnimatePresence>
-              {selectedRecentTx.length > 0 && (
-                <motion.button
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleApplySelectedRecent}
-                  className="font-hand w-full py-2 nb-blob-pill bg-[#f5dca0] dark:bg-[#5c451c] border-[1.6px] border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] font-bold text-sm shrink-0"
-                  id="apply-selected-recent-btn"
-                >
-                  套用所選 {selectedRecentTx.length} 筆（共 ${selectedRecentTotal}）
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
+          <button
+            onClick={() => setShowRecentPicker(true)}
+            className="font-hand w-full h-9 flex items-center justify-center gap-1.5 bg-[#fdf8ec] dark:bg-[#221d12] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0] shrink-0 rounded-xl"
+            id="open-recent-reuse-picker-btn"
+          >
+            <History className="w-4 h-4" />
+            <span className="text-xs font-bold">昨日紀錄快速複用（{recentCandidates.length} 筆）</span>
+          </button>
         )}
       </div>
+
+      {/* Recent-reuse picker (popup) */}
+      <AnimatePresence>
+        {showRecentPicker && (
+          <div className="absolute inset-0 z-20 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 80 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 80 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="w-full max-w-xs nb-ruled rounded-3xl p-3 pl-5 relative max-h-[80%] flex flex-col"
+            >
+              <div className="flex items-center justify-between shrink-0 mb-2">
+                <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#3a2e18] dark:text-white">
+                  <History className="w-4 h-4" />
+                  <span>昨日紀錄快速複用（可多選）</span>
+                </div>
+                <button onClick={() => setShowRecentPicker(false)} className="text-[#8a7a5a] shrink-0">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-1.5 overflow-y-auto flex-1 min-h-0">
+                {recentCandidates.map((t, i) => {
+                  const isSelected = selectedRecentIds.has(t.id);
+                  const qColor = t.quadrant ? QUADRANT_CONFIGS[t.quadrant].color : '#A8A29E';
+                  const label = t.note || (t.quadrant ? QUADRANT_CONFIGS[t.quadrant].title : '模糊概算');
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => toggleRecentSelect(t.id)}
+                      className={`font-hand w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium border-[1.5px] transition-all shrink-0 ${
+                        isSelected
+                          ? 'bg-amber-400 border-amber-600 text-stone-900 font-bold'
+                          : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0]'
+                      }`}
+                      style={{ borderRadius: i % 2 === 0 ? '4px 12px 4px 12px' : '12px 4px 12px 4px' }}
+                      id={`recent-reuse-chip-${t.id}`}
+                    >
+                      {isSelected ? (
+                        <Check className="w-4 h-4 shrink-0" />
+                      ) : (
+                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: qColor }} />
+                      )}
+                      <span className="truncate flex-1 text-left">{label}</span>
+                      <span className="font-mono font-bold shrink-0">${t.amount}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={handleApplySelectedRecent}
+                disabled={selectedRecentTx.length === 0}
+                className="font-hand w-full py-2.5 nb-blob-pill bg-[#f5dca0] dark:bg-[#5c451c] border-[1.6px] border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] font-bold text-sm shrink-0 mt-2 disabled:opacity-40"
+                id="apply-selected-recent-btn"
+              >
+                {selectedRecentTx.length > 0
+                  ? `套用所選 ${selectedRecentTx.length} 筆（共 $${selectedRecentTotal}）`
+                  : '請先選擇要套用的紀錄'}
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

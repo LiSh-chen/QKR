@@ -6,6 +6,7 @@ interface CalcState {
   previousValue: number | null;
   operator: CalcOperator | null;
   currentEntry: string; // raw text of the number currently being typed
+  justEvaluated: boolean; // true right after '=' — next digit should start fresh, like a real calculator
 }
 
 const MAX_ENTRY_LENGTH = 9;
@@ -29,10 +30,20 @@ function roundClean(n: number): number {
 }
 
 export function useCalculator() {
-  const [state, setState] = useState<CalcState>({ previousValue: null, operator: null, currentEntry: '' });
+  const [state, setState] = useState<CalcState>({
+    previousValue: null,
+    operator: null,
+    currentEntry: '',
+    justEvaluated: false,
+  });
 
   const pressDigit = useCallback((d: '0' | '00' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
     setState((prev) => {
+      // Right after '=', typing a digit starts a brand-new number (standard
+      // calculator behavior) instead of appending onto the previous result.
+      if (prev.justEvaluated) {
+        return { previousValue: null, operator: null, currentEntry: d === '00' ? '0' : d, justEvaluated: false };
+      }
       const base = prev.currentEntry === '0' ? '' : prev.currentEntry;
       const next = base + d;
       return next.length > MAX_ENTRY_LENGTH ? prev : { ...prev, currentEntry: next };
@@ -45,10 +56,10 @@ export function useCalculator() {
       if (prev.operator && prev.currentEntry !== '') {
         // Chain: compute the pending operation first, like a real calculator
         const result = roundClean(applyOp(prev.operator, prev.previousValue!, parseFloat(prev.currentEntry)));
-        return { previousValue: result, operator: op, currentEntry: '' };
+        return { previousValue: result, operator: op, currentEntry: '', justEvaluated: false };
       }
       const pv = prev.currentEntry !== '' ? parseFloat(prev.currentEntry) : prev.previousValue!;
-      return { previousValue: pv, operator: op, currentEntry: '' };
+      return { previousValue: pv, operator: op, currentEntry: '', justEvaluated: false };
     });
   }, []);
 
@@ -57,29 +68,32 @@ export function useCalculator() {
       if (prev.operator === null || prev.previousValue === null) return prev;
       const b = prev.currentEntry !== '' ? parseFloat(prev.currentEntry) : prev.previousValue;
       const result = roundClean(applyOp(prev.operator, prev.previousValue, b));
-      return { previousValue: null, operator: null, currentEntry: String(result) };
+      return { previousValue: null, operator: null, currentEntry: String(result), justEvaluated: true };
     });
   }, []);
 
   const pressBackspace = useCallback(() => {
     setState((prev) => {
+      if (prev.justEvaluated) {
+        return { previousValue: null, operator: null, currentEntry: '', justEvaluated: false };
+      }
       if (prev.currentEntry !== '') {
         return { ...prev, currentEntry: prev.currentEntry.slice(0, -1) };
       }
       if (prev.operator !== null) {
         // undo the pending operator, go back to editing the previous value
-        return { previousValue: null, operator: null, currentEntry: prev.previousValue !== null ? String(prev.previousValue) : '' };
+        return { previousValue: null, operator: null, currentEntry: prev.previousValue !== null ? String(prev.previousValue) : '', justEvaluated: false };
       }
       return prev;
     });
   }, []);
 
   const clear = useCallback(() => {
-    setState({ previousValue: null, operator: null, currentEntry: '' });
+    setState({ previousValue: null, operator: null, currentEntry: '', justEvaluated: false });
   }, []);
 
   const setDirectValue = useCallback((value: string) => {
-    setState({ previousValue: null, operator: null, currentEntry: value });
+    setState({ previousValue: null, operator: null, currentEntry: value, justEvaluated: false });
   }, []);
 
   /** The number that would be used right now if the user tapped a category button without pressing "=". */

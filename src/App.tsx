@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { App as CapApp } from '@capacitor/app';
-import { LayoutGrid, Flame, List, Settings, Plus, Zap } from 'lucide-react';
+import { LayoutGrid, List, Settings, Plus, Zap } from 'lucide-react';
 
 import { Transaction, UserSettings, QuadrantType } from './types';
 import {
@@ -18,7 +18,6 @@ import {
   loadUserSettings,
   saveUserSettings,
   hasPersistedSettings,
-  calculateStreakStats,
   triggerHapticFeedback,
   playClickSound,
 } from './lib/storage';
@@ -30,7 +29,6 @@ import { QuickEntryModal } from './components/QuickEntryModal';
 import { VoiceEntryModal } from './components/VoiceEntryModal';
 import { WidgetDock } from './components/WidgetDock';
 import { QuadrantMatrixView } from './components/QuadrantMatrixView';
-import { StreakView } from './components/StreakView';
 import { TransactionList } from './components/TransactionList';
 import { SettingsView } from './components/SettingsView';
 import { findRoutineCandidate } from './lib/routine';
@@ -48,7 +46,7 @@ import {
 export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [userSettings, setUserSettings] = useState<UserSettings>(loadUserSettings());
-  const [activeTab, setActiveTab] = useState<'quick' | 'matrix' | 'streak' | 'history' | 'settings'>(
+  const [activeTab, setActiveTab] = useState<'quick' | 'matrix' | 'history' | 'settings'>(
     'quick'
   );
 
@@ -220,6 +218,37 @@ export default function App() {
     triggerHapticFeedback('medium');
   };
 
+  // Duplicate a set of existing transactions onto a new date (明細頁「複製到某天」)
+  const handleDuplicateTransactions = (ids: string[], targetDate: string) => {
+    let latest: Transaction[] = transactions;
+    ids.forEach((id) => {
+      const source = transactions.find((t) => t.id === id);
+      if (!source) return;
+      const newTx = addTransaction({
+        amount: source.amount,
+        quadrant: source.quadrant,
+        note: source.note,
+        is_lump_sum: source.is_lump_sum,
+        is_zero_spend: source.is_zero_spend,
+        entry_method: 'manual',
+        entry_date: targetDate,
+      });
+      latest = [newTx, ...latest];
+    });
+    setTransactions(latest);
+    triggerHapticFeedback('success');
+  };
+
+  // Batch reclassify (明細頁「更改分類」)
+  const handleBatchReclassify = (ids: string[], quadrant: QuadrantType) => {
+    let latest = transactions;
+    ids.forEach((id) => {
+      latest = updateTransaction(id, { quadrant, is_lump_sum: false, needs_classification: false });
+    });
+    setTransactions(latest);
+    triggerHapticFeedback('success');
+  };
+
   // Handle Settings Update
   const handleUpdateSettings = (updates: Partial<UserSettings>) => {
     setUserSettings((prev) => {
@@ -263,8 +292,6 @@ export default function App() {
   };
 
   // Calculations
-  const streakStats = calculateStreakStats(transactions);
-
   const todayStr = new Date().toISOString().split('T')[0];
   const todayTransactions = transactions.filter((t) => t.entry_date === todayStr);
   const todayTotal = todayTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
@@ -272,7 +299,6 @@ export default function App() {
   const NAV_ITEMS = [
     { id: 'quick', label: '快速記帳', icon: Zap },
     { id: 'matrix', label: '2x2 分析', icon: LayoutGrid },
-    { id: 'streak', label: 'Streak', icon: Flame },
     { id: 'history', label: '明細', icon: List },
     { id: 'settings', label: '設定', icon: Settings },
   ] as const;
@@ -285,7 +311,7 @@ export default function App() {
       {/* Main Container */}
       <main
         className={`flex-1 min-h-0 w-full max-w-5xl mx-auto px-4 pt-3 ${
-          activeTab === 'quick' || activeTab === 'streak' || activeTab === 'history'
+          activeTab === 'quick' || activeTab === 'matrix' || activeTab === 'history'
             ? 'overflow-hidden flex flex-col pb-3'
             : 'overflow-y-auto pb-4'
         }`}
@@ -299,7 +325,7 @@ export default function App() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
             className={
-              activeTab === 'quick' || activeTab === 'streak' || activeTab === 'history'
+              activeTab === 'quick' || activeTab === 'matrix' || activeTab === 'history'
                 ? 'flex-1 min-h-0 flex flex-col'
                 : ''
             }
@@ -318,7 +344,6 @@ export default function App() {
                   setIsVoiceModalOpen(true);
                 }}
                 todayTotal={todayTotal}
-                currentStreak={streakStats.currentStreak}
               />
             )}
 
@@ -329,19 +354,14 @@ export default function App() {
               />
             )}
 
-            {activeTab === 'streak' && (
-              <StreakView
-                streakStats={streakStats}
-                transactions={transactions}
-                onOpenQuickModal={() => handleOpenQuickModal('streak_page')}
-              />
-            )}
-
             {activeTab === 'history' && (
               <TransactionList
                 transactions={transactions}
                 onDelete={handleDeleteTransaction}
                 onBatchDelete={handleBatchDeleteTransactions}
+                onBatchDuplicate={handleDuplicateTransactions}
+                onBatchReclassify={handleBatchReclassify}
+                onUpdateTransaction={(id, updates) => setTransactions(updateTransaction(id, updates))}
                 onOpenQuickModal={() => handleOpenQuickModal('history_page')}
               />
             )}

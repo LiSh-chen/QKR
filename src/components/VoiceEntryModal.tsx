@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Mic, Clock3, PiggyBank, Check } from 'lucide-react';
+import { X, Mic, Clock3, PiggyBank } from 'lucide-react';
 import { QuadrantType, Transaction } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { playClickSound, triggerHapticFeedback } from '../lib/storage';
-import { startListening, stopListening, parseVoiceText, parseVoiceTextMulti } from '../lib/voiceEntry';
+import { startListening, stopListening, parseVoiceText } from '../lib/voiceEntry';
 
 interface VoiceEntryModalProps {
   isOpen: boolean;
@@ -27,22 +27,7 @@ const QUADRANT_STICKY_STYLE: Record<
   UNNECESSARY_URGENT: { bg: '#f0b8b8', border: '#7a2020', text: '#7a2020', rotate: '-1deg', radius: 'nb-blob-sticky-b' },
 };
 
-type Stage = 'idle' | 'listening' | 'error' | 'review' | 'review_multi';
-
-type ItemClassification = QuadrantType | 'LUMP_SUM' | 'LATER' | null;
-
-interface MultiItemDraft {
-  amount: string;
-  note: string;
-  classification: ItemClassification;
-}
-
-const QUADRANT_MINI_COLORS: Record<QuadrantType, string> = {
-  NECESSARY_DAILY: '#2e5c26',
-  NECESSARY_URGENT: '#1e4a78',
-  UNNECESSARY_DAILY: '#7a5314',
-  UNNECESSARY_URGENT: '#7a2020',
-};
+type Stage = 'idle' | 'listening' | 'error' | 'review';
 
 export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
   isOpen,
@@ -58,7 +43,6 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
   const [errorMsg, setErrorMsg] = useState('');
   const [amount, setAmount] = useState<string>(pendingClassifyTx ? String(pendingClassifyTx.amount) : '');
   const [note, setNote] = useState<string>(pendingClassifyTx?.note || '');
-  const [multiItems, setMultiItems] = useState<MultiItemDraft[]>([]);
 
   const startedRef = useRef(false);
 
@@ -77,7 +61,6 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
     setStage('idle');
     setAmount('');
     setNote('');
-    setMultiItems([]);
     startedRef.current = false;
   }, [isOpen, pendingClassifyTx]);
 
@@ -96,22 +79,10 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
         playClickSound(1200);
         startedRef.current = false;
 
-        const multi = parseVoiceTextMulti(text);
-        if (multi.items.length >= 2) {
-          setMultiItems(
-            multi.items.map((item) => ({
-              amount: String(item.amount),
-              note: item.note,
-              classification: null,
-            }))
-          );
-          setStage('review_multi');
-        } else {
-          const parsed = parseVoiceText(text);
-          setAmount(parsed.amount !== null ? String(parsed.amount) : '');
-          setNote(parsed.note);
-          setStage('review');
-        }
+        const parsed = parseVoiceText(text);
+        setAmount(parsed.amount !== null ? String(parsed.amount) : '');
+        setNote(parsed.note);
+        setStage('review');
       },
       onError: (msg) => {
         setErrorMsg(msg);
@@ -170,39 +141,6 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
         voice_raw_text: liveText || undefined,
       });
     }
-    onClose();
-  };
-
-  const updateMultiItem = (idx: number, updates: Partial<MultiItemDraft>) => {
-    setMultiItems((prev) => prev.map((item, i) => (i === idx ? { ...item, ...updates } : item)));
-  };
-
-  const handleSaveAllMultiItems = () => {
-    triggerHapticFeedback('success');
-    playClickSound(1200);
-    const entryDate = new Date().toISOString().split('T')[0];
-
-    multiItems.forEach((item) => {
-      const amountNum = parseFloat(item.amount);
-      if (isNaN(amountNum) || amountNum <= 0) return;
-
-      const isLumpSum = item.classification === 'LUMP_SUM';
-      const needsLater = item.classification === 'LATER' || item.classification === null;
-      const quadrant = isLumpSum || needsLater ? null : (item.classification as QuadrantType);
-
-      onSaveNew({
-        amount: amountNum,
-        quadrant,
-        note: item.note.trim(),
-        is_lump_sum: isLumpSum,
-        is_zero_spend: false,
-        needs_classification: needsLater,
-        entry_method: 'voice',
-        entry_date: entryDate,
-        voice_raw_text: liveText || undefined,
-      });
-    });
-
     onClose();
   };
 
@@ -293,6 +231,9 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   <br />
                   說完後再按一次麥克風結束
                 </p>
+                <p className="font-hand text-[10px] text-rose-700 dark:text-rose-300 font-bold text-center">
+                  ⚠️ 一次錄音請只說一筆品項，多筆請分開錄
+                </p>
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={beginListening}
@@ -352,93 +293,6 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   重新再試一次
                 </button>
               </div>
-            )}
-
-            {stage === 'review_multi' && (
-              <>
-                <div className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878] italic">
-                  聽到「{liveText}」，抓到 {multiItems.length} 筆品項：
-                </div>
-
-                <div className="space-y-2 max-h-[45vh] overflow-y-auto pr-0.5">
-                  {multiItems.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-[#fdf8ec] dark:bg-[#221d12] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] rounded-xl p-2 space-y-1.5"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[#b08d57] dark:text-[#d4b878] font-bold text-xs font-hand shrink-0">$</span>
-                        <input
-                          type="number"
-                          inputMode="decimal"
-                          value={item.amount}
-                          onChange={(e) => updateMultiItem(idx, { amount: e.target.value })}
-                          className="font-hand w-16 bg-transparent text-sm font-bold text-[#3a2e18] dark:text-white focus:outline-none border-b border-dashed border-[#a08a5c]"
-                          id={`multi-item-amount-${idx}`}
-                        />
-                        <input
-                          type="text"
-                          value={item.note}
-                          onChange={(e) => updateMultiItem(idx, { note: e.target.value })}
-                          placeholder="品項"
-                          className="font-hand flex-1 min-w-0 bg-transparent text-xs text-[#5a4a2a] dark:text-[#d4c49a] focus:outline-none border-b border-dashed border-[#a08a5c]"
-                          id={`multi-item-note-${idx}`}
-                        />
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        {QUADRANT_LIST.map((qKey) => (
-                          <button
-                            key={qKey}
-                            onClick={() => updateMultiItem(idx, { classification: qKey })}
-                            className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                            style={{
-                              backgroundColor: QUADRANT_MINI_COLORS[qKey],
-                              boxShadow: item.classification === qKey ? '0 0 0 2px #ea580c' : 'none',
-                            }}
-                            title={QUADRANT_CONFIGS[qKey].title}
-                            id={`multi-item-${idx}-quadrant-${qKey}`}
-                          >
-                            {item.classification === qKey && <Check className="w-3 h-3 text-white" />}
-                          </button>
-                        ))}
-                        <button
-                          onClick={() => updateMultiItem(idx, { classification: 'LUMP_SUM' })}
-                          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-[1.5px] border-dashed ${
-                            item.classification === 'LUMP_SUM' ? 'border-orange-600 bg-orange-100' : 'border-[#a08a5c]'
-                          }`}
-                          title="模糊概算"
-                          id={`multi-item-${idx}-lumpsum`}
-                        >
-                          <PiggyBank className="w-3 h-3 text-[#5a4a2a]" />
-                        </button>
-                        <button
-                          onClick={() => updateMultiItem(idx, { classification: 'LATER' })}
-                          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-[1.5px] border-dashed ${
-                            item.classification === 'LATER' ? 'border-orange-600 bg-orange-100' : 'border-[#a08a5c]'
-                          }`}
-                          title="稍後分類"
-                          id={`multi-item-${idx}-later`}
-                        >
-                          <Clock3 className="w-3 h-3 text-[#5a4a2a]" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <p className="font-hand text-[9px] text-[#8a7a5a] dark:text-[#b8a878]">
-                  沒選分類的項目會自動歸入「稍後分類」，之後會提醒你補選
-                </p>
-
-                <button
-                  onClick={handleSaveAllMultiItems}
-                  className="font-hand w-full h-9 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-sm"
-                  id="voice-modal-save-all-btn"
-                >
-                  全部存檔（{multiItems.length} 筆）
-                </button>
-              </>
             )}
 
             {stage === 'review' && (
