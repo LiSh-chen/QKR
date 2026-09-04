@@ -219,7 +219,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full min-h-0 gap-2 ml-4">
+      <div className="relative z-10 flex flex-col h-full min-h-0 gap-1.5 ml-4 overflow-y-auto">
         {/* Compact top bar: today's total */}
         <div className="flex items-center justify-between px-0.5 shrink-0">
           <span className="text-[11px] text-[#8a7a5a] dark:text-[#b8a878]">今日支出</span>
@@ -233,12 +233,12 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
             triggerHapticFeedback('light');
             onOpenVoiceModal();
           }}
-          className="font-hand w-full h-10 flex items-center justify-center gap-2 bg-gradient-to-b from-orange-400 to-orange-600 border-[1.8px] border-orange-800 text-white shrink-0"
+          className="font-hand w-full h-9 flex items-center justify-center gap-2 bg-gradient-to-b from-orange-400 to-orange-600 border-[1.8px] border-orange-800 text-white shrink-0"
           style={{ borderRadius: '180px 16px 180px 16px / 16px 180px 16px 180px' }}
           id="widget-voice-entry-btn"
         >
           <Mic className="w-4 h-4" />
-          <span className="text-sm font-bold">🎙️ 語音記帳（用講的）</span>
+          <span className="text-sm font-bold">語音記帳（用講的）</span>
         </motion.button>
 
         {/* Pending "稍後分類" reminder */}
@@ -371,7 +371,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         </div>
 
         {/* 2x2 Quadrant sticky notes + a dedicated lump-sum button */}
-        <div className="grid grid-cols-2 gap-2 shrink-0">
+        <div className="grid grid-cols-2 gap-1.5 shrink-0">
           {QUADRANT_LIST.map((qKey) => {
             const q = QUADRANT_CONFIGS[qKey];
             const s = QUADRANT_STICKY_STYLE[qKey];
@@ -398,29 +398,31 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           })}
         </div>
 
-        <motion.button
-          whileTap={{ scale: 0.97 }}
-          onClick={handleLumpSumClick}
-          className="font-hand w-full h-9 flex items-center justify-center gap-1.5 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0] shrink-0"
-          style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
-          id="lump-sum-confirm-btn"
-        >
-          <PiggyBank className="w-4 h-4" />
-          <span className="text-xs font-bold">模糊概算補登（不分象限）</span>
-        </motion.button>
-
-        {/* Recent-reuse: a single button — tapping opens a picker instead of always
-            showing the full list, so this doesn't compete for space day-to-day. */}
-        {recentCandidates.length > 0 && (
-          <button
-            onClick={() => setShowRecentPicker(true)}
-            className="font-hand w-full h-9 flex items-center justify-center gap-1.5 bg-[#fdf8ec] dark:bg-[#221d12] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0] shrink-0 rounded-xl"
-            id="open-recent-reuse-picker-btn"
+        <div className="flex gap-1.5 shrink-0">
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={handleLumpSumClick}
+            className="font-hand flex-1 h-9 flex items-center justify-center gap-1 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0]"
+            style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
+            id="lump-sum-confirm-btn"
           >
-            <History className="w-4 h-4" />
-            <span className="text-xs font-bold">昨日紀錄快速複用（{recentCandidates.length} 筆）</span>
-          </button>
-        )}
+            <PiggyBank className="w-3.5 h-3.5" />
+            <span className="text-[11px] font-bold">模糊概算</span>
+          </motion.button>
+
+          {/* Recent-reuse: a single button — tapping opens a picker instead of always
+              showing the full list, so this doesn't compete for space day-to-day. */}
+          {recentCandidates.length > 0 && (
+            <button
+              onClick={() => setShowRecentPicker(true)}
+              className="font-hand flex-1 h-9 flex items-center justify-center gap-1 bg-[#fdf8ec] dark:bg-[#221d12] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0] rounded-xl"
+              id="open-recent-reuse-picker-btn"
+            >
+              <History className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold">昨日複用（{recentCandidates.length}）</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Recent-reuse picker (popup) */}

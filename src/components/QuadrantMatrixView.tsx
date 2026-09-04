@@ -119,13 +119,13 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
   const avgLumpSum = Math.round(monthlyStackedData.reduce((s, m) => s + m.LUMP_SUM, 0) / monthsWithData);
 
   return (
-    <div className="min-h-full nb-ruled rounded-3xl p-3.5 relative">
+    <div className="h-full nb-ruled rounded-3xl p-3.5 relative flex flex-col">
       <div className="nb-binder" />
       <div className="nb-holes">
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
-      <div className="ml-4 space-y-3">
+      <div className="ml-4 space-y-3 overflow-y-auto flex-1 min-h-0">
         {/* Header & Mode Switch */}
         <div className="flex items-center justify-between gap-2 bg-[#fdf8ec] dark:bg-[#221d12] px-4 py-3 rounded-2xl border-2 border-[#4a3a20] dark:border-[#c9b98a]">
           <div className="flex items-center gap-1.5 min-w-0">
