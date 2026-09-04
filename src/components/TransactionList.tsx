@@ -50,6 +50,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [openRowId, setOpenRowId] = useState<string | null>(null);
   const [showDuplicatePicker, setShowDuplicatePicker] = useState(false);
   const [duplicateTargetDate, setDuplicateTargetDate] = useState('');
 
@@ -307,7 +308,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           )}
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto space-y-2.5 pb-1">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pb-1">
           <AnimatePresence>
             {filteredTx.length === 0 ? (
               <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-8 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 text-center text-[#8a7a5a] space-y-2">
@@ -321,74 +322,80 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               filteredTx.map((tx) => {
                 const qConfig = tx.quadrant ? QUADRANT_CONFIGS[tx.quadrant] : null;
                 const isSelected = selectedIds.includes(tx.id);
+                const isOpen = openRowId === tx.id;
+                const dotColor = tx.is_zero_spend ? '#0d9488' : tx.is_lump_sum ? '#b45309' : qConfig?.color || '#a8a29e';
+                const shortDate = tx.entry_date ? tx.entry_date.slice(5).replace('-', '/') : '';
 
                 return (
-                  <motion.div
-                    key={tx.id}
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className={`p-3.5 rounded-2xl border shadow-sm flex items-center justify-between gap-2 transition-all ${
-                      isSelected
-                        ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
-                        : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelect(tx.id)}
-                        className="w-4 h-4 rounded border-stone-300 dark:border-stone-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
-                      />
-
-                      <div className="flex-shrink-0">
-                        {tx.is_zero_spend ? (
-                          <span className="w-9 h-9 rounded-xl bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200 flex items-center justify-center font-bold text-xs">$0</span>
-                        ) : tx.is_lump_sum ? (
-                          <span className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200 flex items-center justify-center font-bold text-xs">補</span>
-                        ) : qConfig ? (
-                          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${qConfig.badgeBg}`}>{qConfig.axisY[0]}</span>
-                        ) : (
-                          <span className="w-9 h-9 rounded-xl bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300 flex items-center justify-center font-bold text-xs">?</span>
-                        )}
-                      </div>
-
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-hand font-bold text-[#3a2e18] dark:text-white text-sm truncate">
-                            {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
-                          </span>
-                          {tx.voice_raw_text && <Mic className="w-3 h-3 text-rose-500 dark:text-rose-400 shrink-0" />}
-                          {qConfig && (
-                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${qConfig.badgeBg}`}>{qConfig.title}</span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-[#8a7a5a] mt-0.5 font-mono">{tx.entry_date}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className={`font-mono font-extrabold text-sm ${tx.is_zero_spend ? 'text-teal-600 dark:text-teal-400' : 'text-[#3a2e18] dark:text-white'}`}>
-                        ${tx.amount.toLocaleString()}
-                      </span>
+                  <div key={tx.id} className="relative">
+                    {/* Actions revealed on swipe-left */}
+                    <div className="absolute inset-y-0 right-0 flex items-stretch">
                       <button
-                        onClick={() => setEditingTx(tx)}
-                        className="p-1.5 text-[#8a7a5a] hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg transition-colors"
+                        onClick={() => {
+                          setEditingTx(tx);
+                          setOpenRowId(null);
+                        }}
+                        className="w-11 flex items-center justify-center bg-blue-500 text-white rounded-l-none"
                         title="編輯"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onDelete(tx.id)}
-                        className="p-1.5 text-[#8a7a5a] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
+                        onClick={() => {
+                          onDelete(tx.id);
+                          setOpenRowId(null);
+                        }}
+                        className="w-11 flex items-center justify-center bg-rose-600 text-white rounded-r-xl"
                         title="刪除"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                  </motion.div>
+
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1, x: isOpen ? -88 : 0 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
+                      drag="x"
+                      dragConstraints={{ left: -88, right: 0 }}
+                      dragElastic={0.15}
+                      onDragEnd={(_, info) => {
+                        if (info.offset.x < -44) setOpenRowId(tx.id);
+                        else setOpenRowId(null);
+                      }}
+                      onClick={() => {
+                        if (isOpen) setOpenRowId(null);
+                      }}
+                      className={`relative z-10 px-3 py-2.5 rounded-2xl border shadow-sm flex items-center gap-2 transition-colors ${
+                        isSelected
+                          ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
+                          : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(tx.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4 rounded border-stone-300 dark:border-stone-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                      />
+
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+
+                      <span className="font-hand font-bold text-[#3a2e18] dark:text-white text-sm truncate flex-1 min-w-0">
+                        {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
+                      </span>
+
+                      {tx.voice_raw_text && <Mic className="w-3 h-3 text-rose-500 dark:text-rose-400 shrink-0" />}
+
+                      <span className="text-[10px] text-[#8a7a5a] font-mono shrink-0">{shortDate}</span>
+
+                      <span className={`font-mono font-extrabold text-sm shrink-0 ${tx.is_zero_spend ? 'text-teal-600 dark:text-teal-400' : 'text-[#3a2e18] dark:text-white'}`}>
+                        ${tx.amount.toLocaleString()}
+                      </span>
+                    </motion.div>
+                  </div>
                 );
               })
             )}
