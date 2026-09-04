@@ -327,7 +327,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 const shortDate = tx.entry_date ? tx.entry_date.slice(5).replace('-', '/') : '';
 
                 return (
-                  <div key={tx.id} className="relative">
+                  <div key={tx.id} className="relative rounded-2xl overflow-hidden">
                     {/* Actions revealed on swipe-left */}
                     <div className="absolute inset-y-0 right-0 flex items-stretch">
                       <button
@@ -335,39 +335,39 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                           setEditingTx(tx);
                           setOpenRowId(null);
                         }}
-                        className="w-11 flex items-center justify-center bg-blue-500 text-white rounded-l-none"
+                        className="w-14 flex items-center justify-center bg-blue-500 text-white"
                         title="編輯"
                       >
-                        <Pencil className="w-4 h-4" />
+                        <Pencil className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => {
                           onDelete(tx.id);
                           setOpenRowId(null);
                         }}
-                        className="w-11 flex items-center justify-center bg-rose-600 text-white rounded-r-xl"
+                        className="w-14 flex items-center justify-center bg-rose-600 text-white"
                         title="刪除"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
 
                     <motion.div
                       layout
                       initial={{ opacity: 0 }}
-                      animate={{ opacity: 1, x: isOpen ? -88 : 0 }}
+                      animate={{ opacity: 1, x: isOpen ? -112 : 0 }}
                       exit={{ opacity: 0, scale: 0.97 }}
                       drag="x"
-                      dragConstraints={{ left: -88, right: 0 }}
+                      dragConstraints={{ left: -112, right: 0 }}
                       dragElastic={0.15}
                       onDragEnd={(_, info) => {
-                        if (info.offset.x < -44) setOpenRowId(tx.id);
+                        if (info.offset.x < -56) setOpenRowId(tx.id);
                         else setOpenRowId(null);
                       }}
                       onClick={() => {
                         if (isOpen) setOpenRowId(null);
                       }}
-                      className={`relative z-10 px-3 py-2.5 rounded-2xl border shadow-sm flex items-center gap-2 transition-colors ${
+                      className={`relative z-10 px-3 py-2.5 border shadow-sm flex items-center gap-2 transition-colors ${
                         isSelected
                           ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
                           : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60'
@@ -381,7 +381,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         className="w-4 h-4 rounded border-stone-300 dark:border-stone-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
                       />
 
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+                      <span
+                        className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[8px] font-bold text-white"
+                        style={{ backgroundColor: dotColor }}
+                      >
+                        {tx.is_zero_spend ? '0' : tx.is_lump_sum ? '概' : qConfig ? qConfig.axisY[0] : '?'}
+                      </span>
 
                       <span className="font-hand font-bold text-[#3a2e18] dark:text-white text-sm truncate flex-1 min-w-0">
                         {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
