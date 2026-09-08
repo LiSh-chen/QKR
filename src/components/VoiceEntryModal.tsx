@@ -19,12 +19,12 @@ interface VoiceEntryModalProps {
 
 const QUADRANT_STICKY_STYLE: Record<
   QuadrantType,
-  { bg: string; border: string; text: string; rotate: string; radius: string }
+  { photoClass: string; text: string; rotate: string }
 > = {
-  NECESSARY_DAILY: { bg: '#c8e6c0', border: '#2e5c26', text: '#2e5c26', rotate: '-1.5deg', radius: 'nb-blob-sticky-a' },
-  NECESSARY_URGENT: { bg: '#bcd8f0', border: '#1e4a78', text: '#1e4a78', rotate: '1deg', radius: 'nb-blob-sticky-b' },
-  UNNECESSARY_DAILY: { bg: '#f5dca0', border: '#7a5314', text: '#7a5314', rotate: '1.5deg', radius: 'nb-blob-sticky-a' },
-  UNNECESSARY_URGENT: { bg: '#f0b8b8', border: '#7a2020', text: '#7a2020', rotate: '-1deg', radius: 'nb-blob-sticky-b' },
+  NECESSARY_DAILY: { photoClass: 'nb-sticky-green', text: '#1e3a17', rotate: '-1.5deg' },
+  NECESSARY_URGENT: { photoClass: 'nb-sticky-blue', text: '#0f2d47', rotate: '1deg' },
+  UNNECESSARY_DAILY: { photoClass: 'nb-sticky-yellow', text: '#5c3d0a', rotate: '1.5deg' },
+  UNNECESSARY_URGENT: { photoClass: 'nb-sticky-red', text: '#5c1414', rotate: '-1deg' },
 };
 
 type Stage = 'idle' | 'listening' | 'error' | 'review';
@@ -342,8 +342,8 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                       <button
                         key={qKey}
                         onClick={() => handleQuadrantClick(qKey)}
-                        className={`font-hand nb-curl relative h-8 ${s.radius} text-center transition-all flex items-center justify-center overflow-hidden`}
-                        style={{ backgroundColor: s.bg, border: `1.6px solid ${s.border}`, transform: `rotate(${s.rotate})`, boxShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
+                        className={`font-hand nb-sticky-photo ${s.photoClass} relative h-9 text-center transition-all flex items-center justify-center`}
+                        style={{ transform: `rotate(${s.rotate})` }}
                         id={`voice-modal-quadrant-${qKey}`}
                       >
                         <div className="nb-tape" style={{ transform: `translateX(-50%) rotate(${s.rotate})` }} />
@@ -359,8 +359,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   <div className="flex gap-1.5">
                     <button
                       onClick={handleLumpSum}
-                      className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0] text-[10px] font-bold"
-                      style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
+                      className="font-hand nb-tag-photo nb-tag-1 flex-1 h-9 flex items-center justify-center gap-1 text-[#4a3010] text-[10px] font-bold"
                       id="voice-modal-lump-sum-btn"
                     >
                       模糊概算

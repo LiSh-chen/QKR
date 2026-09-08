@@ -15,16 +15,19 @@ interface WidgetDockProps {
   todayTotal: number;
 }
 
-// Sticky-note look per quadrant: fill / border / text color / tape rotation / card rotation
+// Sticky-note look per quadrant: real photographed note + text/rotation only
+// (the photo itself already has the color, curled corner, and shadow baked in)
 const QUADRANT_STICKY_STYLE: Record<
   QuadrantType,
-  { bg: string; darkBg: string; border: string; text: string; darkText: string; rotate: string; radius: string }
+  { photoClass: string; text: string; darkText: string; rotate: string }
 > = {
-  NECESSARY_DAILY: { bg: '#c8e6c0', darkBg: '#2e4a2a', border: '#2e5c26', text: '#2e5c26', darkText: '#a8dba0', rotate: '-1.5deg', radius: 'nb-blob-sticky-a' },
-  NECESSARY_URGENT: { bg: '#bcd8f0', darkBg: '#213c56', border: '#1e4a78', text: '#1e4a78', darkText: '#a8cdf0', rotate: '1deg', radius: 'nb-blob-sticky-b' },
-  UNNECESSARY_DAILY: { bg: '#f5dca0', darkBg: '#5c451c', border: '#7a5314', text: '#7a5314', darkText: '#f0cf8a', rotate: '1.5deg', radius: 'nb-blob-sticky-a' },
-  UNNECESSARY_URGENT: { bg: '#f0b8b8', darkBg: '#5c2626', border: '#7a2020', text: '#7a2020', darkText: '#f0a8a8', rotate: '-1deg', radius: 'nb-blob-sticky-b' },
+  NECESSARY_DAILY: { photoClass: 'nb-sticky-green', text: '#1e3a17', darkText: '#e8f5e0', rotate: '-1.5deg' },
+  NECESSARY_URGENT: { photoClass: 'nb-sticky-blue', text: '#0f2d47', darkText: '#e8f2fa', rotate: '1deg' },
+  UNNECESSARY_DAILY: { photoClass: 'nb-sticky-yellow', text: '#5c3d0a', darkText: '#fdf3d8', rotate: '1.5deg' },
+  UNNECESSARY_URGENT: { photoClass: 'nb-sticky-red', text: '#5c1414', darkText: '#fce8e8', rotate: '-1deg' },
 };
+
+const KEYPAD_RING_CLASSES = ['nb-ring-1', 'nb-ring-2', 'nb-ring-3', 'nb-ring-4', 'nb-ring-5', 'nb-ring-6', 'nb-ring-7', 'nb-ring-8'];
 
 const DIGIT_ROTATIONS = ['-2deg', '1.5deg', '-1deg', '1deg', '-1.5deg', '2deg', '-2deg', '1deg', '-1deg', '-1deg', '1.5deg'];
 
@@ -186,7 +189,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressDigit(value);
       }}
-      className="font-hand h-9 nb-blob-1 bg-[#fefaf0] dark:bg-[#3a3120] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-sm active:scale-95 transition-transform"
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-sm active:scale-95 transition-transform`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-btn-${label}`}
     >
@@ -204,7 +207,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressOperator(op);
       }}
-      className="font-hand h-9 nb-blob-2 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.6px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-base active:scale-95 transition-transform"
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] dark:text-[#e8c896] text-base active:scale-95 transition-transform`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-op-${label}`}
     >
@@ -332,7 +335,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               calc.clear();
               startTimeRef.current = null;
             }}
-            className="font-hand h-9 nb-blob-3 bg-[#f5d6d6] dark:bg-[#4a2626] border-[1.6px] border-[#a33] dark:border-[#d47878] flex items-center justify-center font-bold text-[#7a1f1f] dark:text-[#f0a8a8] text-sm active:scale-95 transition-transform"
+            className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] dark:text-[#f0a8a8] text-sm active:scale-95 transition-transform"
             style={{ transform: 'rotate(-1.5deg)' }}
             id="keypad-btn-C"
           >
@@ -380,16 +383,10 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                 key={qKey}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuadrantDirectClick(qKey)}
-                className={`font-hand nb-curl relative h-10 ${s.radius} text-center transition-all flex items-center justify-center overflow-hidden`}
-                style={{
-                  backgroundColor: s.bg,
-                  border: `1.6px solid ${s.border}`,
-                  transform: `rotate(${s.rotate})`,
-                  boxShadow: '2px 4px 6px rgba(0,0,0,0.28)',
-                }}
+                className={`font-hand nb-sticky-photo ${s.photoClass} relative h-11 text-center transition-all flex items-center justify-center`}
+                style={{ transform: `rotate(${s.rotate})` }}
                 id={`quadrant-direct-btn-${qKey}`}
               >
-                <div className="nb-tape" style={{ transform: `translateX(-50%) rotate(${s.rotate})` }} />
                 <span className="text-xs font-bold" style={{ color: s.text }}>
                   {q.title}
                 </span>
@@ -402,8 +399,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleLumpSumClick}
-            className="font-hand flex-1 h-9 flex items-center justify-center gap-1 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0]"
-            style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
+            className="font-hand nb-tag-photo nb-tag-1 flex-1 h-11 flex items-center justify-center text-[#4a3010] dark:text-[#4a3010]"
             id="lump-sum-confirm-btn"
           >
             <span className="text-[11px] font-bold">模糊概算</span>
@@ -414,7 +410,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           {recentCandidates.length > 0 && (
             <button
               onClick={() => setShowRecentPicker(true)}
-              className="font-hand flex-1 h-9 flex items-center justify-center gap-1 bg-[#fdf8ec] dark:bg-[#221d12] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0] rounded-xl"
+              className="font-hand nb-tag-photo nb-tag-2 flex-1 h-11 flex items-center justify-center gap-1 text-[#4a3010] dark:text-[#4a3010]"
               id="open-recent-reuse-picker-btn"
             >
               <RotateCcw className="w-3.5 h-3.5" />

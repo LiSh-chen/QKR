@@ -25,13 +25,15 @@ interface QuickEntryModalProps {
 
 const QUADRANT_STICKY_STYLE: Record<
   QuadrantType,
-  { bg: string; border: string; text: string; rotate: string; radius: string }
+  { photoClass: string; text: string; rotate: string }
 > = {
-  NECESSARY_DAILY: { bg: '#c8e6c0', border: '#2e5c26', text: '#2e5c26', rotate: '-1.5deg', radius: 'nb-blob-sticky-a' },
-  NECESSARY_URGENT: { bg: '#bcd8f0', border: '#1e4a78', text: '#1e4a78', rotate: '1deg', radius: 'nb-blob-sticky-b' },
-  UNNECESSARY_DAILY: { bg: '#f5dca0', border: '#7a5314', text: '#7a5314', rotate: '1.5deg', radius: 'nb-blob-sticky-a' },
-  UNNECESSARY_URGENT: { bg: '#f0b8b8', border: '#7a2020', text: '#7a2020', rotate: '-1deg', radius: 'nb-blob-sticky-b' },
+  NECESSARY_DAILY: { photoClass: 'nb-sticky-green', text: '#1e3a17', rotate: '-1.5deg' },
+  NECESSARY_URGENT: { photoClass: 'nb-sticky-blue', text: '#0f2d47', rotate: '1deg' },
+  UNNECESSARY_DAILY: { photoClass: 'nb-sticky-yellow', text: '#5c3d0a', rotate: '1.5deg' },
+  UNNECESSARY_URGENT: { photoClass: 'nb-sticky-red', text: '#5c1414', rotate: '-1deg' },
 };
+
+const KEYPAD_RING_CLASSES = ['nb-ring-1', 'nb-ring-2', 'nb-ring-3', 'nb-ring-4', 'nb-ring-5', 'nb-ring-6', 'nb-ring-7', 'nb-ring-8'];
 
 const DIGIT_ROTATIONS = ['-2deg', '1.5deg', '-1deg', '1deg', '-1.5deg', '2deg', '-2deg', '1deg', '-1deg', '-1deg', '1.5deg'];
 
@@ -122,7 +124,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         playClickSound(900);
         calc.pressDigit(value);
       }}
-      className="font-hand h-7 nb-blob-1 bg-[#fefaf0] dark:bg-[#3a3120] border-[1.4px] border-[#4a3a20] dark:border-[#c9b98a] flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-xs"
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-xs`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-keypad-${label}`}
     >
@@ -138,7 +140,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         playClickSound(1000);
         calc.pressOperator(op);
       }}
-      className="font-hand h-7 nb-blob-2 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.4px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-sm"
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] dark:text-[#e8c896] text-sm`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-op-${label}`}
     >
@@ -228,7 +230,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(500);
                   calc.clear();
                 }}
-                className="font-hand h-7 nb-blob-3 bg-[#f5d6d6] dark:bg-[#4a2626] border-[1.4px] border-[#a33] dark:border-[#d47878] flex items-center justify-center font-bold text-[#7a1f1f] dark:text-[#f0a8a8] text-xs"
+                className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] dark:text-[#f0a8a8] text-xs"
                 style={{ transform: 'rotate(-1.5deg)' }}
                 id="quick-modal-keypad-C"
               >
@@ -244,7 +246,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(700);
                   calc.pressBackspace();
                 }}
-                className="font-hand h-7 nb-blob-4 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.4px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-xs"
+                className="font-hand h-9 nb-ring-photo nb-ring-7 flex items-center justify-center font-bold text-[#7a4a1a] dark:text-[#e8c896] text-xs"
                 style={{ transform: 'rotate(-1deg)' }}
                 id="quick-modal-backspace"
               >
@@ -273,8 +275,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   <button
                     key={qKey}
                     onClick={() => handleQuadrantClick(qKey)}
-                    className={`font-hand nb-curl relative h-8 ${s.radius} text-center transition-all flex items-center justify-center overflow-hidden`}
-                    style={{ backgroundColor: s.bg, border: `1.6px solid ${s.border}`, transform: `rotate(${s.rotate})`, boxShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
+                    className={`font-hand nb-sticky-photo ${s.photoClass} relative h-9 text-center transition-all flex items-center justify-center`}
+                    style={{ transform: `rotate(${s.rotate})` }}
                     id={`quick-modal-quadrant-${qKey}`}
                   >
                     <div className="nb-tape" style={{ transform: `translateX(-50%) rotate(${s.rotate})` }} />
@@ -289,8 +291,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             <div className="flex gap-1.5">
               <button
                 onClick={handleLumpSumClick}
-                className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#d4c49a] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#5a4a2a] dark:border-[#c9b98a] text-[#5a4a2a] dark:text-[#e8dcc0] text-[10px] font-bold"
-                style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
+                className="font-hand nb-tag-photo nb-tag-1 flex-1 h-9 flex items-center justify-center gap-1 text-[#4a3010] text-[10px] font-bold"
                 id="quick-modal-lump-sum-btn"
               >
                 模糊概算補登

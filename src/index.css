@@ -17,20 +17,33 @@
 }
 
 /* Wood desk surface — sits behind the notebook page so the page reads as an
-   object resting on a table, not just a flat background fill. */
+   object resting on a table, not just a flat background fill. Real photographed
+   wood-grain texture, tiled. */
 .nb-desk {
   background-image:
-    repeating-linear-gradient(95deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 40px),
-    linear-gradient(180deg, #4a3423, #2e2013);
+    linear-gradient(180deg, rgba(20,12,4,0.35), rgba(20,12,4,0.55)),
+    url('./assets/notebook/wood_texture.webp');
+  background-size: 340px 340px;
+  background-repeat: repeat;
 }
 
 .nb-ruled {
   background-color: var(--nb-paper);
-  background-image: repeating-linear-gradient(var(--nb-paper), var(--nb-paper) 23px, var(--nb-paper-line) 24px);
+  background-image:
+    repeating-linear-gradient(var(--nb-paper-line) 0, var(--nb-paper-line) 1px, transparent 1px, transparent 24px),
+    url('./assets/notebook/paper_texture.webp');
+  background-size: 100% 24px, 320px 580px;
+  background-repeat: repeat, repeat;
+  background-blend-mode: multiply, normal;
 }
 .dark .nb-ruled {
   background-color: var(--nb-paper-dark);
-  background-image: repeating-linear-gradient(var(--nb-paper-dark), var(--nb-paper-dark) 23px, var(--nb-paper-line-dark) 24px);
+  background-image:
+    repeating-linear-gradient(var(--nb-paper-line-dark) 0, var(--nb-paper-line-dark) 1px, transparent 1px, transparent 24px),
+    url('./assets/notebook/paper_texture.webp');
+  background-size: 100% 24px, 320px 580px;
+  background-repeat: repeat, repeat;
+  background-blend-mode: multiply, overlay;
 }
 
 /* Hand-drawn wobble blob radius — apply with a rotate() transform for extra imperfection */
@@ -72,16 +85,56 @@
 
 .nb-tape {
   position: absolute;
-  top: -4px;
+  top: -6px;
   left: 50%;
-  width: 22px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  width: 34px;
+  height: 14px;
+  background-image: url('./assets/notebook/tape_small_cream.webp');
+  background-size: cover;
+  opacity: 0.88;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
 }
 
+/* Real photographed sticky notes — used for the 2x2 quadrant buttons and the
+   voice-entry button. The curled corner + shadow is already baked into the
+   photo, so these need no extra CSS curl/border effects layered on top. */
+.nb-sticky-photo {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(1px 3px 4px rgba(0,0,0,0.35));
+}
+.nb-sticky-green  { background-image: url('./assets/notebook/sticky_green.webp'); }
+.nb-sticky-blue   { background-image: url('./assets/notebook/sticky_blue.webp'); }
+.nb-sticky-yellow { background-image: url('./assets/notebook/sticky_yellow.webp'); }
+.nb-sticky-red    { background-image: url('./assets/notebook/sticky_red.webp'); }
+
+/* Kraft paper tag photos — used for the lump-sum / recent-reuse buttons */
+.nb-tag-photo {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3));
+}
+.nb-tag-1 { background-image: url('./assets/notebook/tag_1.webp'); }
+.nb-tag-2 { background-image: url('./assets/notebook/tag_2.webp'); }
+
+/* Hand-drawn ink-ring photos — used for the calculator keypad buttons */
+.nb-ring-photo {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.nb-ring-1 { background-image: url('./assets/notebook/ring_1.webp'); }
+.nb-ring-2 { background-image: url('./assets/notebook/ring_2.webp'); }
+.nb-ring-3 { background-image: url('./assets/notebook/ring_3.webp'); }
+.nb-ring-4 { background-image: url('./assets/notebook/ring_4.webp'); }
+.nb-ring-5 { background-image: url('./assets/notebook/ring_5.webp'); }
+.nb-ring-6 { background-image: url('./assets/notebook/ring_6.webp'); }
+.nb-ring-7 { background-image: url('./assets/notebook/ring_7.webp'); }
+.nb-ring-8 { background-image: url('./assets/notebook/ring_8.webp'); }
+
 /* Sticky-note curled corner: a lifted highlight flap + the shadow it casts
-   back onto the note, applied to any element with position:relative. */
+   back onto the note, applied to any element with position:relative.
+   (Kept for elements that DON'T use a real sticky-note photo, e.g. transaction
+   list rows and the lump-sum reminder card in the 2x2 view.) */
 .nb-curl {
   position: relative;
 }
