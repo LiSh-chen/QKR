@@ -297,15 +297,15 @@ export default function App() {
   const todayTotal = todayTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
 
   const NAV_ITEMS = [
-    { id: 'quick', label: '快速記帳', icon: Zap },
-    { id: 'matrix', label: '2x2 分析', icon: LayoutGrid },
-    { id: 'history', label: '明細', icon: List },
-    { id: 'settings', label: '設定', icon: Settings },
+    { id: 'quick', label: '快速記帳', icon: Zap, tabBg: '#e2a56e', tabBgDark: '#6b3d10', activeText: '#c9683c', activeTextDark: '#f0a868' },
+    { id: 'matrix', label: '2x2 分析', icon: LayoutGrid, tabBg: '#8fb8c9', tabBgDark: '#1c3d4a', activeText: '#1e6b8a', activeTextDark: '#7ec8e3' },
+    { id: 'history', label: '明細', icon: List, tabBg: '#a9c98a', tabBgDark: '#33501c', activeText: '#2e5c26', activeTextDark: '#a8dba0' },
+    { id: 'settings', label: '設定', icon: Settings, tabBg: '#b3a3c2', tabBgDark: '#3d2e52', activeText: '#5a3d78', activeTextDark: '#c9a8e8' },
   ] as const;
 
   return (
     <div
-      className="flex flex-col bg-[#dcd0ad] dark:bg-[#181410] text-[#3a2e18] dark:text-[#e8dcc0] font-sans transition-colors duration-200 overflow-hidden"
+      className="nb-desk flex flex-col text-[#3a2e18] dark:text-[#e8dcc0] font-sans transition-colors duration-200 overflow-hidden"
       style={{ height: '100dvh', paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
       {/* Main Container */}
@@ -402,10 +402,11 @@ export default function App() {
         </div>
       )}
 
-      {/* Bottom Nav — notebook index / divider tabs */}
+      {/* Bottom Nav — notebook index/divider tabs, each page with its own color identity;
+          the active tab shares the page's paper color and sits raised/fused above the rest. */}
       <nav
-        className="shrink-0 z-30 bg-[#c9bb92] dark:bg-[#2a2418] px-1.5 pt-2 flex items-end justify-around"
-        style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.15)' }}
+        className="shrink-0 z-30 px-2 pt-1 flex items-end justify-around gap-1"
+        style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
       >
         {NAV_ITEMS.map((tab) => {
           const Icon = tab.icon;
@@ -418,11 +419,25 @@ export default function App() {
                 triggerHapticFeedback('light');
                 playClickSound(700);
               }}
-              className={`font-hand flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-bold transition-all rounded-t-xl border-[1.5px] border-b-0 ${
+              className="font-hand flex-1 flex flex-col items-center gap-0.5 py-1.5 text-[10px] font-bold rounded-t-xl transition-all"
+              style={
                 isActive
-                  ? 'bg-[#fdf8ec] dark:bg-[#221d12] text-orange-700 dark:text-orange-300 border-[#4a3a20] dark:border-[#c9b98a] -translate-y-1'
-                  : 'bg-[#d8cba8] dark:bg-[#3a3120] text-[#7a6a4a] dark:text-[#b8a878] border-transparent'
-              }`}
+                  ? {
+                      backgroundColor: isDarkMode ? '#2a2418' : '#f1e9d2',
+                      color: isDarkMode ? tab.activeTextDark : tab.activeText,
+                      transform: 'translateY(-6px)',
+                      boxShadow: '0 -3px 8px rgba(0,0,0,0.25), 0 6px 10px rgba(0,0,0,0.35)',
+                      zIndex: 3,
+                      paddingTop: '10px',
+                      paddingBottom: '11px',
+                    }
+                  : {
+                      backgroundColor: isDarkMode ? tab.tabBgDark : tab.tabBg,
+                      color: isDarkMode ? '#d8cba8' : '#4a3420',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.35)',
+                    }
+              }
               id={`tab-${tab.id}`}
             >
               <Icon className="w-5 h-5" />

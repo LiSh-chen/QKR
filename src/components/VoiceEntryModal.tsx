@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Mic, Clock3, PiggyBank } from 'lucide-react';
+import { X, Mic, Clock3 } from 'lucide-react';
 import { QuadrantType, Transaction } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { playClickSound, triggerHapticFeedback } from '../lib/storage';
@@ -342,7 +342,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                       <button
                         key={qKey}
                         onClick={() => handleQuadrantClick(qKey)}
-                        className={`font-hand relative h-8 ${s.radius} text-center transition-all flex items-center justify-center`}
+                        className={`font-hand nb-curl relative h-8 ${s.radius} text-center transition-all flex items-center justify-center overflow-hidden`}
                         style={{ backgroundColor: s.bg, border: `1.6px solid ${s.border}`, transform: `rotate(${s.rotate})`, boxShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
                         id={`voice-modal-quadrant-${qKey}`}
                       >
@@ -363,7 +363,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                       style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
                       id="voice-modal-lump-sum-btn"
                     >
-                      <PiggyBank className="w-3 h-3" /> 模糊概算
+                      模糊概算
                     </button>
                     <button
                       onClick={handleClassifyLater}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Zap, Delete, Sparkles, PiggyBank } from 'lucide-react';
+import { X, Zap, Delete, Sparkles } from 'lucide-react';
 import { QuadrantType, Transaction } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import {
@@ -273,7 +273,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   <button
                     key={qKey}
                     onClick={() => handleQuadrantClick(qKey)}
-                    className={`font-hand relative h-8 ${s.radius} text-center transition-all flex items-center justify-center`}
+                    className={`font-hand nb-curl relative h-8 ${s.radius} text-center transition-all flex items-center justify-center overflow-hidden`}
                     style={{ backgroundColor: s.bg, border: `1.6px solid ${s.border}`, transform: `rotate(${s.rotate})`, boxShadow: '2px 2px 4px rgba(0,0,0,0.2)' }}
                     id={`quick-modal-quadrant-${qKey}`}
                   >
@@ -293,7 +293,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
                 id="quick-modal-lump-sum-btn"
               >
-                <PiggyBank className="w-3 h-3" /> 模糊概算補登
+                模糊概算補登
               </button>
               <button
                 onClick={handleZeroSpendToday}

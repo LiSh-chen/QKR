@@ -360,6 +360,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       drag="x"
                       dragConstraints={{ left: -112, right: 0 }}
                       dragElastic={0.15}
+                      dragMomentum={false}
                       onDragEnd={(_, info) => {
                         if (info.offset.x < -56) setOpenRowId(tx.id);
                         else setOpenRowId(null);
@@ -369,7 +370,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       }}
                       className={`relative z-10 px-3 py-2.5 border shadow-sm flex items-center gap-2 transition-colors ${
                         isSelected
-                          ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800'
+                          ? 'bg-emerald-100 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-800'
                           : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60'
                       }`}
                     >
@@ -378,6 +379,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         checked={isSelected}
                         onChange={() => toggleSelect(tx.id)}
                         onClick={(e) => e.stopPropagation()}
+                        onPointerDownCapture={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
                         className="w-4 h-4 rounded border-stone-300 dark:border-stone-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
                       />
 

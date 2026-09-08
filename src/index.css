@@ -2,6 +2,13 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: 'ChenYuluoyan';
+  src: url('./assets/fonts/ChenYuluoyan-Subset.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400 700;
+}
+
 :root {
   --nb-paper: #f1e9d2;
   --nb-paper-line: #c9b98a66;
@@ -13,7 +20,15 @@
 }
 
 .font-hand {
-  font-family: 'Kalam', cursive;
+  font-family: 'ChenYuluoyan', 'Kalam', cursive;
+}
+
+/* Wood desk surface — sits behind the notebook page so the page reads as an
+   object resting on a table, not just a flat background fill. */
+.nb-desk {
+  background-image:
+    repeating-linear-gradient(95deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0.08) 1px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 40px),
+    linear-gradient(180deg, #4a3423, #2e2013);
 }
 
 .nb-ruled {
@@ -70,4 +85,24 @@
   height: 8px;
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+/* Sticky-note curled corner: a lifted highlight flap + the shadow it casts
+   back onto the note, applied to any element with position:relative. */
+.nb-curl {
+  position: relative;
+}
+.nb-curl::before {
+  content: "";
+  position: absolute; top: 0; right: 0; width: 24%; height: 24%;
+  background: linear-gradient(135deg, rgba(255,255,255,.65), rgba(255,255,255,.15) 60%);
+  clip-path: polygon(100% 0%, 0% 0%, 100% 100%);
+  pointer-events: none;
+}
+.nb-curl::after {
+  content: "";
+  position: absolute; top: 0; right: 0; width: 28%; height: 28%;
+  background: linear-gradient(135deg, transparent 55%, rgba(0,0,0,.22) 62%, transparent 72%);
+  clip-path: polygon(100% 0%, 0% 0%, 100% 100%);
+  pointer-events: none;
 }

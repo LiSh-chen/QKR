@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, AlertCircle, Delete, X, History, Check, PiggyBank, Mic, Clock3 } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Delete, X, History, Check, RotateCcw, Mic, Clock3 } from 'lucide-react';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { QuadrantType, Transaction } from '../types';
 import { triggerHapticFeedback, playClickSound } from '../lib/storage';
@@ -380,12 +380,12 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                 key={qKey}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuadrantDirectClick(qKey)}
-                className={`font-hand relative h-10 ${s.radius} text-center transition-all flex items-center justify-center`}
+                className={`font-hand nb-curl relative h-10 ${s.radius} text-center transition-all flex items-center justify-center overflow-hidden`}
                 style={{
                   backgroundColor: s.bg,
                   border: `1.6px solid ${s.border}`,
                   transform: `rotate(${s.rotate})`,
-                  boxShadow: '2px 2px 4px rgba(0,0,0,0.2)',
+                  boxShadow: '2px 4px 6px rgba(0,0,0,0.28)',
                 }}
                 id={`quadrant-direct-btn-${qKey}`}
               >
@@ -406,7 +406,6 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
             style={{ borderRadius: '180px 20px 180px 20px / 20px 180px 20px 180px' }}
             id="lump-sum-confirm-btn"
           >
-            <PiggyBank className="w-3.5 h-3.5" />
             <span className="text-[11px] font-bold">模糊概算</span>
           </motion.button>
 
@@ -418,7 +417,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               className="font-hand flex-1 h-9 flex items-center justify-center gap-1 bg-[#fdf8ec] dark:bg-[#221d12] border-[1.6px] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0] rounded-xl"
               id="open-recent-reuse-picker-btn"
             >
-              <History className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5" />
               <span className="text-[11px] font-bold">昨日複用（{recentCandidates.length}）</span>
             </button>
           )}
