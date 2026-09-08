@@ -2,13 +2,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-@font-face {
-  font-family: 'ChenYuluoyan';
-  src: url('./assets/fonts/ChenYuluoyan-Subset.woff2') format('woff2');
-  font-display: swap;
-  font-weight: 400 700;
-}
-
 :root {
   --nb-paper: #f1e9d2;
   --nb-paper-line: #c9b98a66;
@@ -20,7 +13,7 @@
 }
 
 .font-hand {
-  font-family: 'ChenYuluoyan', 'Kalam', cursive;
+  font-family: 'Kalam', cursive;
 }
 
 /* Wood desk surface — sits behind the notebook page so the page reads as an

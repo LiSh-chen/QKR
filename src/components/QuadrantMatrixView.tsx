@@ -127,7 +127,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
 
       <div className="ml-4 space-y-3 overflow-y-auto flex-1 min-h-0">
         {/* Header & Mode Switch */}
-        <div className="flex items-center justify-between gap-2 bg-[#fdf8ec] dark:bg-[#221d12] px-4 py-3 rounded-2xl border-2 border-[#4a3a20] dark:border-[#c9b98a]">
+        <div className="flex items-center justify-between gap-2 bg-white/8 dark:bg-black/15 px-4 py-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60">
           <div className="flex items-center gap-1.5 min-w-0">
             <LayoutGrid className="w-4 h-4 text-orange-700 dark:text-orange-300 shrink-0" />
             <h2 className="font-hand text-base font-bold text-[#3a2e18] dark:text-white truncate">2x2 四象限數據分析</h2>
@@ -166,7 +166,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                 { label: '本月支出', value: `$${totalSpend.toLocaleString()}`, icon: Calendar },
                 { label: '日均花費', value: `$${avgPerDay.toLocaleString()}`, icon: TrendingUp },
               ].map((s) => (
-                <div key={s.label} className="bg-[#fdf8ec] dark:bg-[#221d12] border-2 border-[#4a3a20] dark:border-[#c9b98a] rounded-2xl p-3 text-center">
+                <div key={s.label} className="bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 rounded-2xl p-3 text-center">
                   <s.icon className="w-4 h-4 mx-auto text-orange-700 dark:text-orange-300" />
                   <div className="font-hand text-base font-bold text-[#3a2e18] dark:text-white mt-1">{s.value}</div>
                   <div className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878]">{s.label}</div>
@@ -175,7 +175,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
             </div>
 
             {/* Donut chart */}
-            <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-4 rounded-3xl border-2 border-[#4a3a20] dark:border-[#c9b98a]">
+            <div className="bg-white/8 dark:bg-black/15 p-4 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60">
               {hasMonthData ? (
                 <div className="w-40 h-40 mx-auto relative mb-3">
                   <ResponsiveContainer width="100%" height="100%">
@@ -230,7 +230,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
 
             {/* Lump-Sum summary */}
             {lumpSumCount > 0 && (
-              <div className="bg-[#f5e9c8] dark:bg-[#3a2f18] p-3 rounded-2xl border-2 border-dashed border-[#8a6a2a] flex items-center justify-between gap-2">
+              <div className="nb-curl relative overflow-hidden bg-[#f5e9c8] dark:bg-[#3a2f18] p-3 rounded-2xl border-2 border-dashed border-[#8a6a2a] flex items-center justify-between gap-2">
                 <div className="font-hand flex items-center gap-1.5 text-xs text-[#5a4a2a] dark:text-[#d4c49a]">
                   <Info className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
                   <span>模糊概算補登（不分象限，已計入總支出）</span>
@@ -243,7 +243,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
           </>
         ) : (
           /* 歷史趨勢 */
-          <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-4 rounded-3xl border-2 border-[#4a3a20] dark:border-[#c9b98a] space-y-3">
+          <div className="bg-white/8 dark:bg-black/15 p-4 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-3">
             <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#5a4a2a] dark:text-[#d4c49a]">
               <TrendingUp className="w-4 h-4 text-orange-700 dark:text-orange-300" />
               <span>近 8 個月支出趨勢（按象限堆疊）</span>

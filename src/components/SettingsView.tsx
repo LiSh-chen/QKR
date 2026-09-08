@@ -83,7 +83,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
       <div className="ml-4 space-y-6">
       {/* Header */}
-      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-5 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm">
+      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60">
         <div className="flex items-center gap-2">
           <SettingsIcon className="w-5 h-5 text-stone-700 dark:text-stone-300" />
           <h2 className="text-xl font-bold text-[#3a2e18] dark:text-white">系統設定與資料管理</h2>
@@ -94,7 +94,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* Preferences Section (includes Dark Mode) */}
-      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-5 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm space-y-4">
+      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-4">
         <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 border-b border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 pb-2">
           互動偏好設定
         </h3>
@@ -150,7 +150,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* Notifications Section (merged from the old 推播通知 tab) */}
-      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-5 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm space-y-4">
+      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-4">
         <div className="flex items-center gap-2 border-b border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 pb-2">
           <Bell className="w-4 h-4 text-indigo-500" />
           <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">系統通知設定</h3>
@@ -171,7 +171,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="time"
             value={settings.daily_reminder_time}
             onChange={(e) => onUpdateSettings({ daily_reminder_time: e.target.value })}
-            className="bg-[#f5efdc] dark:bg-[#2e2818] border border-stone-200 dark:border-stone-700 rounded-xl px-4 py-2 text-sm font-mono font-bold text-[#3a2e18] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="bg-white/10 dark:bg-black/20 border-[1.5px] border-dashed border-[#a08a5c]/60 dark:border-[#8a7a5a]/50 rounded-xl px-4 py-2 text-sm font-mono font-bold text-[#3a2e18] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             id="settings-reminder-time-input"
           />
           <label className="flex items-center gap-2 text-xs font-medium text-[#5a4a2a] dark:text-[#d4c49a] cursor-pointer ml-auto">
@@ -201,7 +201,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* SLA Performance Metrics Monitor */}
-      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-5 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm space-y-3">
+      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-emerald-500" />
@@ -221,7 +221,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             slaLogs.map((log, idx) => (
               <div
                 key={idx}
-                className="p-2 rounded-xl bg-[#f5efdc] dark:bg-[#2e2818]/80 flex items-center justify-between text-[11px]"
+                className="p-2 rounded-xl bg-white/8 dark:bg-black/15 flex items-center justify-between text-[11px]"
               >
                 <span className="text-stone-500">[{log.timestamp}] 來源: {log.source}</span>
                 <span className={`font-bold ${log.passed ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500'}`}>
@@ -234,7 +234,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* Data Backup & Restore */}
-      <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-5 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 shadow-sm space-y-4">
+      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-4">
         <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 border-b border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 pb-2">
           資料匯出與備份 (Local-First)
         </h3>

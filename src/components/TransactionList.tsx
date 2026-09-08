@@ -167,7 +167,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
       <div className="ml-4 flex-1 min-h-0 flex flex-col gap-3">
         <div className="shrink-0 space-y-2">
-          <div className="bg-[#fdf8ec] dark:bg-[#221d12] border-2 border-[#4a3a20] dark:border-[#c9b98a] rounded-2xl p-2.5">
+          <div className="bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 rounded-2xl p-2.5">
             <div className="flex items-center justify-between mb-1.5">
               <button
                 onClick={() => setCalendarMonth((m) => (m.month === 0 ? { year: m.year - 1, month: 11 } : { year: m.year, month: m.month - 1 }))}
@@ -235,7 +235,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-1.5 bg-[#f5efdc] dark:bg-[#2e2818] border-[1.5px] border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 rounded-xl px-3 py-2">
+            <div className="flex-1 flex items-center gap-1.5 bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#a08a5c]/60 dark:border-[#8a7a5a]/50 rounded-xl px-3 py-2">
               <Search className="w-3.5 h-3.5 text-[#8a7a5a] shrink-0" />
               <input
                 type="text"
@@ -247,7 +247,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             </div>
             <button
               onClick={() => setShowCategoryPicker(true)}
-              className="font-hand flex items-center gap-1 px-3 py-2 bg-[#f5efdc] dark:bg-[#2e2818] border-[1.5px] border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 rounded-xl text-xs text-[#5a4a2a] dark:text-[#d4c49a] whitespace-nowrap shrink-0"
+              className="font-hand flex items-center gap-1 px-3 py-2 bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#a08a5c]/60 dark:border-[#8a7a5a]/50 rounded-xl text-xs text-[#5a4a2a] dark:text-[#d4c49a] whitespace-nowrap shrink-0"
               id="open-category-filter-btn"
             >
               <Tag className="w-3.5 h-3.5" />
@@ -311,7 +311,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pb-1">
           <AnimatePresence>
             {filteredTx.length === 0 ? (
-              <div className="bg-[#fdf8ec] dark:bg-[#221d12] p-8 rounded-3xl border border-[#4a3a20]/70 dark:border-[#c9b98a]/60 text-center text-[#8a7a5a] space-y-2">
+              <div className="bg-white/8 dark:bg-black/15 p-8 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/60 dark:border-[#c9b98a]/50 text-center text-[#8a7a5a] space-y-2">
                 <AlertCircle className="w-8 h-8 mx-auto text-stone-300" />
                 <p className="font-hand text-sm font-medium">沒有找到符合條件的記帳紀錄</p>
                 <button onClick={onOpenQuickModal} className="font-hand mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
@@ -319,7 +319,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 </button>
               </div>
             ) : (
-              filteredTx.map((tx) => {
+              filteredTx.map((tx, idx) => {
                 const qConfig = tx.quadrant ? QUADRANT_CONFIGS[tx.quadrant] : null;
                 const isSelected = selectedIds.includes(tx.id);
                 const isOpen = openRowId === tx.id;
@@ -368,11 +368,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       onClick={() => {
                         if (isOpen) setOpenRowId(null);
                       }}
-                      className={`relative z-10 px-3 py-2.5 border shadow-sm flex items-center gap-2 transition-colors ${
+                      className={`nb-curl relative z-10 px-3 py-2.5 border-[1.6px] flex items-center gap-2 transition-colors ${
                         isSelected
-                          ? 'bg-emerald-100 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-800'
+                          ? 'bg-emerald-100 dark:bg-emerald-900 border-emerald-400 dark:border-emerald-700'
                           : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60'
                       }`}
+                      style={{
+                        borderRadius: idx % 2 === 0 ? '3px 10px 3px 10px' : '10px 3px 10px 3px',
+                        boxShadow: '1.5px 2.5px 4px rgba(0,0,0,0.2)',
+                      }}
                     >
                       <input
                         type="checkbox"
