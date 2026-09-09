@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Search,
   Trash2,
-  Pencil,
   AlertCircle,
   Download,
   CheckSquare,
@@ -18,6 +17,13 @@ import {
 } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
+
+const QUADRANT_STICKY_PHOTO: Record<QuadrantType, string> = {
+  NECESSARY_DAILY: 'nb-sticky-green',
+  NECESSARY_URGENT: 'nb-sticky-blue',
+  UNNECESSARY_DAILY: 'nb-sticky-yellow',
+  UNNECESSARY_URGENT: 'nb-sticky-red',
+};
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -49,8 +55,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     return { year: now.getFullYear(), month: now.getMonth() };
   });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
-  const [openRowId, setOpenRowId] = useState<string | null>(null);
+  const [detailTx, setDetailTx] = useState<Transaction | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [showDuplicatePicker, setShowDuplicatePicker] = useState(false);
   const [duplicateTargetDate, setDuplicateTargetDate] = useState('');
 
@@ -167,7 +173,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
       <div className="ml-4 flex-1 min-h-0 flex flex-col gap-3">
         <div className="shrink-0 space-y-2">
-          <div className="bg-white/8 border-[1.5px] border-dashed border-[#4a3a20]/70 rounded-2xl p-2.5">
+          <div
+            className="nb-note-photo nb-note-white relative p-2.5"
+            style={{ transform: 'rotate(-0.4deg)', filter: 'drop-shadow(2px 5px 8px rgba(0,0,0,0.35))' }}
+          >
             <div className="flex items-center justify-between mb-1.5">
               <button
                 onClick={() => setCalendarMonth((m) => (m.month === 0 ? { year: m.year - 1, month: 11 } : { year: m.year, month: m.month - 1 }))}
@@ -308,7 +317,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           )}
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pb-1">
+        <div className="relative flex-1 min-h-0">
+          <div
+            className="pointer-events-none absolute top-0 left-0 right-0 h-4 z-20"
+            style={{ background: 'linear-gradient(rgba(20,12,4,0.18), transparent)' }}
+          />
+          <div className="h-full overflow-y-auto space-y-1.5 pb-1 pt-1">
           <AnimatePresence>
             {filteredTx.length === 0 ? (
               <div className="bg-white/8 p-8 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/60 text-center text-[#8a7a5a] space-y-2">
@@ -322,96 +336,55 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               filteredTx.map((tx, idx) => {
                 const qConfig = tx.quadrant ? QUADRANT_CONFIGS[tx.quadrant] : null;
                 const isSelected = selectedIds.includes(tx.id);
-                const isOpen = openRowId === tx.id;
-                const dotColor = tx.is_zero_spend ? '#0d9488' : tx.is_lump_sum ? '#b45309' : qConfig?.color || '#a8a29e';
+                const stickyClass = tx.is_zero_spend || tx.is_lump_sum || !qConfig
+                  ? 'nb-tag-gray'
+                  : QUADRANT_STICKY_PHOTO[tx.quadrant as QuadrantType];
                 const shortDate = tx.entry_date ? tx.entry_date.slice(5).replace('-', '/') : '';
 
                 return (
-                  <div key={tx.id} className="relative rounded-2xl overflow-hidden">
-                    {/* Actions revealed on swipe-left */}
-                    <div className="absolute inset-y-0 right-0 flex items-stretch">
-                      <button
-                        onClick={() => {
-                          setEditingTx(tx);
-                          setOpenRowId(null);
-                        }}
-                        className="w-14 flex items-center justify-center bg-blue-500 text-white"
-                        title="編輯"
-                      >
-                        <Pencil className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          onDelete(tx.id);
-                          setOpenRowId(null);
-                        }}
-                        className="w-14 flex items-center justify-center bg-rose-600 text-white"
-                        title="刪除"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
+                  <motion.button
+                    key={tx.id}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    onClick={() => setDetailTx(tx)}
+                    className={`nb-sticky-photo ${stickyClass} relative w-full px-3 py-2.5 flex items-center gap-2 text-left`}
+                    style={{
+                      transform: `rotate(${idx % 2 === 0 ? '-0.6deg' : '0.6deg'})`,
+                    }}
+                    id={`tx-row-${tx.id}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(tx.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      onPointerDownCapture={(e) => e.stopPropagation()}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      className="w-4 h-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                    />
+                    {isSelected && (
+                      <span className="absolute inset-0 rounded-[inherit] border-[3px] border-orange-500 pointer-events-none" />
+                    )}
 
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1, x: isOpen ? -112 : 0 }}
-                      exit={{ opacity: 0, scale: 0.97 }}
-                      drag="x"
-                      dragConstraints={{ left: -112, right: 0 }}
-                      dragElastic={0.15}
-                      dragMomentum={false}
-                      onDragEnd={(_, info) => {
-                        if (info.offset.x < -56) setOpenRowId(tx.id);
-                        else setOpenRowId(null);
-                      }}
-                      onClick={() => {
-                        if (isOpen) setOpenRowId(null);
-                      }}
-                      className={`nb-curl relative z-10 px-3 py-2.5 border-[1.6px] flex items-center gap-2 transition-colors ${
-                        isSelected
-                          ? 'bg-emerald-100 border-emerald-400'
-                          : 'bg-[#fdf8ec] border-[#4a3a20]/70'
-                      }`}
-                      style={{
-                        borderRadius: idx % 2 === 0 ? '3px 10px 3px 10px' : '10px 3px 10px 3px',
-                        boxShadow: '1.5px 2.5px 4px rgba(0,0,0,0.2)',
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelect(tx.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        onPointerDownCapture={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
-                      />
+                    <span className="font-hand font-bold text-[#2a2013] text-sm truncate flex-1 min-w-0">
+                      {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
+                    </span>
 
-                      <span
-                        className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[8px] font-bold text-white"
-                        style={{ backgroundColor: dotColor }}
-                      >
-                        {tx.is_zero_spend ? '0' : tx.is_lump_sum ? '概' : qConfig ? qConfig.axisY[0] : '?'}
-                      </span>
+                    {tx.voice_raw_text && <Mic className="w-3 h-3 text-[#5c1414] shrink-0" />}
 
-                      <span className="font-hand font-bold text-[#3a2e18] text-sm truncate flex-1 min-w-0">
-                        {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
-                      </span>
+                    <span className="text-[10px] text-[#2a2013]/70 font-mono shrink-0">{shortDate}</span>
 
-                      {tx.voice_raw_text && <Mic className="w-3 h-3 text-rose-500 shrink-0" />}
-
-                      <span className="text-[10px] text-[#8a7a5a] font-mono shrink-0">{shortDate}</span>
-
-                      <span className={`font-mono font-extrabold text-sm shrink-0 ${tx.is_zero_spend ? 'text-teal-600' : 'text-[#3a2e18]'}`}>
-                        ${tx.amount.toLocaleString()}
-                      </span>
-                    </motion.div>
-                  </div>
+                    <span className="font-mono font-extrabold text-sm shrink-0 text-[#2a2013]">
+                      ${tx.amount.toLocaleString()}
+                    </span>
+                  </motion.button>
                 );
               })
             )}
           </AnimatePresence>
+          </div>
         </div>
       </div>
 
@@ -513,81 +486,144 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         )}
       </AnimatePresence>
 
+      {/* Detail / Edit popup — a real sticky note matching the item's category color */}
       <AnimatePresence>
-        {editingTx && (
+        {detailTx && (
           <div className="absolute inset-0 z-20 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
             <motion.div
-              initial={{ opacity: 0, y: 80 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 80 }}
-              className="w-full max-w-xs nb-ruled rounded-3xl p-4 pl-6 relative space-y-3"
+              initial={{ opacity: 0, y: 80, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 80, scale: 0.95 }}
+              className="w-full max-w-xs relative"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-hand text-sm font-bold text-[#3a2e18]">編輯紀錄</span>
-                <button onClick={() => setEditingTx(null)} className="text-[#8a7a5a]">
-                  <X className="w-5 h-5" />
+              <div
+                className={`nb-sticky-photo ${
+                  detailTx.is_zero_spend || detailTx.is_lump_sum || !detailTx.quadrant
+                    ? 'nb-tag-gray'
+                    : QUADRANT_STICKY_PHOTO[detailTx.quadrant]
+                } relative p-5 space-y-3`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-hand text-base font-bold text-[#2a2013]">記帳詳情</span>
+                  <button onClick={() => setDetailTx(null)} className="text-[#2a2013]/70">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-hand text-sm text-[#2a2013]/70 font-bold">$</span>
+                  <input
+                    type="number"
+                    value={detailTx.amount}
+                    onChange={(e) => setDetailTx({ ...detailTx, amount: parseFloat(e.target.value) || 0 })}
+                    className="font-hand flex-1 bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
+                  />
+                </div>
+
+                <input
+                  type="text"
+                  value={detailTx.note || ''}
+                  onChange={(e) => setDetailTx({ ...detailTx, note: e.target.value })}
+                  placeholder="備註"
+                  className="font-hand w-full bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
+                />
+
+                <input
+                  type="date"
+                  value={detailTx.entry_date}
+                  onChange={(e) => setDetailTx({ ...detailTx, entry_date: e.target.value })}
+                  className="font-hand w-full bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
+                />
+
+                {detailTx.voice_raw_text && (
+                  <div className="font-hand text-[10px] text-[#2a2013]/60 italic">
+                    語音原句：「{detailTx.voice_raw_text}」
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2">
+                  {QUADRANT_LIST.map((qKey) => (
+                    <button
+                      key={qKey}
+                      onClick={() => setDetailTx({ ...detailTx, quadrant: qKey, is_lump_sum: false })}
+                      className="font-hand h-9 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1"
+                      style={{
+                        backgroundColor: QUADRANT_CONFIGS[qKey].color,
+                        boxShadow: detailTx.quadrant === qKey && !detailTx.is_lump_sum ? '0 0 0 2px #2a2013' : 'none',
+                      }}
+                    >
+                      {detailTx.quadrant === qKey && !detailTx.is_lump_sum && <Check className="w-3 h-3" />}
+                      {QUADRANT_CONFIGS[qKey].title}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setDeleteConfirmId(detailTx.id)}
+                    className="flex-1 h-10 rounded-xl bg-rose-600/90 border-[1.6px] border-rose-900 font-bold text-white text-sm flex items-center justify-center gap-1.5"
+                    id="detail-delete-btn"
+                  >
+                    <Trash2 className="w-4 h-4" /> 刪除
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (onUpdateTransaction) {
+                        onUpdateTransaction(detailTx.id, {
+                          amount: detailTx.amount,
+                          note: detailTx.note,
+                          entry_date: detailTx.entry_date,
+                          quadrant: detailTx.quadrant,
+                          is_lump_sum: detailTx.is_lump_sum,
+                        });
+                      }
+                      setDetailTx(null);
+                    }}
+                    className="flex-1 h-10 rounded-xl bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] text-sm"
+                    id="detail-save-btn"
+                  >
+                    儲存變更
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete confirmation — a second explicit step before anything is actually removed */}
+      <AnimatePresence>
+        {deleteConfirmId && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="nb-note-photo nb-note-yellow relative w-full max-w-[260px] p-5 space-y-3 text-center"
+            >
+              <AlertCircle className="w-8 h-8 mx-auto text-rose-700" />
+              <p className="font-hand text-sm font-bold text-[#2a2013]">確定要刪除這筆記帳紀錄嗎？</p>
+              <p className="font-hand text-xs text-[#2a2013]/70">刪除後將無法復原</p>
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={() => setDeleteConfirmId(null)}
+                  className="flex-1 h-10 rounded-xl bg-white/60 border-[1.5px] border-[#2a2013]/40 font-bold text-[#2a2013] text-sm"
+                  id="delete-confirm-cancel-btn"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={() => {
+                    onDelete(deleteConfirmId);
+                    setDeleteConfirmId(null);
+                    setDetailTx(null);
+                  }}
+                  className="flex-1 h-10 rounded-xl bg-rose-600 border-[1.5px] border-rose-900 font-bold text-white text-sm"
+                  id="delete-confirm-ok-btn"
+                >
+                  確定刪除
                 </button>
               </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-hand text-sm text-[#b08d57] font-bold">$</span>
-                <input
-                  type="number"
-                  value={editingTx.amount}
-                  onChange={(e) => setEditingTx({ ...editingTx, amount: parseFloat(e.target.value) || 0 })}
-                  className="font-hand flex-1 bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18]"
-                />
-              </div>
-
-              <input
-                type="text"
-                value={editingTx.note || ''}
-                onChange={(e) => setEditingTx({ ...editingTx, note: e.target.value })}
-                placeholder="備註"
-                className="font-hand w-full bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18]"
-              />
-
-              <input
-                type="date"
-                value={editingTx.entry_date}
-                onChange={(e) => setEditingTx({ ...editingTx, entry_date: e.target.value })}
-                className="font-hand w-full bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18]"
-              />
-
-              <div className="grid grid-cols-2 gap-2">
-                {QUADRANT_LIST.map((qKey) => (
-                  <button
-                    key={qKey}
-                    onClick={() => setEditingTx({ ...editingTx, quadrant: qKey, is_lump_sum: false })}
-                    className="font-hand h-10 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1"
-                    style={{
-                      backgroundColor: QUADRANT_CONFIGS[qKey].color,
-                      boxShadow: editingTx.quadrant === qKey && !editingTx.is_lump_sum ? '0 0 0 2px #ea580c' : 'none',
-                    }}
-                  >
-                    {editingTx.quadrant === qKey && !editingTx.is_lump_sum && <Check className="w-3 h-3" />}
-                    {QUADRANT_CONFIGS[qKey].title}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => {
-                  if (onUpdateTransaction) {
-                    onUpdateTransaction(editingTx.id, {
-                      amount: editingTx.amount,
-                      note: editingTx.note,
-                      entry_date: editingTx.entry_date,
-                      quadrant: editingTx.quadrant,
-                      is_lump_sum: editingTx.is_lump_sum,
-                    });
-                  }
-                  setEditingTx(null);
-                }}
-                className="font-hand w-full h-10 rounded-xl bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] text-sm"
-              >
-                儲存變更
-              </button>
             </motion.div>
           </div>
         )}

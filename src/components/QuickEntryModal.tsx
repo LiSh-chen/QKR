@@ -184,10 +184,10 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               </button>
             </div>
 
-            {/* Receipt-style amount display */}
+            {/* Amount display — real note-paper photo */}
             <div
-              className="bg-[#fdf8ec] border-2 border-[#3a2e18] px-3 py-1.5 flex items-center justify-between"
-              style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px', transform: 'rotate(-0.4deg)', boxShadow: '2px 2px 0 rgba(60,40,10,0.15)' }}
+              className="nb-note-photo nb-note-white relative px-3 py-1.5 flex items-center justify-between"
+              style={{ transform: 'rotate(-0.3deg)' }}
             >
               <span className="text-[#b08d57] font-bold text-sm font-hand">$</span>
               <span className="flex-1 text-right text-xl font-hand font-bold text-[#3a2e18] tabular-nums truncate">
@@ -201,7 +201,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="備註：便當、咖啡..."
-              className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70"
+              className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70"
               id="quick-modal-note-input"
             />
 
@@ -258,8 +258,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(1000);
                   calc.pressEquals();
                 }}
-                className="font-hand col-span-3 h-7 nb-blob-pill bg-[#c8e6c0] border-[1.5px] border-[#2e5c26] flex items-center justify-center font-bold text-[#2e5c26] text-xs"
-                style={{ transform: 'rotate(0.5deg)' }}
+                className="font-hand nb-tag-photo nb-tag-stamp-sm col-span-3 h-8 flex items-center justify-center font-bold text-[#1e4a2e] text-xs"
                 id="quick-modal-equals"
               >
                 = 算一算

@@ -38,9 +38,9 @@ html, body {
   background-image:
     linear-gradient(180deg, rgba(20,12,4,0.35), rgba(20,12,4,0.55)),
     url('./assets/notebook/wood_texture.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-size: 100% 100%, 140% 140%;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
 }
 
 .nb-ruled {
@@ -48,7 +48,7 @@ html, body {
   background-image:
     repeating-linear-gradient(var(--nb-paper-line) 0, var(--nb-paper-line) 1px, transparent 1px, transparent 24px),
     url('./assets/notebook/paper_texture.webp');
-  background-size: 100% 24px, cover;
+  background-size: 100% 24px, 140% 140%;
   background-position: 0 0, center;
   background-repeat: repeat, no-repeat;
   background-blend-mode: multiply, normal;
@@ -124,6 +124,8 @@ html, body {
 }
 .nb-tag-1 { background-image: url('./assets/notebook/tag_1.webp'); }
 .nb-tag-2 { background-image: url('./assets/notebook/tag_2.webp'); }
+.nb-tag-stamp-lg { background-image: url('./assets/notebook/tag_stamp_large.webp'); }
+.nb-tag-stamp-sm { background-image: url('./assets/notebook/tag_stamp_small.webp'); }
 
 /* Real photographed note-paper sheets — used for floating toasts and popup
    dialogs (confirmations, detail views) so they read as a memo note stuck

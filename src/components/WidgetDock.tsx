@@ -267,15 +267,15 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           <span className="text-base font-black font-mono text-[#4a3a20]">${todayTotal.toLocaleString()}</span>
         </div>
 
-        {/* Voice entry — a clearly-labeled pill, not just a bare icon, so its purpose is obvious at a glance */}
+        {/* Voice entry — a real stamped-tag photo so it matches the rest of the
+            paper/ink aesthetic instead of a flat modern gradient pill */}
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={() => {
             triggerHapticFeedback('light');
             onOpenVoiceModal();
           }}
-          className="font-hand w-full h-9 flex items-center justify-center gap-2 bg-gradient-to-b from-orange-400 to-orange-600 border-[1.8px] border-orange-800 text-white shrink-0"
-          style={{ borderRadius: '180px 16px 180px 16px / 16px 180px 16px 180px' }}
+          className="font-hand nb-tag-photo nb-tag-stamp-lg w-full h-11 flex items-center justify-center gap-2 text-[#1e4a2e] shrink-0"
           id="widget-voice-entry-btn"
         >
           <Mic className="w-4 h-4" />
@@ -297,12 +297,11 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           </button>
         )}
 
-        {/* Receipt-style amount display */}
+        {/* Amount display — a real white note-paper photo, matching the rest
+            of the physical-object aesthetic instead of a flat CSS box */}
         <div
-          className={`relative bg-[#fdf8ec] border-2 px-3 py-2 flex items-center justify-between shrink-0 transition-colors ${
-            showError ? 'border-rose-500' : 'border-[#3a2e18]'
-          }`}
-          style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px', transform: 'rotate(-0.4deg)', boxShadow: '2px 2px 0 rgba(60,40,10,0.15)' }}
+          className="nb-note-photo nb-note-white relative px-4 py-2.5 flex items-center justify-between shrink-0"
+          style={{ transform: 'rotate(-0.3deg)' }}
         >
           <span className="text-[#b08d57] font-bold text-base font-hand">$</span>
           <span className="flex-1 text-right text-2xl font-hand font-bold text-[#3a2e18] tabular-nums truncate">
@@ -321,7 +320,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           value={noteStr}
           onChange={(e) => setNoteStr(e.target.value)}
           placeholder="備註：便當、咖啡..."
-          className="font-hand w-full px-3 py-2 bg-[#fdf8ec]/60 text-[#5a4a2a] text-sm rounded-xl border-[1.5px] border-dashed border-[#a08a5c] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
+          className="font-hand w-full px-3 py-2 bg-transparent text-[#5a4a2a] text-sm border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
           id="main-direct-note-input"
         />
 
@@ -369,7 +368,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressBackspace();
             }}
-            className="font-hand h-9 nb-blob-4 bg-[#f5e0b8] border-[1.6px] border-[#8a6a2a] flex items-center justify-center font-bold text-[#5a4014] text-xs active:scale-95 transition-transform"
+            className="font-hand h-9 nb-ring-photo nb-ring-5 flex items-center justify-center font-bold text-[#5a4014] text-xs active:scale-95 transition-transform"
             style={{ transform: 'rotate(-1deg)' }}
             id="keypad-btn-backspace"
           >
@@ -382,8 +381,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressEquals();
             }}
-            className="font-hand col-span-3 h-9 nb-blob-pill bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] flex items-center justify-center font-bold text-[#2e5c26] text-sm active:scale-95 transition-transform"
-            style={{ transform: 'rotate(0.5deg)' }}
+            className="font-hand nb-tag-photo nb-tag-stamp-sm col-span-3 h-9 flex items-center justify-center font-bold text-[#1e4a2e] text-sm active:scale-95 transition-transform"
             id="keypad-btn-equals"
           >
             = 算一算

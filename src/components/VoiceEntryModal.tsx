@@ -305,8 +305,8 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
 
                 <div className="flex items-center gap-2">
                   <div
-                    className="flex-1 bg-[#fdf8ec] border-2 border-[#3a2e18] px-3 py-1.5 flex items-center gap-1"
-                    style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px' }}
+                    className="nb-note-photo nb-note-white flex-1 relative px-3 py-1.5 flex items-center gap-1"
+                    style={{ transform: 'rotate(-0.3deg)' }}
                   >
                     <span className="text-[#b08d57] font-bold text-sm font-hand shrink-0">$</span>
                     <input
@@ -327,7 +327,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   onChange={(e) => setNote(e.target.value)}
                   disabled={isClassifyMode}
                   placeholder="品項備註"
-                  className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 disabled:opacity-70"
+                  className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70 disabled:opacity-70"
                   id="voice-modal-note-input"
                 />
 
