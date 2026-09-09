@@ -26,15 +26,21 @@ button:focus, button:focus-visible {
   outline: none;
 }
 
+html, body {
+  background-color: #2e2013;
+  margin: 0;
+}
+
 /* Wood desk surface — sits behind the notebook page so the page reads as an
    object resting on a table, not just a flat background fill. Real photographed
-   wood-grain texture, tiled. */
+   wood-grain texture. Non-repeating/cover so there's no tiling seam. */
 .nb-desk {
   background-image:
     linear-gradient(180deg, rgba(20,12,4,0.35), rgba(20,12,4,0.55)),
     url('./assets/notebook/wood_texture.webp');
-  background-size: 340px 340px;
-  background-repeat: repeat;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .nb-ruled {
@@ -42,18 +48,10 @@ button:focus, button:focus-visible {
   background-image:
     repeating-linear-gradient(var(--nb-paper-line) 0, var(--nb-paper-line) 1px, transparent 1px, transparent 24px),
     url('./assets/notebook/paper_texture.webp');
-  background-size: 100% 24px, 320px 580px;
-  background-repeat: repeat, repeat;
+  background-size: 100% 24px, cover;
+  background-position: 0 0, center;
+  background-repeat: repeat, no-repeat;
   background-blend-mode: multiply, normal;
-}
-.dark .nb-ruled {
-  background-color: var(--nb-paper-dark);
-  background-image:
-    repeating-linear-gradient(var(--nb-paper-line-dark) 0, var(--nb-paper-line-dark) 1px, transparent 1px, transparent 24px),
-    url('./assets/notebook/paper_texture.webp');
-  background-size: 100% 24px, 320px 580px;
-  background-repeat: repeat, repeat;
-  background-blend-mode: multiply, overlay;
 }
 
 /* Hand-drawn wobble blob radius — apply with a rotate() transform for extra imperfection */

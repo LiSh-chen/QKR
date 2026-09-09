@@ -229,6 +229,37 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
+      {/* Success / Error feedback — a floating note-paper toast anchored to the
+          OUTER card (not the scrollable/offset inner content), so it's always
+          properly centered and never gets clipped by inner overflow-y-auto. */}
+      <AnimatePresence>
+        {lastResult && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.9 }}
+            className="absolute left-1/2 top-14 z-30 w-[85%] max-w-[280px]"
+            style={{ transform: 'translateX(-50%)' }}
+          >
+            <div
+              className="nb-note-photo nb-note-white relative px-4 py-3"
+              style={{ filter: 'drop-shadow(2px 6px 10px rgba(0,0,0,0.4))' }}
+            >
+              <div className="font-hand flex items-center justify-between gap-2 text-xs text-[#2e5c26]">
+                <div className="flex items-center gap-1.5 truncate">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span className="font-bold truncate">{lastResult.label}</span>
+                  {lastResult.durationSec && <span className="font-mono shrink-0">{lastResult.durationSec}s</span>}
+                </div>
+                <button onClick={() => setLastResult(null)} className="shrink-0">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative z-10 flex flex-col h-full min-h-0 gap-1.5 ml-4 overflow-y-auto">
         {/* Compact top bar: today's total */}
         <div className="flex items-center justify-between px-0.5 shrink-0">
@@ -265,36 +296,6 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
             <span className="truncate">還有 {pendingClassifyTxs.length} 筆待分類（點擊立即處理）</span>
           </button>
         )}
-
-        {/* Success / Error feedback — a floating note-paper toast, not part of
-            document flow, so it never stretches the page height */}
-        <AnimatePresence>
-          {lastResult && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.9 }}
-              className="absolute left-1/2 top-14 z-30 w-[85%] max-w-[280px]"
-              style={{ transform: 'translateX(-50%)' }}
-            >
-              <div
-                className="nb-note-photo nb-note-white relative px-4 py-3"
-                style={{ filter: 'drop-shadow(2px 6px 10px rgba(0,0,0,0.4))' }}
-              >
-                <div className="font-hand flex items-center justify-between gap-2 text-xs text-[#2e5c26]">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    <span className="font-bold truncate">{lastResult.label}</span>
-                    {lastResult.durationSec && <span className="font-mono shrink-0">{lastResult.durationSec}s</span>}
-                  </div>
-                  <button onClick={() => setLastResult(null)} className="shrink-0">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Receipt-style amount display */}
         <div

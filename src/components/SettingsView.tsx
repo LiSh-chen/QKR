@@ -5,8 +5,6 @@ import {
   Upload,
   RotateCcw,
   Zap,
-  Moon,
-  Sun,
   Bell,
   Clock,
   Send,
@@ -100,28 +98,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </h3>
 
         <div className="space-y-3 text-xs">
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50:bg-stone-800/50">
-            <div className="flex items-center gap-2">
-              {settings.dark_mode_enabled ? (
-                <Moon className="w-4 h-4 text-indigo-500 shrink-0" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-500 shrink-0" />
-              )}
-              <div>
-                <div className="font-bold text-[#3a2e18]">深色模式</div>
-                <div className="text-[#8a7a5a]">切換淺色 / 深色主題</div>
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.dark_mode_enabled}
-              onChange={(e) => onUpdateSettings({ dark_mode_enabled: e.target.checked })}
-              className="w-4 h-4 text-emerald-600 rounded border-stone-300"
-              id="settings-dark-mode-toggle"
-            />
-          </label>
-
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50:bg-stone-800/50">
+          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50">
             <div>
               <div className="font-bold text-[#3a2e18]">觸覺回饋 (Haptic Feedback)</div>
               <div className="text-[#8a7a5a]">點擊按鈕或完成記帳時觸發輕微震動</div>
@@ -134,7 +111,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             />
           </label>
 
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50:bg-stone-800/50">
+          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50">
             <div>
               <div className="font-bold text-[#3a2e18]">音效反饋 (Sound Effects)</div>
               <div className="text-[#8a7a5a]">按鍵音與成功音效提示</div>
