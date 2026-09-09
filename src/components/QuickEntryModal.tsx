@@ -124,7 +124,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         playClickSound(900);
         calc.pressDigit(value);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-xs`}
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] text-xs`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-keypad-${label}`}
     >
@@ -140,7 +140,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         playClickSound(1000);
         calc.pressOperator(op);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] dark:text-[#e8c896] text-sm`}
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] text-sm`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-op-${label}`}
     >
@@ -172,12 +172,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             {/* Compact header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Zap className="w-4 h-4 text-orange-700 dark:text-orange-300 shrink-0" />
-                <h3 className="font-hand text-base font-bold text-[#3a2e18] dark:text-white truncate">極速記帳</h3>
+                <Zap className="w-4 h-4 text-orange-700 shrink-0" />
+                <h3 className="font-hand text-base font-bold text-[#3a2e18] truncate">極速記帳</h3>
               </div>
               <button
                 onClick={onClose}
-                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18] dark:hover:text-white transition-colors shrink-0"
+                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18]:text-white transition-colors shrink-0"
                 id="close-quick-modal-btn"
               >
                 <X className="w-4.5 h-4.5" />
@@ -186,11 +186,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
             {/* Receipt-style amount display */}
             <div
-              className="bg-[#fdf8ec] dark:bg-[#221d12] border-2 border-[#3a2e18] dark:border-[#c9b98a] px-3 py-1.5 flex items-center justify-between"
+              className="bg-[#fdf8ec] border-2 border-[#3a2e18] px-3 py-1.5 flex items-center justify-between"
               style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px', transform: 'rotate(-0.4deg)', boxShadow: '2px 2px 0 rgba(60,40,10,0.15)' }}
             >
-              <span className="text-[#b08d57] dark:text-[#d4b878] font-bold text-sm font-hand">$</span>
-              <span className="flex-1 text-right text-xl font-hand font-bold text-[#3a2e18] dark:text-white tabular-nums truncate">
+              <span className="text-[#b08d57] font-bold text-sm font-hand">$</span>
+              <span className="flex-1 text-right text-xl font-hand font-bold text-[#3a2e18] tabular-nums truncate">
                 {calc.display || '0'}
               </span>
             </div>
@@ -201,7 +201,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="備註：便當、咖啡..."
-              className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] dark:text-[#d4c49a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] dark:border-[#8a7a5a] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70"
+              className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70"
               id="quick-modal-note-input"
             />
 
@@ -230,7 +230,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(500);
                   calc.clear();
                 }}
-                className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] dark:text-[#f0a8a8] text-xs"
+                className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] text-xs"
                 style={{ transform: 'rotate(-1.5deg)' }}
                 id="quick-modal-keypad-C"
               >
@@ -246,7 +246,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(700);
                   calc.pressBackspace();
                 }}
-                className="font-hand h-9 nb-ring-photo nb-ring-7 flex items-center justify-center font-bold text-[#7a4a1a] dark:text-[#e8c896] text-xs"
+                className="font-hand h-9 nb-ring-photo nb-ring-7 flex items-center justify-center font-bold text-[#7a4a1a] text-xs"
                 style={{ transform: 'rotate(-1deg)' }}
                 id="quick-modal-backspace"
               >
@@ -258,7 +258,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(1000);
                   calc.pressEquals();
                 }}
-                className="font-hand col-span-3 h-7 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.5px] border-[#2e5c26] dark:border-[#7ab86e] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-xs"
+                className="font-hand col-span-3 h-7 nb-blob-pill bg-[#c8e6c0] border-[1.5px] border-[#2e5c26] flex items-center justify-center font-bold text-[#2e5c26] text-xs"
                 style={{ transform: 'rotate(0.5deg)' }}
                 id="quick-modal-equals"
               >
@@ -298,7 +298,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               </button>
               <button
                 onClick={handleZeroSpendToday}
-                className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#bcd8f0] dark:bg-[#213c56] border-[1.6px] border-dashed border-[#1e4a78] text-[#1e4a78] dark:text-[#a8cdf0] text-[10px] font-bold"
+                className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#bcd8f0] border-[1.6px] border-dashed border-[#1e4a78] text-[#1e4a78] text-[10px] font-bold"
                 style={{ borderRadius: '20px 180px 20px 180px / 180px 20px 180px 20px' }}
                 id="quick-modal-zero-spend-btn"
               >

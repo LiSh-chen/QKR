@@ -83,24 +83,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
       <div className="ml-4 space-y-6">
       {/* Header */}
-      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60">
+      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70">
         <div className="flex items-center gap-2">
-          <SettingsIcon className="w-5 h-5 text-stone-700 dark:text-stone-300" />
-          <h2 className="text-xl font-bold text-[#3a2e18] dark:text-white">系統設定與資料管理</h2>
+          <SettingsIcon className="w-5 h-5 text-stone-700" />
+          <h2 className="text-xl font-bold text-[#3a2e18]">系統設定與資料管理</h2>
         </div>
-        <p className="text-xs text-stone-500 dark:text-[#8a7a5a] mt-1">
+        <p className="text-xs text-stone-500 mt-1">
           Local-First 本地優先架構，所有資料安全儲存於您的裝置。
         </p>
       </div>
 
       {/* Preferences Section (includes Dark Mode) */}
-      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-4">
-        <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 border-b border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 pb-2">
+      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-4">
+        <h3 className="text-sm font-bold text-stone-800 border-b border-[#a08a5c]/50 pb-2">
           互動偏好設定
         </h3>
 
         <div className="space-y-3 text-xs">
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50">
+          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50:bg-stone-800/50">
             <div className="flex items-center gap-2">
               {settings.dark_mode_enabled ? (
                 <Moon className="w-4 h-4 text-indigo-500 shrink-0" />
@@ -108,7 +108,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <Sun className="w-4 h-4 text-amber-500 shrink-0" />
               )}
               <div>
-                <div className="font-bold text-[#3a2e18] dark:text-white">深色模式</div>
+                <div className="font-bold text-[#3a2e18]">深色模式</div>
                 <div className="text-[#8a7a5a]">切換淺色 / 深色主題</div>
               </div>
             </div>
@@ -121,9 +121,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             />
           </label>
 
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50">
+          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50:bg-stone-800/50">
             <div>
-              <div className="font-bold text-[#3a2e18] dark:text-white">觸覺回饋 (Haptic Feedback)</div>
+              <div className="font-bold text-[#3a2e18]">觸覺回饋 (Haptic Feedback)</div>
               <div className="text-[#8a7a5a]">點擊按鈕或完成記帳時觸發輕微震動</div>
             </div>
             <input
@@ -134,9 +134,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             />
           </label>
 
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50 dark:hover:bg-stone-800/50">
+          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50:bg-stone-800/50">
             <div>
-              <div className="font-bold text-[#3a2e18] dark:text-white">音效反饋 (Sound Effects)</div>
+              <div className="font-bold text-[#3a2e18]">音效反饋 (Sound Effects)</div>
               <div className="text-[#8a7a5a]">按鍵音與成功音效提示</div>
             </div>
             <input
@@ -150,20 +150,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* Notifications Section (merged from the old 推播通知 tab) */}
-      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-4">
-        <div className="flex items-center gap-2 border-b border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 pb-2">
+      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-4">
+        <div className="flex items-center gap-2 border-b border-[#a08a5c]/50 pb-2">
           <Bell className="w-4 h-4 text-indigo-500" />
-          <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">系統通知設定</h3>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+          <h3 className="text-sm font-bold text-stone-800">系統通知設定</h3>
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">
             真實系統通知
           </span>
         </div>
-        <p className="text-xs text-stone-500 dark:text-[#8a7a5a] -mt-2">
+        <p className="text-xs text-stone-500 -mt-2">
           採用手機原生通知，會直接顯示在下拉通知列，不需開啟 App。時段習慣偵測（過時未記帳提醒）也會透過同一組通知管道推播。
         </p>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#5a4a2a] dark:text-[#d4c49a] shrink-0">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#5a4a2a] shrink-0">
             <Clock className="w-4 h-4 text-emerald-500" />
             <span>每日結算時間</span>
           </div>
@@ -171,10 +171,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             type="time"
             value={settings.daily_reminder_time}
             onChange={(e) => onUpdateSettings({ daily_reminder_time: e.target.value })}
-            className="bg-white/10 dark:bg-black/20 border-[1.5px] border-dashed border-[#a08a5c]/60 dark:border-[#8a7a5a]/50 rounded-xl px-4 py-2 text-sm font-mono font-bold text-[#3a2e18] dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="bg-white/10 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl px-4 py-2 text-sm font-mono font-bold text-[#3a2e18] focus:outline-none focus:ring-2 focus:ring-emerald-500"
             id="settings-reminder-time-input"
           />
-          <label className="flex items-center gap-2 text-xs font-medium text-[#5a4a2a] dark:text-[#d4c49a] cursor-pointer ml-auto">
+          <label className="flex items-center gap-2 text-xs font-medium text-[#5a4a2a] cursor-pointer ml-auto">
             <input
               type="checkbox"
               checked={settings.reminder_enabled}
@@ -194,22 +194,22 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <Send className="w-4 h-4" /> 送出測試通知
         </button>
         {testSentMsg && (
-          <div className="p-2.5 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200 text-xs rounded-xl font-bold text-center">
+          <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold text-center">
             {testSentMsg}
           </div>
         )}
       </div>
 
       {/* SLA Performance Metrics Monitor */}
-      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-3">
+      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-emerald-500" />
-            <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200">
+            <h3 className="text-sm font-bold text-stone-800">
               SLA 極速效能監控日誌 (SLA &le; 1.0s)
             </h3>
           </div>
-          <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
             實測 Target SLA Passed
           </span>
         </div>
@@ -221,10 +221,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             slaLogs.map((log, idx) => (
               <div
                 key={idx}
-                className="p-2 rounded-xl bg-white/8 dark:bg-black/15 flex items-center justify-between text-[11px]"
+                className="p-2 rounded-xl bg-white/8 flex items-center justify-between text-[11px]"
               >
                 <span className="text-stone-500">[{log.timestamp}] 來源: {log.source}</span>
-                <span className={`font-bold ${log.passed ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500'}`}>
+                <span className={`font-bold ${log.passed ? 'text-emerald-600' : 'text-amber-500'}`}>
                   耗時 {log.durationMs}ms ({log.passed ? '通關 ✓' : '超時'})
                 </span>
               </div>
@@ -234,13 +234,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       </div>
 
       {/* Data Backup & Restore */}
-      <div className="bg-white/8 dark:bg-black/15 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-4">
-        <h3 className="text-sm font-bold text-stone-800 dark:text-stone-200 border-b border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 pb-2">
+      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-4">
+        <h3 className="text-sm font-bold text-stone-800 border-b border-[#a08a5c]/50 pb-2">
           資料匯出與備份 (Local-First)
         </h3>
 
         {importStatusMsg && (
-          <div className="p-3 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200 text-xs rounded-xl font-bold">
+          <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold">
             {importStatusMsg}
           </div>
         )}
@@ -248,19 +248,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             onClick={handleExportJson}
-            className="py-3 px-4 bg-stone-100 hover:bg-[#e8dcc0] dark:bg-stone-800 dark:hover:bg-[#4a3f26] text-stone-800 dark:text-stone-200 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all"
+            className="py-3 px-4 bg-stone-100 hover:bg-[#e8dcc0]:bg-[#4a3f26] text-stone-800 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all"
           >
             <Download className="w-4 h-4" /> 匯出 JSON 備份
           </button>
 
-          <label className="py-3 px-4 bg-stone-100 hover:bg-[#e8dcc0] dark:bg-stone-800 dark:hover:bg-[#4a3f26] text-stone-800 dark:text-stone-200 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all">
+          <label className="py-3 px-4 bg-stone-100 hover:bg-[#e8dcc0]:bg-[#4a3f26] text-stone-800 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all">
             <Upload className="w-4 h-4" /> 匯入 JSON 資料
             <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
           </label>
 
           <button
             onClick={onResetToSeed}
-            className="py-3 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all"
+            className="py-3 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all"
           >
             <RotateCcw className="w-4 h-4" /> 重設預設示範資料
           </button>

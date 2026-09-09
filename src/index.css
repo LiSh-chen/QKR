@@ -16,6 +16,16 @@
   font-family: 'Kalam', cursive;
 }
 
+/* Remove the default browser/WebView tap-focus outline (a dashed ring) that
+   was showing up around sticky notes and tags after being tapped. */
+button, a, [role="button"] {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus, button:focus-visible {
+  outline: none;
+}
+
 /* Wood desk surface — sits behind the notebook page so the page reads as an
    object resting on a table, not just a flat background fill. Real photographed
    wood-grain texture, tiled. */
@@ -116,6 +126,16 @@
 }
 .nb-tag-1 { background-image: url('./assets/notebook/tag_1.webp'); }
 .nb-tag-2 { background-image: url('./assets/notebook/tag_2.webp'); }
+
+/* Real photographed note-paper sheets — used for floating toasts and popup
+   dialogs (confirmations, detail views) so they read as a memo note stuck
+   on top of the page, not a generic UI card, and never stretch page height. */
+.nb-note-photo {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.nb-note-white  { background-image: url('./assets/notebook/note_white.webp'); }
+.nb-note-yellow { background-image: url('./assets/notebook/sticky_yellow2.webp'); }
 
 /* Hand-drawn ink-ring photos — used for the calculator keypad buttons */
 .nb-ring-photo {

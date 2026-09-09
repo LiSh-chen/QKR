@@ -42,6 +42,13 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   const [noteStr, setNoteStr] = useState('');
   const [showError, setShowError] = useState(false);
   const [lastResult, setLastResult] = useState<{ label: string; durationSec?: string } | null>(null);
+
+  // Auto-dismiss the floating note-paper toast after a couple of seconds.
+  React.useEffect(() => {
+    if (!lastResult) return;
+    const t = setTimeout(() => setLastResult(null), 2200);
+    return () => clearTimeout(t);
+  }, [lastResult]);
   const [selectedRecentIds, setSelectedRecentIds] = useState<Set<string>>(new Set());
   const [showRecentPicker, setShowRecentPicker] = useState(false);
 
@@ -189,7 +196,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressDigit(value);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] dark:text-[#e8dcc0] text-sm active:scale-95 transition-transform`}
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] text-sm active:scale-95 transition-transform`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-btn-${label}`}
     >
@@ -207,7 +214,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressOperator(op);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] dark:text-[#e8c896] text-base active:scale-95 transition-transform`}
+      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] text-base active:scale-95 transition-transform`}
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-op-${label}`}
     >
@@ -216,7 +223,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   );
 
   return (
-    <div className="h-full flex flex-col nb-ruled text-[#3a2e18] dark:text-[#e8dcc0] rounded-3xl p-3 shadow-xl relative overflow-hidden">
+    <div className="h-full flex flex-col nb-ruled text-[#3a2e18] rounded-3xl p-3 shadow-xl relative overflow-hidden">
       <div className="nb-binder" />
       <div className="nb-holes">
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
@@ -225,8 +232,8 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
       <div className="relative z-10 flex flex-col h-full min-h-0 gap-1.5 ml-4 overflow-y-auto">
         {/* Compact top bar: today's total */}
         <div className="flex items-center justify-between px-0.5 shrink-0">
-          <span className="text-[11px] text-[#8a7a5a] dark:text-[#b8a878]">今日支出</span>
-          <span className="text-base font-black font-mono text-[#4a3a20] dark:text-white">${todayTotal.toLocaleString()}</span>
+          <span className="text-[11px] text-[#8a7a5a]">今日支出</span>
+          <span className="text-base font-black font-mono text-[#4a3a20]">${todayTotal.toLocaleString()}</span>
         </div>
 
         {/* Voice entry — a clearly-labeled pill, not just a bare icon, so its purpose is obvious at a glance */}
@@ -251,7 +258,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               const t = pendingClassifyTxs[0];
               onOpenClassify({ id: t.id, amount: t.amount, note: t.note });
             }}
-            className="font-hand flex items-center gap-1.5 px-2.5 py-1.5 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.4px] border-dashed border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] text-xs font-bold shrink-0 rounded-lg"
+            className="font-hand flex items-center gap-1.5 px-2.5 py-1.5 bg-[#f5e0b8] border-[1.4px] border-dashed border-[#8a6a2a] text-[#5a4014] text-xs font-bold shrink-0 rounded-lg"
             id="widget-pending-classify-banner"
           >
             <Clock3 className="w-3.5 h-3.5 shrink-0" />
@@ -259,36 +266,45 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           </button>
         )}
 
-        {/* Success / Error feedback */}
+        {/* Success / Error feedback — a floating note-paper toast, not part of
+            document flow, so it never stretches the page height */}
         <AnimatePresence>
           {lastResult && (
             <motion.div
-              initial={{ opacity: 0, y: -6, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: -6, height: 0 }}
-              className="font-hand bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] text-[#2e5c26] dark:text-[#a8dba0] rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-xs shrink-0 overflow-hidden"
+              initial={{ opacity: 0, y: -10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.9 }}
+              className="absolute left-1/2 top-14 z-30 w-[85%] max-w-[280px]"
+              style={{ transform: 'translateX(-50%)' }}
             >
-              <div className="flex items-center gap-1.5 truncate">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span className="font-bold truncate">{lastResult.label}</span>
-                {lastResult.durationSec && <span className="font-mono shrink-0">{lastResult.durationSec}s</span>}
+              <div
+                className="nb-note-photo nb-note-white relative px-4 py-3"
+                style={{ filter: 'drop-shadow(2px 6px 10px rgba(0,0,0,0.4))' }}
+              >
+                <div className="font-hand flex items-center justify-between gap-2 text-xs text-[#2e5c26]">
+                  <div className="flex items-center gap-1.5 truncate">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span className="font-bold truncate">{lastResult.label}</span>
+                    {lastResult.durationSec && <span className="font-mono shrink-0">{lastResult.durationSec}s</span>}
+                  </div>
+                  <button onClick={() => setLastResult(null)} className="shrink-0">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <button onClick={() => setLastResult(null)} className="shrink-0">
-                <X className="w-4 h-4" />
-              </button>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Receipt-style amount display */}
         <div
-          className={`relative bg-[#fdf8ec] dark:bg-[#221d12] border-2 px-3 py-2 flex items-center justify-between shrink-0 transition-colors ${
-            showError ? 'border-rose-500' : 'border-[#3a2e18] dark:border-[#c9b98a]'
+          className={`relative bg-[#fdf8ec] border-2 px-3 py-2 flex items-center justify-between shrink-0 transition-colors ${
+            showError ? 'border-rose-500' : 'border-[#3a2e18]'
           }`}
           style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px', transform: 'rotate(-0.4deg)', boxShadow: '2px 2px 0 rgba(60,40,10,0.15)' }}
         >
-          <span className="text-[#b08d57] dark:text-[#d4b878] font-bold text-base font-hand">$</span>
-          <span className="flex-1 text-right text-2xl font-hand font-bold text-[#3a2e18] dark:text-white tabular-nums truncate">
+          <span className="text-[#b08d57] font-bold text-base font-hand">$</span>
+          <span className="flex-1 text-right text-2xl font-hand font-bold text-[#3a2e18] tabular-nums truncate">
             {calc.display || '0'}
           </span>
           {showError && (
@@ -304,7 +320,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           value={noteStr}
           onChange={(e) => setNoteStr(e.target.value)}
           placeholder="備註：便當、咖啡..."
-          className="font-hand w-full px-3 py-2 bg-[#fdf8ec]/60 dark:bg-black/20 text-[#5a4a2a] dark:text-[#d4c49a] text-sm rounded-xl border-[1.5px] border-dashed border-[#a08a5c] dark:border-[#8a7a5a] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
+          className="font-hand w-full px-3 py-2 bg-[#fdf8ec]/60 text-[#5a4a2a] text-sm rounded-xl border-[1.5px] border-dashed border-[#a08a5c] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
           id="main-direct-note-input"
         />
 
@@ -335,7 +351,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               calc.clear();
               startTimeRef.current = null;
             }}
-            className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] dark:text-[#f0a8a8] text-sm active:scale-95 transition-transform"
+            className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] text-sm active:scale-95 transition-transform"
             style={{ transform: 'rotate(-1.5deg)' }}
             id="keypad-btn-C"
           >
@@ -352,7 +368,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressBackspace();
             }}
-            className="font-hand h-9 nb-blob-4 bg-[#f5e0b8] dark:bg-[#4a3f1c] border-[1.6px] border-[#8a6a2a] dark:border-[#d4b878] flex items-center justify-center font-bold text-[#5a4014] dark:text-[#f0dca8] text-xs active:scale-95 transition-transform"
+            className="font-hand h-9 nb-blob-4 bg-[#f5e0b8] border-[1.6px] border-[#8a6a2a] flex items-center justify-center font-bold text-[#5a4014] text-xs active:scale-95 transition-transform"
             style={{ transform: 'rotate(-1deg)' }}
             id="keypad-btn-backspace"
           >
@@ -365,7 +381,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressEquals();
             }}
-            className="font-hand col-span-3 h-9 nb-blob-pill bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] dark:border-[#7ab86e] flex items-center justify-center font-bold text-[#2e5c26] dark:text-[#a8dba0] text-sm active:scale-95 transition-transform"
+            className="font-hand col-span-3 h-9 nb-blob-pill bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] flex items-center justify-center font-bold text-[#2e5c26] text-sm active:scale-95 transition-transform"
             style={{ transform: 'rotate(0.5deg)' }}
             id="keypad-btn-equals"
           >
@@ -399,7 +415,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleLumpSumClick}
-            className="font-hand nb-tag-photo nb-tag-1 flex-1 h-11 flex items-center justify-center text-[#4a3010] dark:text-[#4a3010]"
+            className="font-hand nb-tag-photo nb-tag-1 flex-1 h-11 flex items-center justify-center text-[#4a3010]"
             id="lump-sum-confirm-btn"
           >
             <span className="text-[11px] font-bold">模糊概算</span>
@@ -410,7 +426,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           {recentCandidates.length > 0 && (
             <button
               onClick={() => setShowRecentPicker(true)}
-              className="font-hand nb-tag-photo nb-tag-2 flex-1 h-11 flex items-center justify-center gap-1 text-[#4a3010] dark:text-[#4a3010]"
+              className="font-hand nb-tag-photo nb-tag-2 flex-1 h-11 flex items-center justify-center gap-1 text-[#4a3010]"
               id="open-recent-reuse-picker-btn"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -432,7 +448,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-3 pl-5 relative max-h-[80%] flex flex-col"
             >
               <div className="flex items-center justify-between shrink-0 mb-2">
-                <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#3a2e18] dark:text-white">
+                <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#3a2e18]">
                   <History className="w-4 h-4" />
                   <span>昨日紀錄快速複用（可多選）</span>
                 </div>
@@ -453,7 +469,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                       className={`font-hand w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium border-[1.5px] transition-all shrink-0 ${
                         isSelected
                           ? 'bg-amber-400 border-amber-600 text-stone-900 font-bold'
-                          : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20] dark:border-[#c9b98a] text-[#3a2e18] dark:text-[#e8dcc0]'
+                          : 'bg-[#fdf8ec] border-[#4a3a20] text-[#3a2e18]'
                       }`}
                       style={{ borderRadius: i % 2 === 0 ? '4px 12px 4px 12px' : '12px 4px 12px 4px' }}
                       id={`recent-reuse-chip-${t.id}`}
@@ -473,7 +489,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               <button
                 onClick={handleApplySelectedRecent}
                 disabled={selectedRecentTx.length === 0}
-                className="font-hand w-full py-2.5 nb-blob-pill bg-[#f5dca0] dark:bg-[#5c451c] border-[1.6px] border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] font-bold text-sm shrink-0 mt-2 disabled:opacity-40"
+                className="font-hand w-full py-2.5 nb-blob-pill bg-[#f5dca0] border-[1.6px] border-[#8a6a2a] text-[#5a4014] font-bold text-sm shrink-0 mt-2 disabled:opacity-40"
                 id="apply-selected-recent-btn"
               >
                 {selectedRecentTx.length > 0

@@ -167,19 +167,19 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
       <div className="ml-4 flex-1 min-h-0 flex flex-col gap-3">
         <div className="shrink-0 space-y-2">
-          <div className="bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 rounded-2xl p-2.5">
+          <div className="bg-white/8 border-[1.5px] border-dashed border-[#4a3a20]/70 rounded-2xl p-2.5">
             <div className="flex items-center justify-between mb-1.5">
               <button
                 onClick={() => setCalendarMonth((m) => (m.month === 0 ? { year: m.year - 1, month: 11 } : { year: m.year, month: m.month - 1 }))}
-                className="p-1 text-[#5a4a2a] dark:text-[#d4c49a]"
+                className="p-1 text-[#5a4a2a]"
                 id="calendar-prev-month-btn"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="font-hand text-sm font-bold text-[#3a2e18] dark:text-white">{monthLabel}</span>
+              <span className="font-hand text-sm font-bold text-[#3a2e18]">{monthLabel}</span>
               <button
                 onClick={() => setCalendarMonth((m) => (m.month === 11 ? { year: m.year + 1, month: 0 } : { year: m.year, month: m.month + 1 }))}
-                className="p-1 text-[#5a4a2a] dark:text-[#d4c49a]"
+                className="p-1 text-[#5a4a2a]"
                 id="calendar-next-month-btn"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -188,7 +188,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
             <div className="grid grid-cols-7 gap-1 mb-1">
               {WEEKDAY_LABELS.map((w) => (
-                <div key={w} className="text-center text-[9px] font-bold text-[#8a7a5a] dark:text-[#b8a878]">
+                <div key={w} className="text-center text-[9px] font-bold text-[#8a7a5a]">
                   {w}
                 </div>
               ))}
@@ -212,7 +212,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     }}
                     id={`calendar-day-${day.dateStr}`}
                   >
-                    <span className={isSelected ? '' : 'dark:text-[#e8dcc0] text-[#3a2e18]'}>{day.dayNum}</span>
+                    <span className={isSelected ? '' : ' text-[#3a2e18]'}>{day.dayNum}</span>
                     {hasTx && (
                       <span
                         className="w-1 h-1 rounded-full absolute bottom-0.5"
@@ -227,7 +227,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             {selectedDate && (
               <button
                 onClick={() => setSelectedDate(null)}
-                className="font-hand w-full mt-1.5 text-[10px] text-orange-700 dark:text-orange-300 font-bold underline"
+                className="font-hand w-full mt-1.5 text-[10px] text-orange-700 font-bold underline"
               >
                 清除日期篩選（目前：{selectedDate}）
               </button>
@@ -235,19 +235,19 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-1.5 bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#a08a5c]/60 dark:border-[#8a7a5a]/50 rounded-xl px-3 py-2">
+            <div className="flex-1 flex items-center gap-1.5 bg-white/8 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl px-3 py-2">
               <Search className="w-3.5 h-3.5 text-[#8a7a5a] shrink-0" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜尋備註或金額..."
-                className="font-hand flex-1 min-w-0 bg-transparent text-xs text-[#5a4a2a] dark:text-[#d4c49a] focus:outline-none"
+                className="font-hand flex-1 min-w-0 bg-transparent text-xs text-[#5a4a2a] focus:outline-none"
               />
             </div>
             <button
               onClick={() => setShowCategoryPicker(true)}
-              className="font-hand flex items-center gap-1 px-3 py-2 bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#a08a5c]/60 dark:border-[#8a7a5a]/50 rounded-xl text-xs text-[#5a4a2a] dark:text-[#d4c49a] whitespace-nowrap shrink-0"
+              className="font-hand flex items-center gap-1 px-3 py-2 bg-white/8 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl text-xs text-[#5a4a2a] whitespace-nowrap shrink-0"
               id="open-category-filter-btn"
             >
               <Tag className="w-3.5 h-3.5" />
@@ -255,7 +255,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             </button>
             <button
               onClick={exportToCsv}
-              className="flex items-center gap-1 px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 border-[1.5px] border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs font-bold shrink-0"
+              className="flex items-center gap-1 px-3 py-2 bg-emerald-50 border-[1.5px] border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold shrink-0"
               title="將記帳清單匯出為 CSV"
             >
               <Download className="w-3.5 h-3.5" />
@@ -263,10 +263,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </div>
 
           {filteredTx.length > 0 && (
-            <div className="flex items-center justify-between pt-1.5 border-t border-[#a08a5c]/50 dark:border-[#8a7a5a]/40 text-xs text-[#5a4a2a] dark:text-[#d4c49a]">
+            <div className="flex items-center justify-between pt-1.5 border-t border-[#a08a5c]/50 text-xs text-[#5a4a2a]">
               <button onClick={toggleSelectAll} className="font-hand flex items-center gap-1.5 font-semibold">
                 {isAllSelected ? (
-                  <CheckSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <CheckSquare className="w-4 h-4 text-emerald-600" />
                 ) : (
                   <Square className="w-4 h-4 text-[#8a7a5a]" />
                 )}
@@ -275,12 +275,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
               {selectedIds.length > 0 && (
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                  <span className="font-mono text-emerald-600 font-bold text-[11px]">
                     已選 {selectedIds.length}
                   </span>
                   <button
                     onClick={() => setShowCategoryPicker(true)}
-                    className="p-1.5 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 rounded-lg"
+                    className="p-1.5 bg-blue-50 border border-blue-200 text-blue-600 rounded-lg"
                     title="更改分類"
                     id="batch-reclassify-btn"
                   >
@@ -288,7 +288,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   </button>
                   <button
                     onClick={() => setShowDuplicatePicker(true)}
-                    className="p-1.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 rounded-lg"
+                    className="p-1.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg"
                     title="複製到某天"
                     id="batch-duplicate-btn"
                   >
@@ -296,7 +296,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   </button>
                   <button
                     onClick={handleBatchDeleteClick}
-                    className="p-1.5 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 rounded-lg"
+                    className="p-1.5 bg-rose-50 border border-rose-200 text-rose-600 rounded-lg"
                     title="刪除"
                     id="batch-delete-btn"
                   >
@@ -311,10 +311,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pb-1">
           <AnimatePresence>
             {filteredTx.length === 0 ? (
-              <div className="bg-white/8 dark:bg-black/15 p-8 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/60 dark:border-[#c9b98a]/50 text-center text-[#8a7a5a] space-y-2">
+              <div className="bg-white/8 p-8 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/60 text-center text-[#8a7a5a] space-y-2">
                 <AlertCircle className="w-8 h-8 mx-auto text-stone-300" />
                 <p className="font-hand text-sm font-medium">沒有找到符合條件的記帳紀錄</p>
-                <button onClick={onOpenQuickModal} className="font-hand mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                <button onClick={onOpenQuickModal} className="font-hand mt-2 text-xs font-bold text-emerald-600 hover:underline">
                   + 立即新增一筆記帳
                 </button>
               </div>
@@ -370,8 +370,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       }}
                       className={`nb-curl relative z-10 px-3 py-2.5 border-[1.6px] flex items-center gap-2 transition-colors ${
                         isSelected
-                          ? 'bg-emerald-100 dark:bg-emerald-900 border-emerald-400 dark:border-emerald-700'
-                          : 'bg-[#fdf8ec] dark:bg-[#221d12] border-[#4a3a20]/70 dark:border-[#c9b98a]/60'
+                          ? 'bg-emerald-100 border-emerald-400'
+                          : 'bg-[#fdf8ec] border-[#4a3a20]/70'
                       }`}
                       style={{
                         borderRadius: idx % 2 === 0 ? '3px 10px 3px 10px' : '10px 3px 10px 3px',
@@ -385,7 +385,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         onClick={(e) => e.stopPropagation()}
                         onPointerDownCapture={(e) => e.stopPropagation()}
                         onPointerDown={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded border-stone-300 dark:border-stone-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                        className="w-4 h-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
                       />
 
                       <span
@@ -395,15 +395,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         {tx.is_zero_spend ? '0' : tx.is_lump_sum ? '概' : qConfig ? qConfig.axisY[0] : '?'}
                       </span>
 
-                      <span className="font-hand font-bold text-[#3a2e18] dark:text-white text-sm truncate flex-1 min-w-0">
+                      <span className="font-hand font-bold text-[#3a2e18] text-sm truncate flex-1 min-w-0">
                         {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
                       </span>
 
-                      {tx.voice_raw_text && <Mic className="w-3 h-3 text-rose-500 dark:text-rose-400 shrink-0" />}
+                      {tx.voice_raw_text && <Mic className="w-3 h-3 text-rose-500 shrink-0" />}
 
                       <span className="text-[10px] text-[#8a7a5a] font-mono shrink-0">{shortDate}</span>
 
-                      <span className={`font-mono font-extrabold text-sm shrink-0 ${tx.is_zero_spend ? 'text-teal-600 dark:text-teal-400' : 'text-[#3a2e18] dark:text-white'}`}>
+                      <span className={`font-mono font-extrabold text-sm shrink-0 ${tx.is_zero_spend ? 'text-teal-600' : 'text-[#3a2e18]'}`}>
                         ${tx.amount.toLocaleString()}
                       </span>
                     </motion.div>
@@ -425,7 +425,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-4 pl-6 relative"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="font-hand text-sm font-bold text-[#3a2e18] dark:text-white">
+                <span className="font-hand text-sm font-bold text-[#3a2e18]">
                   {selectedIds.length > 0 ? `將 ${selectedIds.length} 筆改成分類` : '篩選分類'}
                 </span>
                 <button onClick={() => setShowCategoryPicker(false)} className="text-[#8a7a5a]">
@@ -466,7 +466,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     </button>
                     <button
                       onClick={() => { setSelectedQuadrantFilter('ALL'); setShowCategoryPicker(false); }}
-                      className="font-hand h-11 rounded-xl text-xs font-bold text-[#5a4a2a] dark:text-[#d4c49a] col-span-2 border-[1.5px] border-dashed border-[#a08a5c] flex items-center justify-center"
+                      className="font-hand h-11 rounded-xl text-xs font-bold text-[#5a4a2a] col-span-2 border-[1.5px] border-dashed border-[#a08a5c] flex items-center justify-center"
                     >
                       顯示全部分類
                     </button>
@@ -488,7 +488,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-4 pl-6 relative"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="font-hand text-sm font-bold text-[#3a2e18] dark:text-white">
+                <span className="font-hand text-sm font-bold text-[#3a2e18]">
                   將 {selectedIds.length} 筆複製到...
                 </span>
                 <button onClick={() => setShowDuplicatePicker(false)} className="text-[#8a7a5a]">
@@ -499,12 +499,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 type="date"
                 value={duplicateTargetDate}
                 onChange={(e) => setDuplicateTargetDate(e.target.value)}
-                className="font-hand w-full bg-[#fdf8ec] dark:bg-[#221d12] border-[1.5px] border-[#4a3a20] dark:border-[#c9b98a] rounded-xl px-3 py-2 text-sm text-[#3a2e18] dark:text-white mb-3"
+                className="font-hand w-full bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18] mb-3"
               />
               <button
                 onClick={handleConfirmDuplicate}
                 disabled={!duplicateTargetDate}
-                className="font-hand w-full h-10 rounded-xl bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] dark:text-[#a8dba0] text-sm disabled:opacity-40"
+                className="font-hand w-full h-10 rounded-xl bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] text-sm disabled:opacity-40"
               >
                 確認複製
               </button>
@@ -523,7 +523,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-4 pl-6 relative space-y-3"
             >
               <div className="flex items-center justify-between">
-                <span className="font-hand text-sm font-bold text-[#3a2e18] dark:text-white">編輯紀錄</span>
+                <span className="font-hand text-sm font-bold text-[#3a2e18]">編輯紀錄</span>
                 <button onClick={() => setEditingTx(null)} className="text-[#8a7a5a]">
                   <X className="w-5 h-5" />
                 </button>
@@ -535,7 +535,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   type="number"
                   value={editingTx.amount}
                   onChange={(e) => setEditingTx({ ...editingTx, amount: parseFloat(e.target.value) || 0 })}
-                  className="font-hand flex-1 bg-[#fdf8ec] dark:bg-[#221d12] border-[1.5px] border-[#4a3a20] dark:border-[#c9b98a] rounded-xl px-3 py-2 text-sm text-[#3a2e18] dark:text-white"
+                  className="font-hand flex-1 bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18]"
                 />
               </div>
 
@@ -544,14 +544,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 value={editingTx.note || ''}
                 onChange={(e) => setEditingTx({ ...editingTx, note: e.target.value })}
                 placeholder="備註"
-                className="font-hand w-full bg-[#fdf8ec] dark:bg-[#221d12] border-[1.5px] border-[#4a3a20] dark:border-[#c9b98a] rounded-xl px-3 py-2 text-sm text-[#3a2e18] dark:text-white"
+                className="font-hand w-full bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18]"
               />
 
               <input
                 type="date"
                 value={editingTx.entry_date}
                 onChange={(e) => setEditingTx({ ...editingTx, entry_date: e.target.value })}
-                className="font-hand w-full bg-[#fdf8ec] dark:bg-[#221d12] border-[1.5px] border-[#4a3a20] dark:border-[#c9b98a] rounded-xl px-3 py-2 text-sm text-[#3a2e18] dark:text-white"
+                className="font-hand w-full bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18]"
               />
 
               <div className="grid grid-cols-2 gap-2">
@@ -584,7 +584,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   }
                   setEditingTx(null);
                 }}
-                className="font-hand w-full h-10 rounded-xl bg-[#c8e6c0] dark:bg-[#2e4a2a] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] dark:text-[#a8dba0] text-sm"
+                className="font-hand w-full h-10 rounded-xl bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] text-sm"
               >
                 儲存變更
               </button>

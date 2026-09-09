@@ -125,12 +125,12 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
-      <div className="ml-4 space-y-3 overflow-y-auto flex-1 min-h-0">
+      <div className="ml-4 space-y-2 overflow-y-auto flex-1 min-h-0">
         {/* Header & Mode Switch */}
-        <div className="flex items-center justify-between gap-2 bg-white/8 dark:bg-black/15 px-4 py-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60">
+        <div className="flex items-center justify-between gap-2 bg-white/8 px-3 py-2 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70">
           <div className="flex items-center gap-1.5 min-w-0">
-            <LayoutGrid className="w-4 h-4 text-orange-700 dark:text-orange-300 shrink-0" />
-            <h2 className="font-hand text-base font-bold text-[#3a2e18] dark:text-white truncate">2x2 四象限數據分析</h2>
+            <LayoutGrid className="w-4 h-4 text-orange-700 shrink-0" />
+            <h2 className="font-hand text-base font-bold text-[#3a2e18] truncate">2x2 四象限數據分析</h2>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <button
@@ -138,7 +138,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
               className={`font-hand px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
                 viewMode === 'this_month'
                   ? 'bg-orange-600 border-orange-800 text-white'
-                  : 'bg-transparent border-[#a08a5c] text-[#7a6a4a] dark:text-[#b8a878]'
+                  : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
               }`}
               id="matrix-mode-this-month-btn"
             >
@@ -149,7 +149,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
               className={`font-hand px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
                 viewMode === 'history'
                   ? 'bg-orange-600 border-orange-800 text-white'
-                  : 'bg-transparent border-[#a08a5c] text-[#7a6a4a] dark:text-[#b8a878]'
+                  : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
               }`}
               id="matrix-mode-history-btn"
             >
@@ -166,18 +166,18 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                 { label: '本月支出', value: `$${totalSpend.toLocaleString()}`, icon: Calendar },
                 { label: '日均花費', value: `$${avgPerDay.toLocaleString()}`, icon: TrendingUp },
               ].map((s) => (
-                <div key={s.label} className="bg-white/8 dark:bg-black/15 border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 rounded-2xl p-3 text-center">
-                  <s.icon className="w-4 h-4 mx-auto text-orange-700 dark:text-orange-300" />
-                  <div className="font-hand text-base font-bold text-[#3a2e18] dark:text-white mt-1">{s.value}</div>
-                  <div className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878]">{s.label}</div>
+                <div key={s.label} className="bg-white/8 border-[1.5px] border-dashed border-[#4a3a20]/70 rounded-xl p-2 text-center">
+                  <s.icon className="w-4 h-4 mx-auto text-orange-700" />
+                  <div className="font-hand text-base font-bold text-[#3a2e18] mt-1">{s.value}</div>
+                  <div className="font-hand text-[10px] text-[#8a7a5a]">{s.label}</div>
                 </div>
               ))}
             </div>
 
             {/* Donut chart */}
-            <div className="bg-white/8 dark:bg-black/15 p-4 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60">
+            <div className="bg-white/8 p-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70">
               {hasMonthData ? (
-                <div className="w-40 h-40 mx-auto relative mb-3">
+                <div className="w-32 h-32 mx-auto relative mb-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={pieData} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="95%" paddingAngle={2} strokeWidth={0}>
@@ -192,8 +192,8 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878]">本月支出</span>
-                    <span className="font-hand text-lg font-black font-mono text-[#3a2e18] dark:text-white">
+                    <span className="font-hand text-[10px] text-[#8a7a5a]">本月支出</span>
+                    <span className="font-hand text-lg font-black font-mono text-[#3a2e18]">
                       ${totalSpend.toLocaleString()}
                     </span>
                   </div>
@@ -212,13 +212,13 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                         <div className="flex items-center justify-between text-xs mb-1">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                            <span className="font-hand font-bold text-[#3a2e18] dark:text-white">{d.name}</span>
+                            <span className="font-hand font-bold text-[#3a2e18]">{d.name}</span>
                           </div>
-                          <span className="font-mono font-bold text-[#5a4a2a] dark:text-[#d4c49a] shrink-0">
+                          <span className="font-mono font-bold text-[#5a4a2a] shrink-0">
                             ${d.value.toLocaleString()} · {pct}%
                           </span>
                         </div>
-                        <div className="h-2.5 rounded-full bg-[#e8dcc0] dark:bg-[#3a3120] overflow-hidden">
+                        <div className="h-2.5 rounded-full bg-[#e8dcc0] overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: d.color }} />
                         </div>
                       </div>
@@ -230,12 +230,12 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
 
             {/* Lump-Sum summary */}
             {lumpSumCount > 0 && (
-              <div className="nb-curl relative overflow-hidden bg-[#f5e9c8] dark:bg-[#3a2f18] p-3 rounded-2xl border-2 border-dashed border-[#8a6a2a] flex items-center justify-between gap-2">
-                <div className="font-hand flex items-center gap-1.5 text-xs text-[#5a4a2a] dark:text-[#d4c49a]">
-                  <Info className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
+              <div className="nb-curl relative overflow-hidden bg-[#f5e9c8] p-3 rounded-2xl border-2 border-dashed border-[#8a6a2a] flex items-center justify-between gap-2">
+                <div className="font-hand flex items-center gap-1.5 text-xs text-[#5a4a2a]">
+                  <Info className="w-3.5 h-3.5 text-amber-700 shrink-0" />
                   <span>模糊概算補登（不分象限，已計入總支出）</span>
                 </div>
-                <span className="font-hand text-[11px] font-bold text-amber-800 dark:text-amber-300 shrink-0">
+                <span className="font-hand text-[11px] font-bold text-amber-800 shrink-0">
                   {lumpSumCount} 筆 · ${lumpSumTotal.toLocaleString()}
                 </span>
               </div>
@@ -243,15 +243,15 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
           </>
         ) : (
           /* 歷史趨勢 */
-          <div className="bg-white/8 dark:bg-black/15 p-4 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 dark:border-[#c9b98a]/60 space-y-3">
-            <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#5a4a2a] dark:text-[#d4c49a]">
-              <TrendingUp className="w-4 h-4 text-orange-700 dark:text-orange-300" />
+          <div className="bg-white/8 p-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-3">
+            <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#5a4a2a]">
+              <TrendingUp className="w-4 h-4 text-orange-700" />
               <span>近 8 個月支出趨勢（按象限堆疊）</span>
             </div>
 
             {hasHistoryData ? (
               <>
-                <div className="h-64">
+                <div className="h-44">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={monthlyStackedData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                       <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#78716c' }} axisLine={false} tickLine={false} />
@@ -273,23 +273,23 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
 
                 {/* 8-month average per quadrant — one full-width row each, no truncation */}
                 <div className="pt-3 border-t-[1.5px] border-dashed border-[#a08a5c] space-y-2">
-                  <div className="font-hand text-xs font-bold text-[#7a6a4a] dark:text-[#b8a878]">近 8 個月平均</div>
+                  <div className="font-hand text-xs font-bold text-[#7a6a4a]">近 8 個月平均</div>
                   {QUADRANT_LIST.map((qKey) => (
                     <div key={qKey} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: QUADRANT_CONFIGS[qKey].color }} />
-                        <span className="font-hand font-bold text-[#3a2e18] dark:text-white">{QUADRANT_CONFIGS[qKey].title}</span>
+                        <span className="font-hand font-bold text-[#3a2e18]">{QUADRANT_CONFIGS[qKey].title}</span>
                       </div>
-                      <span className="font-mono text-[#5a4a2a] dark:text-[#d4c49a] shrink-0">月均 ${avgByQuadrant[qKey].toLocaleString()}</span>
+                      <span className="font-mono text-[#5a4a2a] shrink-0">月均 ${avgByQuadrant[qKey].toLocaleString()}</span>
                     </div>
                   ))}
                   {avgLumpSum > 0 && (
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: LUMP_SUM_COLOR }} />
-                        <span className="font-hand font-bold text-[#3a2e18] dark:text-white">模糊概算</span>
+                        <span className="font-hand font-bold text-[#3a2e18]">模糊概算</span>
                       </div>
-                      <span className="font-mono text-[#5a4a2a] dark:text-[#d4c49a] shrink-0">月均 ${avgLumpSum.toLocaleString()}</span>
+                      <span className="font-mono text-[#5a4a2a] shrink-0">月均 ${avgLumpSum.toLocaleString()}</span>
                     </div>
                   )}
                 </div>

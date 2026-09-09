@@ -208,14 +208,14 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
           <div className="p-3 pl-6 space-y-2 ml-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Mic className="w-4 h-4 text-orange-700 dark:text-orange-300 shrink-0" />
-                <h3 className="font-hand text-base font-bold text-[#3a2e18] dark:text-white truncate">
+                <Mic className="w-4 h-4 text-orange-700 shrink-0" />
+                <h3 className="font-hand text-base font-bold text-[#3a2e18] truncate">
                   {isClassifyMode ? '這筆還沒選分類喔' : '語音記帳'}
                 </h3>
               </div>
               <button
                 onClick={handleClose}
-                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18] dark:hover:text-white transition-colors shrink-0"
+                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18]:text-white transition-colors shrink-0"
                 id="close-voice-modal-btn"
               >
                 <X className="w-4.5 h-4.5" />
@@ -224,14 +224,14 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
 
             {stage === 'idle' && (
               <div className="flex flex-col items-center gap-3 py-4">
-                <p className="font-hand text-xs text-[#7a6a4a] dark:text-[#b8a878] text-center">
+                <p className="font-hand text-xs text-[#7a6a4a] text-center">
                   按下麥克風開始錄音，說出品項跟金額
                   <br />
                   例如「買牛奶90塊」或「花90塊買牛奶」
                   <br />
                   說完後再按一次麥克風結束
                 </p>
-                <p className="font-hand text-[10px] text-rose-700 dark:text-rose-300 font-bold text-center">
+                <p className="font-hand text-[10px] text-rose-700 font-bold text-center">
                   ⚠️ 一次錄音請只說一筆品項，多筆請分開錄
                 </p>
                 <motion.button
@@ -273,22 +273,22 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   ))}
                 </div>
 
-                <p className="font-hand text-sm text-[#3a2e18] dark:text-white text-center min-h-[20px] px-2">
+                <p className="font-hand text-sm text-[#3a2e18] text-center min-h-[20px] px-2">
                   {liveText || '聆聽中...請說話'}
                 </p>
-                <p className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878]">說完了嗎？點一下麥克風結束錄音</p>
+                <p className="font-hand text-[10px] text-[#8a7a5a]">說完了嗎？點一下麥克風結束錄音</p>
               </div>
             )}
 
             {stage === 'error' && (
               <div className="flex flex-col items-center gap-2 py-4">
-                <p className="font-hand text-xs text-rose-700 dark:text-rose-300 text-center">{errorMsg}</p>
+                <p className="font-hand text-xs text-rose-700 text-center">{errorMsg}</p>
                 <button
                   onClick={() => {
                     setStage('idle');
                     setErrorMsg('');
                   }}
-                  className="font-hand text-xs font-bold text-orange-700 dark:text-orange-300 underline"
+                  className="font-hand text-xs font-bold text-orange-700 underline"
                 >
                   重新再試一次
                 </button>
@@ -298,24 +298,24 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
             {stage === 'review' && (
               <>
                 {!isClassifyMode && liveText && (
-                  <div className="font-hand text-[10px] text-[#8a7a5a] dark:text-[#b8a878] italic">
+                  <div className="font-hand text-[10px] text-[#8a7a5a] italic">
                     聽到：「{liveText}」
                   </div>
                 )}
 
                 <div className="flex items-center gap-2">
                   <div
-                    className="flex-1 bg-[#fdf8ec] dark:bg-[#221d12] border-2 border-[#3a2e18] dark:border-[#c9b98a] px-3 py-1.5 flex items-center gap-1"
+                    className="flex-1 bg-[#fdf8ec] border-2 border-[#3a2e18] px-3 py-1.5 flex items-center gap-1"
                     style={{ borderRadius: '180px 8px 180px 8px / 8px 180px 8px 180px' }}
                   >
-                    <span className="text-[#b08d57] dark:text-[#d4b878] font-bold text-sm font-hand shrink-0">$</span>
+                    <span className="text-[#b08d57] font-bold text-sm font-hand shrink-0">$</span>
                     <input
                       type="number"
                       inputMode="decimal"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       disabled={isClassifyMode}
-                      className="font-hand w-full bg-transparent text-lg font-bold text-[#3a2e18] dark:text-white text-right focus:outline-none disabled:opacity-70"
+                      className="font-hand w-full bg-transparent text-lg font-bold text-[#3a2e18] text-right focus:outline-none disabled:opacity-70"
                       id="voice-modal-amount-input"
                     />
                   </div>
@@ -327,11 +327,11 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   onChange={(e) => setNote(e.target.value)}
                   disabled={isClassifyMode}
                   placeholder="品項備註"
-                  className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] dark:text-[#d4c49a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] dark:border-[#8a7a5a] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 disabled:opacity-70"
+                  className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#a08a5c] focus:border-amber-600 focus:outline-none placeholder:text-[#a08a5c]/70 disabled:opacity-70"
                   id="voice-modal-note-input"
                 />
 
-                <div className="font-hand text-xs font-bold text-[#7a6a4a] dark:text-[#b8a878] pt-1">請選擇分類：</div>
+                <div className="font-hand text-xs font-bold text-[#7a6a4a] pt-1">請選擇分類：</div>
 
                 {/* 2x2 quadrant sticky notes */}
                 <div className="grid grid-cols-2 gap-1.5">
@@ -366,7 +366,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                     </button>
                     <button
                       onClick={handleClassifyLater}
-                      className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[1.6px] border-dashed border-[#8a6a2a] text-[#5a4014] dark:text-[#f0dca8] text-[10px] font-bold"
+                      className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#e8dcc0] border-[1.6px] border-dashed border-[#8a6a2a] text-[#5a4014] text-[10px] font-bold"
                       style={{ borderRadius: '20px 180px 20px 180px / 180px 20px 180px 20px' }}
                       id="voice-modal-classify-later-btn"
                     >

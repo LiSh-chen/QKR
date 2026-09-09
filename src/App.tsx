@@ -17,7 +17,6 @@ import {
   deleteTransaction,
   loadUserSettings,
   saveUserSettings,
-  hasPersistedSettings,
   triggerHapticFeedback,
   playClickSound,
 } from './lib/storage';
@@ -50,7 +49,7 @@ export default function App() {
     'quick'
   );
 
-  const isDarkMode = userSettings.dark_mode_enabled;
+
 
   // Quick Entry Modal state
   const [isQuickModalOpen, setIsQuickModalOpen] = useState(false);
@@ -73,11 +72,6 @@ export default function App() {
   useEffect(() => {
     const loaded = loadTransactions();
     setTransactions(loaded);
-
-    // First run only: default dark mode to the system preference
-    if (!hasPersistedSettings() && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      handleUpdateSettings({ dark_mode_enabled: true });
-    }
 
     const checkUrlAndOpenModal = (urlString: string) => {
       try {
@@ -117,14 +111,6 @@ export default function App() {
   useEffect(() => {
     scheduleDailyReminder(userSettings.daily_reminder_time, userSettings.reminder_enabled);
   }, [userSettings.daily_reminder_time, userSettings.reminder_enabled]);
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
 
   // Routine Reminder candidate detection -> fire as a REAL system notification
   const routineCandidate = findRoutineCandidate(transactions, dismissedRoutineIds);
@@ -297,15 +283,15 @@ export default function App() {
   const todayTotal = todayTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
 
   const NAV_ITEMS = [
-    { id: 'quick', label: '快速記帳', icon: Zap, tabBg: '#e2a56e', tabBgDark: '#6b3d10', activeText: '#c9683c', activeTextDark: '#f0a868' },
-    { id: 'matrix', label: '2x2 分析', icon: LayoutGrid, tabBg: '#8fb8c9', tabBgDark: '#1c3d4a', activeText: '#1e6b8a', activeTextDark: '#7ec8e3' },
-    { id: 'history', label: '明細', icon: List, tabBg: '#a9c98a', tabBgDark: '#33501c', activeText: '#2e5c26', activeTextDark: '#a8dba0' },
-    { id: 'settings', label: '設定', icon: Settings, tabBg: '#b3a3c2', tabBgDark: '#3d2e52', activeText: '#5a3d78', activeTextDark: '#c9a8e8' },
+    { id: 'quick', label: '快速記帳', icon: Zap, tabBg: '#e2a56e', activeText: '#c9683c' },
+    { id: 'matrix', label: '2x2 分析', icon: LayoutGrid, tabBg: '#8fb8c9', activeText: '#1e6b8a' },
+    { id: 'history', label: '明細', icon: List, tabBg: '#a9c98a', activeText: '#2e5c26' },
+    { id: 'settings', label: '設定', icon: Settings, tabBg: '#b3a3c2', activeText: '#5a3d78' },
   ] as const;
 
   return (
     <div
-      className="nb-desk flex flex-col text-[#3a2e18] dark:text-[#e8dcc0] font-sans transition-colors duration-200 overflow-hidden"
+      className="nb-desk flex flex-col text-[#3a2e18] font-sans transition-colors duration-200 overflow-hidden"
       style={{ height: '100dvh', paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
       {/* Main Container */}
@@ -392,7 +378,7 @@ export default function App() {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={() => handleOpenQuickModal('floating_btn')}
-            className="w-14 h-14 bg-[#e8dcc0] dark:bg-[#4a3f26] border-[2.5px] border-[#4a3a20] dark:border-[#c9b98a] text-[#4a3a20] dark:text-[#e8dcc0] rounded-full shadow-2xl flex items-center justify-center transition-all group"
+            className="w-14 h-14 bg-[#e8dcc0] border-[2.5px] border-[#4a3a20] text-[#4a3a20] rounded-full shadow-2xl flex items-center justify-center transition-all group"
             style={{ boxShadow: '3px 3px 0 rgba(60,40,10,0.3)' }}
             title="快速記帳"
             id="floating-quick-action-btn"
@@ -423,8 +409,8 @@ export default function App() {
               style={
                 isActive
                   ? {
-                      backgroundColor: isDarkMode ? '#2a2418' : '#f1e9d2',
-                      color: isDarkMode ? tab.activeTextDark : tab.activeText,
+                      backgroundColor: '#f1e9d2',
+                      color: tab.activeText,
                       transform: 'translateY(-6px)',
                       boxShadow: '0 -3px 8px rgba(0,0,0,0.25), 0 6px 10px rgba(0,0,0,0.35)',
                       zIndex: 3,
@@ -432,8 +418,8 @@ export default function App() {
                       paddingBottom: '11px',
                     }
                   : {
-                      backgroundColor: isDarkMode ? tab.tabBgDark : tab.tabBg,
-                      color: isDarkMode ? '#d8cba8' : '#4a3420',
+                      backgroundColor: tab.tabBg,
+                      color: '#4a3420',
                       transform: 'translateY(-2px)',
                       boxShadow: '0 4px 6px rgba(0,0,0,0.35)',
                     }
