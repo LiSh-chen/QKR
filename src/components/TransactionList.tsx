@@ -17,12 +17,13 @@ import {
 } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
+import { RoughBox } from './RoughBox';
 
-const QUADRANT_STICKY_PHOTO: Record<QuadrantType, string> = {
-  NECESSARY_DAILY: 'nb-sticky-green',
-  NECESSARY_URGENT: 'nb-sticky-blue',
-  UNNECESSARY_DAILY: 'nb-sticky-yellow',
-  UNNECESSARY_URGENT: 'nb-sticky-red',
+const QUADRANT_INK: Record<QuadrantType, string> = {
+  NECESSARY_DAILY: '#2e5c26',
+  NECESSARY_URGENT: '#1e4a78',
+  UNNECESSARY_DAILY: '#7a5314',
+  UNNECESSARY_URGENT: '#7a2020',
 };
 
 interface TransactionListProps {
@@ -173,9 +174,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
       <div className="ml-4 flex-1 min-h-0 flex flex-col gap-3">
         <div className="shrink-0 space-y-2">
-          <div
-            className="nb-note-photo nb-note-white relative p-2.5"
-            style={{ transform: 'rotate(-0.4deg)', filter: 'drop-shadow(2px 5px 8px rgba(0,0,0,0.35))' }}
+          {/* Calendar — a hand-drawn box, floating above the scrolling list below */}
+          <RoughBox
+            shape="rectangle"
+            stroke="#3a2e18"
+            strokeWidth={1.6}
+            roughness={1.4}
+            className="relative p-2.5"
+            style={{ transform: 'rotate(-0.4deg)', filter: 'drop-shadow(2px 5px 8px rgba(0,0,0,0.3))' }}
           >
             <div className="flex items-center justify-between mb-1.5">
               <button
@@ -185,7 +191,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="font-hand text-sm font-bold text-[#3a2e18]">{monthLabel}</span>
+              <span className="font-hand pencil-text text-sm font-bold text-[#3a2e18]">{monthLabel}</span>
               <button
                 onClick={() => setCalendarMonth((m) => (m.month === 11 ? { year: m.year + 1, month: 0 } : { year: m.year, month: m.month + 1 }))}
                 className="p-1 text-[#5a4a2a]"
@@ -197,7 +203,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
             <div className="grid grid-cols-7 gap-1 mb-1">
               {WEEKDAY_LABELS.map((w) => (
-                <div key={w} className="text-center text-[9px] font-bold text-[#8a7a5a]">
+                <div key={w} className="font-hand pencil-text text-center text-[9px] font-bold text-[#8a7a5a]">
                   {w}
                 </div>
               ))}
@@ -213,7 +219,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   <button
                     key={day.dateStr}
                     onClick={() => setSelectedDate(isSelected ? null : day.dateStr)}
-                    className="font-hand aspect-square rounded-lg flex flex-col items-center justify-center relative text-[11px]"
+                    className="font-hand pencil-text aspect-square rounded-lg flex flex-col items-center justify-center relative text-[11px]"
                     style={{
                       backgroundColor: isSelected ? '#ea580c' : hasTx ? 'rgba(200,230,192,0.25)' : 'transparent',
                       color: isSelected ? '#fff' : undefined,
@@ -236,32 +242,36 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             {selectedDate && (
               <button
                 onClick={() => setSelectedDate(null)}
-                className="font-hand w-full mt-1.5 text-[10px] text-orange-700 font-bold underline"
+                className="font-hand pencil-text w-full mt-1.5 text-[10px] text-orange-700 font-bold underline"
               >
                 清除日期篩選（目前：{selectedDate}）
               </button>
             )}
-          </div>
+          </RoughBox>
 
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center gap-1.5 bg-white/8 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl px-3 py-2">
+            <RoughBox shape="rectangle" stroke="#a08a5c" strokeWidth={1.3} roughness={1.5} className="flex-1 flex items-center gap-1.5 px-3 py-2">
               <Search className="w-3.5 h-3.5 text-[#8a7a5a] shrink-0" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜尋備註或金額..."
-                className="font-hand flex-1 min-w-0 bg-transparent text-xs text-[#5a4a2a] focus:outline-none"
+                className="font-hand pencil-text flex-1 min-w-0 bg-transparent text-xs text-[#5a4a2a] focus:outline-none"
               />
-            </div>
-            <button
+            </RoughBox>
+            <RoughBox
+              shape="rectangle"
+              stroke="#a08a5c"
+              strokeWidth={1.3}
+              roughness={1.5}
               onClick={() => setShowCategoryPicker(true)}
-              className="font-hand flex items-center gap-1 px-3 py-2 bg-white/8 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl text-xs text-[#5a4a2a] whitespace-nowrap shrink-0"
+              className="font-hand pencil-text flex items-center gap-1 px-3 py-2 text-xs text-[#5a4a2a] whitespace-nowrap shrink-0 cursor-pointer"
               id="open-category-filter-btn"
             >
               <Tag className="w-3.5 h-3.5" />
               {categoryFilterLabel}
-            </button>
+            </RoughBox>
             <button
               onClick={exportToCsv}
               className="flex items-center gap-1 px-3 py-2 bg-emerald-50 border-[1.5px] border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold shrink-0"
@@ -273,7 +283,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
           {filteredTx.length > 0 && (
             <div className="flex items-center justify-between pt-1.5 border-t border-[#a08a5c]/50 text-xs text-[#5a4a2a]">
-              <button onClick={toggleSelectAll} className="font-hand flex items-center gap-1.5 font-semibold">
+              <button onClick={toggleSelectAll} className="font-hand pencil-text flex items-center gap-1.5 font-semibold">
                 {isAllSelected ? (
                   <CheckSquare className="w-4 h-4 text-emerald-600" />
                 ) : (
@@ -317,73 +327,71 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           )}
         </div>
 
+        {/* Scrolling list — a shadow along the top hints the "paper" sliding
+            beneath the fixed calendar note above */}
         <div className="relative flex-1 min-h-0">
           <div
             className="pointer-events-none absolute top-0 left-0 right-0 h-4 z-20"
             style={{ background: 'linear-gradient(rgba(20,12,4,0.18), transparent)' }}
           />
           <div className="h-full overflow-y-auto space-y-1.5 pb-1 pt-1">
-          <AnimatePresence>
-            {filteredTx.length === 0 ? (
-              <div className="bg-white/8 p-8 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/60 text-center text-[#8a7a5a] space-y-2">
-                <AlertCircle className="w-8 h-8 mx-auto text-stone-300" />
-                <p className="font-hand text-sm font-medium">沒有找到符合條件的記帳紀錄</p>
-                <button onClick={onOpenQuickModal} className="font-hand mt-2 text-xs font-bold text-emerald-600 hover:underline">
-                  + 立即新增一筆記帳
-                </button>
-              </div>
-            ) : (
-              filteredTx.map((tx, idx) => {
-                const qConfig = tx.quadrant ? QUADRANT_CONFIGS[tx.quadrant] : null;
-                const isSelected = selectedIds.includes(tx.id);
-                const stickyClass = tx.is_zero_spend || tx.is_lump_sum || !qConfig
-                  ? 'nb-tag-gray'
-                  : QUADRANT_STICKY_PHOTO[tx.quadrant as QuadrantType];
-                const shortDate = tx.entry_date ? tx.entry_date.slice(5).replace('-', '/') : '';
+            <AnimatePresence>
+              {filteredTx.length === 0 ? (
+                <div className="bg-white/8 p-8 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/60 text-center text-[#8a7a5a] space-y-2">
+                  <AlertCircle className="w-8 h-8 mx-auto text-stone-300" />
+                  <p className="font-hand pencil-text text-sm font-medium">沒有找到符合條件的記帳紀錄</p>
+                  <button onClick={onOpenQuickModal} className="font-hand pencil-text mt-2 text-xs font-bold text-emerald-600 hover:underline">
+                    + 立即新增一筆記帳
+                  </button>
+                </div>
+              ) : (
+                filteredTx.map((tx, idx) => {
+                  const qConfig = tx.quadrant ? QUADRANT_CONFIGS[tx.quadrant] : null;
+                  const isSelected = selectedIds.includes(tx.id);
+                  const ink = tx.is_zero_spend || tx.is_lump_sum || !qConfig ? '#6b6259' : QUADRANT_INK[tx.quadrant as QuadrantType];
+                  const shortDate = tx.entry_date ? tx.entry_date.slice(5).replace('-', '/') : '';
 
-                return (
-                  <motion.button
-                    key={tx.id}
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, scale: 0.97 }}
-                    onClick={() => setDetailTx(tx)}
-                    className={`nb-sticky-row-photo ${stickyClass} relative w-full px-3 py-2.5 flex items-center gap-2 text-left overflow-hidden rounded-sm`}
-                    style={{
-                      transform: `rotate(${idx % 2 === 0 ? '-0.6deg' : '0.6deg'})`,
-                    }}
-                    id={`tx-row-${tx.id}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleSelect(tx.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      onPointerDownCapture={(e) => e.stopPropagation()}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      className="w-4 h-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
-                    />
-                    {isSelected && (
-                      <span className="absolute inset-0 rounded-[inherit] border-[3px] border-orange-500 pointer-events-none" />
-                    )}
+                  return (
+                    <RoughBox
+                      key={tx.id}
+                      shape="rectangle"
+                      stroke={ink}
+                      strokeWidth={isSelected ? 2.4 : 1.5}
+                      roughness={1.6}
+                      fill={`${ink}18`}
+                      fillStyle="hachure"
+                      hachureGap={5}
+                      onClick={() => setDetailTx(tx)}
+                      className="relative w-full px-3 py-2.5 flex items-center gap-2 text-left cursor-pointer"
+                      style={{ transform: `rotate(${idx % 2 === 0 ? '-0.4deg' : '0.4deg'})` }}
+                      id={`tx-row-${tx.id}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(tx.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        onPointerDownCapture={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                        className="w-4 h-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
+                      />
 
-                    <span className="font-hand font-bold text-[#2a2013] text-sm truncate flex-1 min-w-0">
-                      {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
-                    </span>
+                      <span className="font-hand pencil-text font-bold text-[#2a2013] text-sm truncate flex-1 min-w-0">
+                        {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
+                      </span>
 
-                    {tx.voice_raw_text && <Mic className="w-3 h-3 text-[#5c1414] shrink-0" />}
+                      {tx.voice_raw_text && <Mic className="w-3 h-3 text-[#5c1414] shrink-0" />}
 
-                    <span className="text-[10px] text-[#2a2013]/70 font-mono shrink-0">{shortDate}</span>
+                      <span className="text-[10px] text-[#2a2013]/70 font-mono shrink-0">{shortDate}</span>
 
-                    <span className="font-mono font-extrabold text-sm shrink-0 text-[#2a2013]">
-                      ${tx.amount.toLocaleString()}
-                    </span>
-                  </motion.button>
-                );
-              })
-            )}
-          </AnimatePresence>
+                      <span className="font-mono font-extrabold text-sm shrink-0 text-[#2a2013]">
+                        ${tx.amount.toLocaleString()}
+                      </span>
+                    </RoughBox>
+                  );
+                })
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -398,7 +406,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-4 pl-6 relative"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="font-hand text-sm font-bold text-[#3a2e18]">
+                <span className="font-hand pencil-text text-sm font-bold text-[#3a2e18]">
                   {selectedIds.length > 0 ? `將 ${selectedIds.length} 筆改成分類` : '篩選分類'}
                 </span>
                 <button onClick={() => setShowCategoryPicker(false)} className="text-[#8a7a5a]">
@@ -407,8 +415,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {QUADRANT_LIST.map((qKey) => (
-                  <button
+                  <RoughBox
                     key={qKey}
+                    shape="rectangle"
+                    stroke={QUADRANT_INK[qKey]}
+                    strokeWidth={1.6}
+                    roughness={1.6}
+                    fill={`${QUADRANT_INK[qKey]}22`}
+                    fillStyle="hachure"
                     onClick={() => {
                       if (selectedIds.length > 0) {
                         handleBatchReclassifyClick(qKey);
@@ -417,32 +431,44 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                         setShowCategoryPicker(false);
                       }
                     }}
-                    className="font-hand h-11 rounded-xl text-xs font-bold text-white flex items-center justify-center"
-                    style={{ backgroundColor: QUADRANT_CONFIGS[qKey].color }}
+                    className="font-hand pencil-text h-11 text-xs font-bold flex items-center justify-center cursor-pointer"
+                    style={{ color: QUADRANT_INK[qKey] }}
                   >
                     {QUADRANT_CONFIGS[qKey].title}
-                  </button>
+                  </RoughBox>
                 ))}
                 {selectedIds.length === 0 && (
                   <>
-                    <button
+                    <RoughBox
+                      shape="rectangle"
+                      stroke="#6b6259"
+                      strokeWidth={1.6}
+                      roughness={1.6}
                       onClick={() => { setSelectedQuadrantFilter('LUMP_SUM'); setShowCategoryPicker(false); }}
-                      className="font-hand h-11 rounded-xl text-xs font-bold text-white bg-stone-500 flex items-center justify-center"
+                      className="font-hand pencil-text h-11 text-xs font-bold text-[#6b6259] flex items-center justify-center cursor-pointer"
                     >
                       僅概算補登
-                    </button>
-                    <button
+                    </RoughBox>
+                    <RoughBox
+                      shape="rectangle"
+                      stroke="#0d9488"
+                      strokeWidth={1.6}
+                      roughness={1.6}
                       onClick={() => { setSelectedQuadrantFilter('ZERO'); setShowCategoryPicker(false); }}
-                      className="font-hand h-11 rounded-xl text-xs font-bold text-white bg-teal-500 flex items-center justify-center"
+                      className="font-hand pencil-text h-11 text-xs font-bold text-teal-700 flex items-center justify-center cursor-pointer"
                     >
                       僅 $0 支出
-                    </button>
-                    <button
+                    </RoughBox>
+                    <RoughBox
+                      shape="rectangle"
+                      stroke="#a08a5c"
+                      strokeWidth={1.4}
+                      roughness={1.6}
                       onClick={() => { setSelectedQuadrantFilter('ALL'); setShowCategoryPicker(false); }}
-                      className="font-hand h-11 rounded-xl text-xs font-bold text-[#5a4a2a] col-span-2 border-[1.5px] border-dashed border-[#a08a5c] flex items-center justify-center"
+                      className="font-hand pencil-text h-11 text-xs font-bold text-[#5a4a2a] col-span-2 flex items-center justify-center cursor-pointer"
                     >
                       顯示全部分類
-                    </button>
+                    </RoughBox>
                   </>
                 )}
               </div>
@@ -461,7 +487,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-4 pl-6 relative"
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="font-hand text-sm font-bold text-[#3a2e18]">
+                <span className="font-hand pencil-text text-sm font-bold text-[#3a2e18]">
                   將 {selectedIds.length} 筆複製到...
                 </span>
                 <button onClick={() => setShowDuplicatePicker(false)} className="text-[#8a7a5a]">
@@ -474,19 +500,26 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 onChange={(e) => setDuplicateTargetDate(e.target.value)}
                 className="font-hand w-full bg-[#fdf8ec] border-[1.5px] border-[#4a3a20] rounded-xl px-3 py-2 text-sm text-[#3a2e18] mb-3"
               />
-              <button
+              <RoughBox
+                shape="rectangle"
+                stroke="#2e5c26"
+                strokeWidth={1.8}
+                roughness={1.6}
+                fill="#2e5c2622"
+                fillStyle="hachure"
                 onClick={handleConfirmDuplicate}
-                disabled={!duplicateTargetDate}
-                className="font-hand w-full h-10 rounded-xl bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] text-sm disabled:opacity-40"
+                className={`font-hand pencil-text w-full h-10 font-bold text-[#2e5c26] text-sm flex items-center justify-center ${
+                  !duplicateTargetDate ? 'opacity-40 pointer-events-none' : 'cursor-pointer'
+                }`}
               >
                 確認複製
-              </button>
+              </RoughBox>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Detail / Edit popup — a real sticky note matching the item's category color */}
+      {/* Detail / Edit popup */}
       <AnimatePresence>
         {detailTx && (
           <div className="absolute inset-0 z-20 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -496,96 +529,108 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               exit={{ opacity: 0, y: 80, scale: 0.95 }}
               className="w-full max-w-xs relative"
             >
-              <div
-                className={`nb-sticky-photo ${
-                  detailTx.is_zero_spend || detailTx.is_lump_sum || !detailTx.quadrant
-                    ? 'nb-tag-gray'
-                    : QUADRANT_STICKY_PHOTO[detailTx.quadrant]
-                } relative p-5 space-y-3`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-hand text-base font-bold text-[#2a2013]">記帳詳情</span>
-                  <button onClick={() => setDetailTx(null)} className="text-[#2a2013]/70">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+              {(() => {
+                const ink = detailTx.is_zero_spend || detailTx.is_lump_sum || !detailTx.quadrant ? '#6b6259' : QUADRANT_INK[detailTx.quadrant];
+                return (
+                  <RoughBox shape="rectangle" stroke={ink} strokeWidth={2.2} roughness={1.6} fill={`${ink}18`} fillStyle="hachure" className="relative p-5 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-hand pencil-text text-base font-bold text-[#2a2013]">記帳詳情</span>
+                      <button onClick={() => setDetailTx(null)} className="text-[#2a2013]/70">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="font-hand text-sm text-[#2a2013]/70 font-bold">$</span>
-                  <input
-                    type="number"
-                    value={detailTx.amount}
-                    onChange={(e) => setDetailTx({ ...detailTx, amount: parseFloat(e.target.value) || 0 })}
-                    className="font-hand flex-1 bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
-                  />
-                </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-hand text-sm text-[#2a2013]/70 font-bold">$</span>
+                      <input
+                        type="number"
+                        value={detailTx.amount}
+                        onChange={(e) => setDetailTx({ ...detailTx, amount: parseFloat(e.target.value) || 0 })}
+                        className="font-hand flex-1 bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
+                      />
+                    </div>
 
-                <input
-                  type="text"
-                  value={detailTx.note || ''}
-                  onChange={(e) => setDetailTx({ ...detailTx, note: e.target.value })}
-                  placeholder="備註"
-                  className="font-hand w-full bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
-                />
+                    <input
+                      type="text"
+                      value={detailTx.note || ''}
+                      onChange={(e) => setDetailTx({ ...detailTx, note: e.target.value })}
+                      placeholder="備註"
+                      className="font-hand w-full bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
+                    />
 
-                <input
-                  type="date"
-                  value={detailTx.entry_date}
-                  onChange={(e) => setDetailTx({ ...detailTx, entry_date: e.target.value })}
-                  className="font-hand w-full bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
-                />
+                    <input
+                      type="date"
+                      value={detailTx.entry_date}
+                      onChange={(e) => setDetailTx({ ...detailTx, entry_date: e.target.value })}
+                      className="font-hand w-full bg-white/50 border-[1.5px] border-[#2a2013]/40 rounded-xl px-3 py-2 text-sm text-[#2a2013]"
+                    />
 
-                {detailTx.voice_raw_text && (
-                  <div className="font-hand text-[10px] text-[#2a2013]/60 italic">
-                    語音原句：「{detailTx.voice_raw_text}」
-                  </div>
-                )}
+                    {detailTx.voice_raw_text && (
+                      <div className="font-hand text-[10px] text-[#2a2013]/60 italic">
+                        語音原句：「{detailTx.voice_raw_text}」
+                      </div>
+                    )}
 
-                <div className="grid grid-cols-2 gap-2">
-                  {QUADRANT_LIST.map((qKey) => (
-                    <button
-                      key={qKey}
-                      onClick={() => setDetailTx({ ...detailTx, quadrant: qKey, is_lump_sum: false })}
-                      className={`font-hand nb-sticky-photo ${QUADRANT_STICKY_PHOTO[qKey]} relative h-10 text-xs font-bold text-[#2a2013] flex items-center justify-center gap-1`}
-                      style={{
-                        outline: detailTx.quadrant === qKey && !detailTx.is_lump_sum ? '2.5px solid #2a2013' : 'none',
-                        outlineOffset: '1px',
-                      }}
-                    >
-                      {detailTx.quadrant === qKey && !detailTx.is_lump_sum && <Check className="w-3 h-3" />}
-                      {QUADRANT_CONFIGS[qKey].title}
-                    </button>
-                  ))}
-                </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {QUADRANT_LIST.map((qKey) => (
+                        <RoughBox
+                          key={qKey}
+                          shape="rectangle"
+                          stroke={QUADRANT_INK[qKey]}
+                          strokeWidth={detailTx.quadrant === qKey && !detailTx.is_lump_sum ? 2.6 : 1.5}
+                          roughness={1.6}
+                          fill={`${QUADRANT_INK[qKey]}22`}
+                          fillStyle="hachure"
+                          onClick={() => setDetailTx({ ...detailTx, quadrant: qKey, is_lump_sum: false })}
+                          className="font-hand pencil-text relative h-10 text-xs font-bold flex items-center justify-center gap-1 cursor-pointer"
+                          style={{ color: QUADRANT_INK[qKey] }}
+                        >
+                          {detailTx.quadrant === qKey && !detailTx.is_lump_sum && <Check className="w-3 h-3" />}
+                          {QUADRANT_CONFIGS[qKey].title}
+                        </RoughBox>
+                      ))}
+                    </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setDeleteConfirmId(detailTx.id)}
-                    className="nb-tag-photo nb-tag-2 flex-1 h-10 font-bold text-[#3a2410] text-sm flex items-center justify-center gap-1.5"
-                    id="detail-delete-btn"
-                  >
-                    <Trash2 className="w-4 h-4" /> 刪除
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (onUpdateTransaction) {
-                        onUpdateTransaction(detailTx.id, {
-                          amount: detailTx.amount,
-                          note: detailTx.note,
-                          entry_date: detailTx.entry_date,
-                          quadrant: detailTx.quadrant,
-                          is_lump_sum: detailTx.is_lump_sum,
-                        });
-                      }
-                      setDetailTx(null);
-                    }}
-                    className="nb-tag-photo nb-tag-1 flex-1 h-10 font-bold text-[#3a2410] text-sm"
-                    id="detail-save-btn"
-                  >
-                    儲存變更
-                  </button>
-                </div>
-              </div>
+                    <div className="flex gap-2">
+                      <RoughBox
+                        shape="rectangle"
+                        stroke="#7a2020"
+                        strokeWidth={1.8}
+                        roughness={1.7}
+                        onClick={() => setDeleteConfirmId(detailTx.id)}
+                        className="flex-1 h-10 font-hand pencil-text font-bold text-[#7a2020] text-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                        id="detail-delete-btn"
+                      >
+                        <Trash2 className="w-4 h-4" /> 刪除
+                      </RoughBox>
+                      <RoughBox
+                        shape="rectangle"
+                        stroke="#2e5c26"
+                        strokeWidth={1.8}
+                        roughness={1.7}
+                        fill="#2e5c2622"
+                        fillStyle="hachure"
+                        onClick={() => {
+                          if (onUpdateTransaction) {
+                            onUpdateTransaction(detailTx.id, {
+                              amount: detailTx.amount,
+                              note: detailTx.note,
+                              entry_date: detailTx.entry_date,
+                              quadrant: detailTx.quadrant,
+                              is_lump_sum: detailTx.is_lump_sum,
+                            });
+                          }
+                          setDetailTx(null);
+                        }}
+                        className="flex-1 h-10 font-hand pencil-text font-bold text-[#2e5c26] text-sm flex items-center justify-center cursor-pointer"
+                        id="detail-save-btn"
+                      >
+                        儲存變更
+                      </RoughBox>
+                    </div>
+                  </RoughBox>
+                );
+              })()}
             </motion.div>
           </div>
         )}
@@ -599,31 +644,51 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="nb-note-photo nb-note-yellow relative w-full max-w-[260px] p-5 space-y-3 text-center"
+              className="w-full max-w-[260px] relative"
             >
-              <AlertCircle className="w-8 h-8 mx-auto text-rose-700" />
-              <p className="font-hand text-sm font-bold text-[#2a2013]">確定要刪除這筆記帳紀錄嗎？</p>
-              <p className="font-hand text-xs text-[#2a2013]/70">刪除後將無法復原</p>
-              <div className="flex gap-2 pt-1">
-                <button
-                  onClick={() => setDeleteConfirmId(null)}
-                  className="flex-1 h-10 rounded-xl bg-white/50 border-[1.5px] border-[#2a2013]/40 font-bold text-[#2a2013] text-sm"
-                  id="delete-confirm-cancel-btn"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={() => {
-                    onDelete(deleteConfirmId);
-                    setDeleteConfirmId(null);
-                    setDetailTx(null);
-                  }}
-                  className="flex-1 h-10 rounded-xl bg-rose-700/85 border-[1.5px] border-rose-950 font-bold text-white text-sm"
-                  id="delete-confirm-ok-btn"
-                >
-                  確定刪除
-                </button>
-              </div>
+              <RoughBox
+                shape="rectangle"
+                stroke="#c0392b"
+                strokeWidth={2}
+                roughness={1.8}
+                fill="#f1e9d2"
+                fillStyle="solid"
+                className="relative p-5 space-y-3 text-center"
+              >
+                <AlertCircle className="w-8 h-8 mx-auto text-rose-700" />
+                <p className="font-hand pencil-text text-sm font-bold text-[#2a2013]">確定要刪除這筆記帳紀錄嗎？</p>
+                <p className="font-hand pencil-text text-xs text-[#2a2013]/70">刪除後將無法復原</p>
+                <div className="flex gap-2 pt-1">
+                  <RoughBox
+                    shape="rectangle"
+                    stroke="#8a7454"
+                    strokeWidth={1.5}
+                    roughness={1.6}
+                    onClick={() => setDeleteConfirmId(null)}
+                    className="flex-1 h-10 font-hand pencil-text font-bold text-[#2a2013] text-sm flex items-center justify-center cursor-pointer"
+                    id="delete-confirm-cancel-btn"
+                  >
+                    取消
+                  </RoughBox>
+                  <RoughBox
+                    shape="rectangle"
+                    stroke="#7a2020"
+                    strokeWidth={1.8}
+                    roughness={1.7}
+                    fill="#7a202022"
+                    fillStyle="hachure"
+                    onClick={() => {
+                      onDelete(deleteConfirmId);
+                      setDeleteConfirmId(null);
+                      setDetailTx(null);
+                    }}
+                    className="flex-1 h-10 font-hand pencil-text font-bold text-[#7a2020] text-sm flex items-center justify-center cursor-pointer"
+                    id="delete-confirm-ok-btn"
+                  >
+                    確定刪除
+                  </RoughBox>
+                </div>
+              </RoughBox>
             </motion.div>
           </div>
         )}

@@ -9,11 +9,11 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Legend,
 } from 'recharts';
 import { LayoutGrid, Info, TrendingUp, Calendar } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
+import { RoughBox } from './RoughBox';
 
 interface QuadrantMatrixViewProps {
   transactions: Transaction[];
@@ -68,7 +68,6 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
 
   const hasMonthData = totalSpend > 0;
 
-  // --- 歷史趨勢: monthly stacked bar, last 8 months ---
   const monthlyStackedData = useMemo(() => {
     const buckets: Record<
       string,
@@ -126,19 +125,22 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
       </div>
 
       <div className="ml-4 space-y-2 overflow-y-auto flex-1 min-h-0">
-        {/* Header & Mode Switch */}
-        <div className="flex items-center justify-between gap-2 bg-white/8 px-3 py-2 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70">
+        <RoughBox
+          shape="rectangle"
+          stroke="#3a2e18"
+          strokeWidth={1.4}
+          roughness={1.4}
+          className="flex items-center justify-between gap-2 px-3 py-2"
+        >
           <div className="flex items-center gap-1.5 min-w-0">
             <LayoutGrid className="w-4 h-4 text-orange-700 shrink-0" />
-            <h2 className="font-hand text-base font-bold text-[#3a2e18] truncate">2x2 四象限數據分析</h2>
+            <h2 className="font-hand pencil-text text-base font-bold text-[#3a2e18] truncate">2x2 四象限數據分析</h2>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => setViewMode('this_month')}
-              className={`font-hand px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
-                viewMode === 'this_month'
-                  ? 'bg-orange-600 border-orange-800 text-white'
-                  : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
+              className={`font-hand pencil-text px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
+                viewMode === 'this_month' ? 'bg-orange-600 border-orange-800 text-white' : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
               }`}
               id="matrix-mode-this-month-btn"
             >
@@ -146,41 +148,37 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
             </button>
             <button
               onClick={() => setViewMode('history')}
-              className={`font-hand px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
-                viewMode === 'history'
-                  ? 'bg-orange-600 border-orange-800 text-white'
-                  : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
+              className={`font-hand pencil-text px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
+                viewMode === 'history' ? 'bg-orange-600 border-orange-800 text-white' : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
               }`}
               id="matrix-mode-history-btn"
             >
               歷史趨勢
             </button>
           </div>
-        </div>
+        </RoughBox>
 
         {viewMode === 'this_month' ? (
           <>
-            {/* Quick stat row — just the two genuinely useful numbers */}
             <div className="grid grid-cols-2 gap-2">
               {[
                 { label: '本月支出', value: `$${totalSpend.toLocaleString()}`, icon: Calendar },
                 { label: '日均花費', value: `$${avgPerDay.toLocaleString()}`, icon: TrendingUp },
               ].map((s) => (
-                <div key={s.label} className="bg-white/8 border-[1.5px] border-dashed border-[#4a3a20]/70 rounded-xl p-2 text-center">
+                <RoughBox key={s.label} shape="rectangle" stroke="#8a7454" strokeWidth={1.3} roughness={1.6} className="p-2 text-center">
                   <s.icon className="w-4 h-4 mx-auto text-orange-700" />
-                  <div className="font-hand text-base font-bold text-[#3a2e18] mt-1">{s.value}</div>
-                  <div className="font-hand text-[10px] text-[#8a7a5a]">{s.label}</div>
-                </div>
+                  <div className="font-hand pencil-text text-base font-bold text-[#3a2e18] mt-1">{s.value}</div>
+                  <div className="font-hand pencil-text text-[10px] text-[#8a7a5a]">{s.label}</div>
+                </RoughBox>
               ))}
             </div>
 
-            {/* Donut chart */}
-            <div className="bg-white/8 p-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70">
+            <RoughBox shape="rectangle" stroke="#3a2e18" strokeWidth={1.4} roughness={1.4} className="p-3">
               {hasMonthData ? (
                 <div className="w-28 h-28 mx-auto relative mb-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={pieData} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="95%" paddingAngle={2} strokeWidth={0}>
+                      <Pie data={pieData} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="95%" paddingAngle={2} strokeWidth={1.5} stroke="#3a2e18">
                         {pieData.map((entry) => (
                           <Cell key={entry.key} fill={entry.color} />
                         ))}
@@ -192,17 +190,16 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="font-hand text-[10px] text-[#8a7a5a]">本月支出</span>
-                    <span className="font-hand text-lg font-black font-mono text-[#3a2e18]">
+                    <span className="font-hand pencil-text text-[10px] text-[#8a7a5a]">本月支出</span>
+                    <span className="font-hand pencil-text text-lg font-black font-mono text-[#3a2e18]">
                       ${totalSpend.toLocaleString()}
                     </span>
                   </div>
                 </div>
               ) : (
-                <p className="font-hand text-sm text-[#8a7a5a] text-center py-10">本月尚無記帳資料</p>
+                <p className="font-hand pencil-text text-sm text-[#8a7a5a] text-center py-10">本月尚無記帳資料</p>
               )}
 
-              {/* Breakdown bars — one full-width row each, never truncates */}
               {hasMonthData && (
                 <div className="space-y-2.5 pt-3 border-t-[1.5px] border-dashed border-[#a08a5c]">
                   {pieData.map((d) => {
@@ -212,7 +209,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                         <div className="flex items-center justify-between text-xs mb-1">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-                            <span className="font-hand font-bold text-[#3a2e18]">{d.name}</span>
+                            <span className="font-hand pencil-text font-bold text-[#3a2e18]">{d.name}</span>
                           </div>
                           <span className="font-mono font-bold text-[#5a4a2a] shrink-0">
                             ${d.value.toLocaleString()} · {pct}%
@@ -226,25 +223,31 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                   })}
                 </div>
               )}
-            </div>
+            </RoughBox>
 
-            {/* Lump-Sum summary */}
             {lumpSumCount > 0 && (
-              <div className="nb-curl relative overflow-hidden bg-[#f5e9c8] p-3 rounded-2xl border-2 border-dashed border-[#8a6a2a] flex items-center justify-between gap-2">
-                <div className="font-hand flex items-center gap-1.5 text-xs text-[#5a4a2a]">
+              <RoughBox
+                shape="rectangle"
+                stroke="#8a6a2a"
+                strokeWidth={1.6}
+                roughness={1.8}
+                fill="#8a6a2a15"
+                fillStyle="hachure"
+                className="flex items-center justify-between gap-2 p-3"
+              >
+                <div className="font-hand pencil-text flex items-center gap-1.5 text-xs text-[#5a4a2a]">
                   <Info className="w-3.5 h-3.5 text-amber-700 shrink-0" />
                   <span>模糊概算補登（不分象限，已計入總支出）</span>
                 </div>
-                <span className="font-hand text-[11px] font-bold text-amber-800 shrink-0">
+                <span className="font-hand pencil-text text-[11px] font-bold text-amber-800 shrink-0">
                   {lumpSumCount} 筆 · ${lumpSumTotal.toLocaleString()}
                 </span>
-              </div>
+              </RoughBox>
             )}
           </>
         ) : (
-          /* 歷史趨勢 */
-          <div className="bg-white/8 p-2.5 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-2">
-            <div className="font-hand flex items-center gap-1.5 text-xs font-bold text-[#5a4a2a]">
+          <RoughBox shape="rectangle" stroke="#3a2e18" strokeWidth={1.4} roughness={1.4} className="p-2.5 space-y-2">
+            <div className="font-hand pencil-text flex items-center gap-1.5 text-xs font-bold text-[#5a4a2a]">
               <TrendingUp className="w-3.5 h-3.5 text-orange-700" />
               <span>近 8 個月支出趨勢（按象限堆疊）</span>
             </div>
@@ -261,37 +264,36 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                         formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name]}
                         contentStyle={{ fontSize: 10, borderRadius: 8, background: '#292524', border: 'none', color: '#fff' }}
                       />
-                      <Bar dataKey="NECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.NECESSARY_DAILY.color} />
-                      <Bar dataKey="NECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.NECESSARY_URGENT.color} />
-                      <Bar dataKey="UNNECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.UNNECESSARY_DAILY.color} />
-                      <Bar dataKey="UNNECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.UNNECESSARY_URGENT.color} />
-                      <Bar dataKey="LUMP_SUM" stackId="m" name="模糊概算" fill={LUMP_SUM_COLOR} radius={[3, 3, 0, 0]} />
+                      <Bar dataKey="NECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.NECESSARY_DAILY.color} stroke="#3a2e18" strokeWidth={1} />
+                      <Bar dataKey="NECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.NECESSARY_URGENT.color} stroke="#3a2e18" strokeWidth={1} />
+                      <Bar dataKey="UNNECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.UNNECESSARY_DAILY.color} stroke="#3a2e18" strokeWidth={1} />
+                      <Bar dataKey="UNNECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.UNNECESSARY_URGENT.color} stroke="#3a2e18" strokeWidth={1} />
+                      <Bar dataKey="LUMP_SUM" stackId="m" name="模糊概算" fill={LUMP_SUM_COLOR} stroke="#3a2e18" strokeWidth={1} radius={[3, 3, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
 
-                {/* 8-month average per quadrant — compact 2-col grid instead of stacked rows */}
                 <div className="pt-2 border-t-[1.5px] border-dashed border-[#a08a5c] grid grid-cols-2 gap-x-2 gap-y-1">
                   {QUADRANT_LIST.map((qKey) => (
                     <div key={qKey} className="flex items-center gap-1 min-w-0 text-[10px]">
                       <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: QUADRANT_CONFIGS[qKey].color }} />
-                      <span className="font-hand font-bold text-[#3a2e18] truncate">{QUADRANT_CONFIGS[qKey].title}</span>
+                      <span className="font-hand pencil-text font-bold text-[#3a2e18] truncate">{QUADRANT_CONFIGS[qKey].title}</span>
                       <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgByQuadrant[qKey].toLocaleString()}</span>
                     </div>
                   ))}
                   {avgLumpSum > 0 && (
                     <div className="flex items-center gap-1 min-w-0 text-[10px] col-span-2">
                       <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: LUMP_SUM_COLOR }} />
-                      <span className="font-hand font-bold text-[#3a2e18]">模糊概算</span>
+                      <span className="font-hand pencil-text font-bold text-[#3a2e18]">模糊概算</span>
                       <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgLumpSum.toLocaleString()}</span>
                     </div>
                   )}
                 </div>
               </>
             ) : (
-              <p className="font-hand text-sm text-[#8a7a5a] text-center py-16">尚無足夠的歷史資料</p>
+              <p className="font-hand pencil-text text-sm text-[#8a7a5a] text-center py-16">尚無足夠的歷史資料</p>
             )}
-          </div>
+          </RoughBox>
         )}
       </div>
     </div>

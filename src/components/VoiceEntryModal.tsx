@@ -5,6 +5,7 @@ import { QuadrantType, Transaction } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { playClickSound, triggerHapticFeedback } from '../lib/storage';
 import { startListening, stopListening, parseVoiceText } from '../lib/voiceEntry';
+import { RoughBox } from './RoughBox';
 
 interface VoiceEntryModalProps {
   isOpen: boolean;
@@ -17,14 +18,11 @@ interface VoiceEntryModalProps {
   pendingClassifyTx?: { id: string; amount: number; note?: string } | null;
 }
 
-const QUADRANT_STICKY_STYLE: Record<
-  QuadrantType,
-  { photoClass: string; text: string; rotate: string }
-> = {
-  NECESSARY_DAILY: { photoClass: 'nb-sticky-green', text: '#1e3a17', rotate: '-1.5deg' },
-  NECESSARY_URGENT: { photoClass: 'nb-sticky-blue', text: '#0f2d47', rotate: '1deg' },
-  UNNECESSARY_DAILY: { photoClass: 'nb-sticky-yellow', text: '#5c3d0a', rotate: '1.5deg' },
-  UNNECESSARY_URGENT: { photoClass: 'nb-sticky-red', text: '#5c1414', rotate: '-1deg' },
+const QUADRANT_INK: Record<QuadrantType, string> = {
+  NECESSARY_DAILY: '#2e5c26',
+  NECESSARY_URGENT: '#1e4a78',
+  UNNECESSARY_DAILY: '#7a5314',
+  UNNECESSARY_URGENT: '#7a2020',
 };
 
 type Stage = 'idle' | 'listening' | 'error' | 'review';
@@ -209,13 +207,13 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Mic className="w-4 h-4 text-orange-700 shrink-0" />
-                <h3 className="font-hand text-base font-bold text-[#3a2e18] truncate">
+                <h3 className="font-hand pencil-text text-base font-bold text-[#3a2e18] truncate">
                   {isClassifyMode ? '這筆還沒選分類喔' : '語音記帳'}
                 </h3>
               </div>
               <button
                 onClick={handleClose}
-                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18]:text-white transition-colors shrink-0"
+                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18] transition-colors shrink-0"
                 id="close-voice-modal-btn"
               >
                 <X className="w-4.5 h-4.5" />
@@ -304,21 +302,25 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                 )}
 
                 <div className="flex items-center gap-2">
-                  <div
-                    className="nb-note-photo nb-note-white flex-1 relative px-3 py-1.5 flex items-center gap-1"
+                  <RoughBox
+                    shape="rectangle"
+                    stroke="#3a2e18"
+                    strokeWidth={1.8}
+                    roughness={1.6}
+                    className="flex-1 relative px-3 py-1.5 flex items-center gap-1"
                     style={{ transform: 'rotate(-0.3deg)' }}
                   >
-                    <span className="text-[#b08d57] font-bold text-sm font-hand shrink-0">$</span>
+                    <span className="text-[#b08d57] font-bold text-sm font-hand pencil-text shrink-0">$</span>
                     <input
                       type="number"
                       inputMode="decimal"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       disabled={isClassifyMode}
-                      className="font-hand w-full bg-transparent text-lg font-bold text-[#3a2e18] text-right focus:outline-none disabled:opacity-70"
+                      className="font-hand pencil-text w-full bg-transparent text-lg font-bold text-[#3a2e18] text-right focus:outline-none disabled:opacity-70"
                       id="voice-modal-amount-input"
                     />
-                  </div>
+                  </RoughBox>
                 </div>
 
                 <input
@@ -333,45 +335,59 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
 
                 <div className="font-hand text-xs font-bold text-[#7a6a4a] pt-1">請選擇分類：</div>
 
-                {/* 2x2 quadrant sticky notes */}
                 <div className="grid grid-cols-2 gap-1.5">
-                  {QUADRANT_LIST.map((qKey) => {
+                  {QUADRANT_LIST.map((qKey, i) => {
                     const q = QUADRANT_CONFIGS[qKey];
-                    const s = QUADRANT_STICKY_STYLE[qKey];
+                    const ink = QUADRANT_INK[qKey];
+                    const rotate = ['-1.2deg', '1deg', '1.2deg', '-1deg'][i];
                     return (
-                      <button
+                      <RoughBox
                         key={qKey}
+                        shape="rectangle"
+                        stroke={ink}
+                        strokeWidth={1.8}
+                        roughness={1.8}
+                        fill={`${ink}22`}
+                        fillStyle="hachure"
+                        hachureGap={4}
+                        hachureAngle={i % 2 === 0 ? 45 : -45}
                         onClick={() => handleQuadrantClick(qKey)}
-                        className={`font-hand nb-sticky-photo ${s.photoClass} relative h-9 text-center transition-all flex items-center justify-center`}
-                        style={{ transform: `rotate(${s.rotate})` }}
+                        className="font-hand pencil-text relative h-9 text-center flex items-center justify-center cursor-pointer"
+                        style={{ transform: `rotate(${rotate})` }}
                         id={`voice-modal-quadrant-${qKey}`}
                       >
-                        <div className="nb-tape" style={{ transform: `translateX(-50%) rotate(${s.rotate})` }} />
-                        <span className="text-[11px] font-bold" style={{ color: s.text }}>
+                        <span className="text-[11px] font-bold" style={{ color: ink }}>
                           {q.title}
                         </span>
-                      </button>
+                      </RoughBox>
                     );
                   })}
                 </div>
 
                 {!isClassifyMode && (
                   <div className="flex gap-1.5">
-                    <button
+                    <RoughBox
+                      shape="rectangle"
+                      stroke="#5a4a2a"
+                      strokeWidth={1.5}
+                      roughness={1.8}
                       onClick={handleLumpSum}
-                      className="font-hand nb-tag-photo nb-tag-1 flex-1 h-9 flex items-center justify-center gap-1 text-[#4a3010] text-[10px] font-bold"
+                      className="font-hand pencil-text flex-1 h-9 flex items-center justify-center gap-1 text-[#5a4a2a] text-[10px] font-bold cursor-pointer"
                       id="voice-modal-lump-sum-btn"
                     >
                       模糊概算
-                    </button>
-                    <button
+                    </RoughBox>
+                    <RoughBox
+                      shape="rectangle"
+                      stroke="#7a5314"
+                      strokeWidth={1.5}
+                      roughness={1.8}
                       onClick={handleClassifyLater}
-                      className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#e8dcc0] border-[1.6px] border-dashed border-[#8a6a2a] text-[#5a4014] text-[10px] font-bold"
-                      style={{ borderRadius: '20px 180px 20px 180px / 180px 20px 180px 20px' }}
+                      className="font-hand pencil-text flex-1 h-8 flex items-center justify-center gap-1 text-[#7a5314] text-[10px] font-bold cursor-pointer"
                       id="voice-modal-classify-later-btn"
                     >
                       <Clock3 className="w-3 h-3" /> 稍後分類
-                    </button>
+                    </RoughBox>
                   </div>
                 )}
               </>

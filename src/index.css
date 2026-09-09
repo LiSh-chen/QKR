@@ -5,10 +5,7 @@
 :root {
   --nb-paper: #f1e9d2;
   --nb-paper-line: #c9b98a66;
-  --nb-paper-dark: #2a2418;
-  --nb-paper-line-dark: #4a3f2666;
   --nb-ink: #3a2e18;
-  --nb-ink-dark: #e8dcc0;
   --nb-margin: #c0392b;
 }
 
@@ -16,8 +13,15 @@
   font-family: 'Kalam', cursive;
 }
 
-/* Remove the default browser/WebView tap-focus outline (a dashed ring) that
-   was showing up around sticky notes and tags after being tapped. */
+/* Pencil-texture filter: applies a very subtle wobble to letterform edges plus
+   a faint graphite-grain mottle, so text reads as "hand-written" rather than
+   flat vector type. Kept intentionally light — a heavier version looked like
+   the text was vibrating rather than hand-drawn. */
+.pencil-text {
+  filter: url(#pencilTextSubtle);
+}
+
+/* Remove the default browser/WebView tap-focus outline (a dashed ring) */
 button, a, [role="button"] {
   outline: none;
   -webkit-tap-highlight-color: transparent;
@@ -32,8 +36,7 @@ html, body {
 }
 
 /* Wood desk surface — sits behind the notebook page so the page reads as an
-   object resting on a table, not just a flat background fill. Real photographed
-   wood-grain texture. Non-repeating/cover so there's no tiling seam. */
+   object resting on a table, not just a flat background fill. */
 .nb-desk {
   background-image:
     linear-gradient(180deg, rgba(20,12,4,0.35), rgba(20,12,4,0.55)),
@@ -43,6 +46,8 @@ html, body {
   background-repeat: no-repeat, no-repeat;
 }
 
+/* The notebook page itself — kept as a real paper photo (this is the physical
+   surface everything is drawn ON, not a drawn element itself). */
 .nb-ruled {
   background-color: var(--nb-paper);
   background-image:
@@ -53,15 +58,6 @@ html, body {
   background-repeat: repeat, no-repeat;
   background-blend-mode: multiply, normal;
 }
-
-/* Hand-drawn wobble blob radius — apply with a rotate() transform for extra imperfection */
-.nb-blob-1 { border-radius: 50% 48% 52% 50% / 52% 50% 48% 50%; }
-.nb-blob-2 { border-radius: 48% 52% 50% 50% / 50% 48% 52% 50%; }
-.nb-blob-3 { border-radius: 52% 48% 50% 52% / 48% 52% 50% 50%; }
-.nb-blob-4 { border-radius: 50% 50% 48% 52% / 52% 48% 50% 50%; }
-.nb-blob-pill { border-radius: 180px 10px 180px 10px / 10px 180px 10px 180px; }
-.nb-blob-sticky-a { border-radius: 7px 3px 7px 3px; }
-.nb-blob-sticky-b { border-radius: 3px 7px 3px 7px; }
 
 .nb-binder {
   position: absolute;
@@ -86,98 +82,4 @@ html, body {
   border-radius: 50%;
   background: #e3d7b4;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.3);
-}
-.dark .nb-hole {
-  background: #5a4f36;
-}
-
-.nb-tape {
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 34px;
-  height: 14px;
-  background-image: url('./assets/notebook/tape_small_cream.webp');
-  background-size: cover;
-  opacity: 0.88;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
-}
-
-/* Real photographed sticky notes — used for the 2x2 quadrant buttons and the
-   voice-entry button. The curled corner + shadow is already baked into the
-   photo, so these need no extra CSS curl/border effects layered on top. */
-.nb-sticky-photo {
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  filter: drop-shadow(1px 3px 4px rgba(0,0,0,0.35));
-}
-/* Compact list-row variant: scales the photo taller than the row and anchors
-   it to the bottom, pushing the curled top-right corner mostly out of the
-   visible (short) row so it doesn't dominate/obscure the text. */
-.nb-sticky-row-photo {
-  background-size: 100% 230%;
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3));
-}
-.nb-sticky-green  { background-image: url('./assets/notebook/sticky_green.webp'); }
-.nb-sticky-blue   { background-image: url('./assets/notebook/sticky_blue.webp'); }
-.nb-sticky-yellow { background-image: url('./assets/notebook/sticky_yellow.webp'); }
-.nb-sticky-red    { background-image: url('./assets/notebook/sticky_red.webp'); }
-
-/* Kraft paper tag photos — used for the lump-sum / recent-reuse buttons */
-.nb-tag-photo {
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3));
-}
-.nb-tag-1 { background-image: url('./assets/notebook/tag_1.webp'); }
-.nb-tag-2 { background-image: url('./assets/notebook/tag_2.webp'); }
-.nb-tag-stamp-lg { background-image: url('./assets/notebook/tag_stamp_large.webp'); }
-.nb-tag-stamp-sm { background-image: url('./assets/notebook/tag_stamp_small.webp'); }
-
-/* Real photographed note-paper sheets — used for floating toasts and popup
-   dialogs (confirmations, detail views) so they read as a memo note stuck
-   on top of the page, not a generic UI card, and never stretch page height. */
-.nb-note-photo {
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-}
-.nb-note-white  { background-image: url('./assets/notebook/note_white.webp'); }
-.nb-note-yellow { background-image: url('./assets/notebook/sticky_yellow2.webp'); }
-
-/* Hand-drawn ink-ring photos — used for the calculator keypad buttons */
-.nb-ring-photo {
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-}
-.nb-ring-1 { background-image: url('./assets/notebook/ring_1.webp'); }
-.nb-ring-2 { background-image: url('./assets/notebook/ring_2.webp'); }
-.nb-ring-3 { background-image: url('./assets/notebook/ring_3.webp'); }
-.nb-ring-4 { background-image: url('./assets/notebook/ring_4.webp'); }
-.nb-ring-5 { background-image: url('./assets/notebook/ring_5.webp'); }
-.nb-ring-6 { background-image: url('./assets/notebook/ring_6.webp'); }
-.nb-ring-7 { background-image: url('./assets/notebook/ring_7.webp'); }
-.nb-ring-8 { background-image: url('./assets/notebook/ring_8.webp'); }
-
-/* Sticky-note curled corner: a lifted highlight flap + the shadow it casts
-   back onto the note, applied to any element with position:relative.
-   (Kept for elements that DON'T use a real sticky-note photo, e.g. transaction
-   list rows and the lump-sum reminder card in the 2x2 view.) */
-.nb-curl {
-  position: relative;
-}
-.nb-curl::before {
-  content: "";
-  position: absolute; top: 0; right: 0; width: 24%; height: 24%;
-  background: linear-gradient(135deg, rgba(255,255,255,.65), rgba(255,255,255,.15) 60%);
-  clip-path: polygon(100% 0%, 0% 0%, 100% 100%);
-  pointer-events: none;
-}
-.nb-curl::after {
-  content: "";
-  position: absolute; top: 0; right: 0; width: 28%; height: 28%;
-  background: linear-gradient(135deg, transparent 55%, rgba(0,0,0,.22) 62%, transparent 72%);
-  clip-path: polygon(100% 0%, 0% 0%, 100% 100%);
-  pointer-events: none;
 }

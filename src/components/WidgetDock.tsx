@@ -5,6 +5,7 @@ import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { QuadrantType, Transaction } from '../types';
 import { triggerHapticFeedback, playClickSound } from '../lib/storage';
 import { useCalculator, CalcOperator } from '../lib/calculator';
+import { RoughBox } from './RoughBox';
 
 interface WidgetDockProps {
   transactions: Transaction[];
@@ -15,19 +16,12 @@ interface WidgetDockProps {
   todayTotal: number;
 }
 
-// Sticky-note look per quadrant: real photographed note + text/rotation only
-// (the photo itself already has the color, curled corner, and shadow baked in)
-const QUADRANT_STICKY_STYLE: Record<
-  QuadrantType,
-  { photoClass: string; text: string; darkText: string; rotate: string }
-> = {
-  NECESSARY_DAILY: { photoClass: 'nb-sticky-green', text: '#1e3a17', darkText: '#e8f5e0', rotate: '-1.5deg' },
-  NECESSARY_URGENT: { photoClass: 'nb-sticky-blue', text: '#0f2d47', darkText: '#e8f2fa', rotate: '1deg' },
-  UNNECESSARY_DAILY: { photoClass: 'nb-sticky-yellow', text: '#5c3d0a', darkText: '#fdf3d8', rotate: '1.5deg' },
-  UNNECESSARY_URGENT: { photoClass: 'nb-sticky-red', text: '#5c1414', darkText: '#fce8e8', rotate: '-1deg' },
+const QUADRANT_INK: Record<QuadrantType, string> = {
+  NECESSARY_DAILY: '#2e5c26',
+  NECESSARY_URGENT: '#1e4a78',
+  UNNECESSARY_DAILY: '#7a5314',
+  UNNECESSARY_URGENT: '#7a2020',
 };
-
-const KEYPAD_RING_CLASSES = ['nb-ring-1', 'nb-ring-2', 'nb-ring-3', 'nb-ring-4', 'nb-ring-5', 'nb-ring-6', 'nb-ring-7', 'nb-ring-8'];
 
 const DIGIT_ROTATIONS = ['-2deg', '1.5deg', '-1deg', '1deg', '-1.5deg', '2deg', '-2deg', '1deg', '-1deg', '-1deg', '1.5deg'];
 
@@ -43,7 +37,6 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   const [showError, setShowError] = useState(false);
   const [lastResult, setLastResult] = useState<{ label: string; durationSec?: string } | null>(null);
 
-  // Auto-dismiss the floating note-paper toast after a couple of seconds.
   React.useEffect(() => {
     if (!lastResult) return;
     const t = setTimeout(() => setLastResult(null), 2200);
@@ -187,8 +180,12 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   };
 
   const digitKey = (label: string, value: Parameters<typeof calc.pressDigit>[0], idx: number) => (
-    <button
+    <RoughBox
       key={label}
+      shape="ellipse"
+      stroke="#3a2e18"
+      strokeWidth={1.6}
+      roughness={2.1}
       onClick={() => {
         markStart();
         triggerHapticFeedback('light');
@@ -196,17 +193,21 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressDigit(value);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] text-sm active:scale-95 transition-transform`}
+      className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#3a2e18] text-sm cursor-pointer"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-btn-${label}`}
     >
       {label}
-    </button>
+    </RoughBox>
   );
 
   const opKey = (label: string, op: CalcOperator, idx: number) => (
-    <button
+    <RoughBox
       key={label}
+      shape="ellipse"
+      stroke="#7a4a1a"
+      strokeWidth={1.6}
+      roughness={2.1}
       onClick={() => {
         markStart();
         triggerHapticFeedback('light');
@@ -214,12 +215,12 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressOperator(op);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] text-base active:scale-95 transition-transform`}
+      className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#7a4a1a] text-base cursor-pointer"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-op-${label}`}
     >
       {label}
-    </button>
+    </RoughBox>
   );
 
   return (
@@ -229,9 +230,6 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
-      {/* Success / Error feedback — a floating note-paper toast anchored to the
-          OUTER card (not the scrollable/offset inner content), so it's always
-          properly centered and never gets clipped by inner overflow-y-auto. */}
       <AnimatePresence>
         {lastResult && (
           <motion.div
@@ -241,11 +239,17 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
             className="absolute left-1/2 top-14 z-30 w-[85%] max-w-[280px]"
             style={{ transform: 'translateX(-50%)' }}
           >
-            <div
-              className="nb-note-photo nb-note-white relative px-4 py-3"
+            <RoughBox
+              shape="rectangle"
+              stroke="#2e5c26"
+              strokeWidth={2}
+              roughness={1.8}
+              fill="#f1e9d2"
+              fillStyle="solid"
+              className="relative px-4 py-3"
               style={{ filter: 'drop-shadow(2px 6px 10px rgba(0,0,0,0.4))' }}
             >
-              <div className="font-hand flex items-center justify-between gap-2 text-xs text-[#2e5c26]">
+              <div className="font-hand pencil-text flex items-center justify-between gap-2 text-xs text-[#2e5c26]">
                 <div className="flex items-center gap-1.5 truncate">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span className="font-bold truncate">{lastResult.label}</span>
@@ -255,41 +259,43 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                   <X className="w-4 h-4" />
                 </button>
               </div>
-            </div>
+            </RoughBox>
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="relative z-10 flex flex-col h-full min-h-0 gap-1.5 ml-4 overflow-y-auto">
-        {/* Compact top bar: today's total */}
         <div className="flex items-center justify-between px-0.5 shrink-0">
-          <span className="text-[11px] text-[#8a7a5a]">今日支出</span>
-          <span className="text-base font-black font-mono text-[#4a3a20]">${todayTotal.toLocaleString()}</span>
+          <span className="font-hand pencil-text text-[11px] text-[#8a7a5a]">今日支出</span>
+          <span className="font-hand pencil-text text-base font-black font-mono text-[#4a3a20]">${todayTotal.toLocaleString()}</span>
         </div>
 
-        {/* Voice entry — a real stamped-tag photo so it matches the rest of the
-            paper/ink aesthetic instead of a flat modern gradient pill */}
-        <motion.button
-          whileTap={{ scale: 0.97 }}
+        <RoughBox
+          shape="rectangle"
+          stroke="#c9683c"
+          strokeWidth={2.2}
+          roughness={2}
+          fill="#c9683c15"
+          fillStyle="hachure"
+          hachureGap={5}
           onClick={() => {
             triggerHapticFeedback('light');
             onOpenVoiceModal();
           }}
-          className="font-hand nb-tag-photo nb-tag-2 w-full h-11 flex items-center justify-center gap-2 text-[#3a2410] shrink-0"
+          className="font-hand pencil-text w-full h-11 flex items-center justify-center gap-2 text-[#7a3d14] shrink-0 cursor-pointer"
           id="widget-voice-entry-btn"
         >
           <Mic className="w-4 h-4" />
           <span className="text-sm font-bold">語音記帳（用講的）</span>
-        </motion.button>
+        </RoughBox>
 
-        {/* Pending "稍後分類" reminder */}
         {pendingClassifyTxs.length > 0 && (
           <button
             onClick={() => {
               const t = pendingClassifyTxs[0];
               onOpenClassify({ id: t.id, amount: t.amount, note: t.note });
             }}
-            className="font-hand flex items-center gap-1.5 px-2.5 py-1.5 bg-[#f5e0b8] border-[1.4px] border-dashed border-[#8a6a2a] text-[#5a4014] text-xs font-bold shrink-0 rounded-lg"
+            className="font-hand pencil-text flex items-center gap-1.5 px-2.5 py-1.5 border-[1.4px] border-dashed border-[#8a6a2a] text-[#5a4014] text-xs font-bold shrink-0 rounded-lg"
             id="widget-pending-classify-banner"
           >
             <Clock3 className="w-3.5 h-3.5 shrink-0" />
@@ -297,34 +303,34 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           </button>
         )}
 
-        {/* Amount display — a real white note-paper photo, matching the rest
-            of the physical-object aesthetic instead of a flat CSS box */}
-        <div
-          className="nb-note-photo nb-note-white relative px-4 py-2.5 flex items-center justify-between shrink-0"
+        <RoughBox
+          shape="rectangle"
+          stroke={showError ? '#c0392b' : '#3a2e18'}
+          strokeWidth={2}
+          roughness={1.6}
+          className="relative px-4 py-2.5 flex items-center justify-between shrink-0"
           style={{ transform: 'rotate(-0.3deg)' }}
         >
-          <span className="text-[#b08d57] font-bold text-base font-hand">$</span>
-          <span className="flex-1 text-right text-2xl font-hand font-bold text-[#3a2e18] tabular-nums truncate">
+          <span className="text-[#b08d57] font-bold text-base font-hand pencil-text">$</span>
+          <span className="flex-1 text-right text-2xl font-hand pencil-text font-bold text-[#3a2e18] tabular-nums truncate">
             {calc.display || '0'}
           </span>
           {showError && (
-            <span className="font-hand absolute -top-2 right-3 bg-rose-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+            <span className="font-hand pencil-text absolute -top-2 right-3 bg-rose-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
               <AlertCircle className="w-2.5 h-2.5" /> 請先輸入金額
             </span>
           )}
-        </div>
+        </RoughBox>
 
-        {/* Note — bigger tap target so it isn't accidentally missed or fat-fingered */}
         <input
           type="text"
           value={noteStr}
           onChange={(e) => setNoteStr(e.target.value)}
           placeholder="備註：便當、咖啡..."
-          className="font-hand w-full px-3 py-2 bg-transparent text-[#5a4a2a] text-sm border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
+          className="font-hand pencil-text w-full px-3 py-2 bg-transparent text-[#5a4a2a] text-sm border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70 shrink-0"
           id="main-direct-note-input"
         />
 
-        {/* Full calculator keypad: digits + operators + 00 + C + backspace + equals */}
         <div className="grid grid-cols-4 gap-1.5 shrink-0">
           {digitKey('7', '7', 0)}
           {digitKey('8', '8', 1)}
@@ -343,7 +349,11 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
 
           {digitKey('00', '00', 3)}
           {digitKey('0', '0', 6)}
-          <button
+          <RoughBox
+            shape="ellipse"
+            stroke="#8a1f1f"
+            strokeWidth={1.8}
+            roughness={2.2}
             onClick={() => {
               triggerHapticFeedback('medium');
               playClickSound(500);
@@ -351,91 +361,113 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               calc.clear();
               startTimeRef.current = null;
             }}
-            className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] text-sm active:scale-95 transition-transform"
+            className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#8a1f1f] text-sm cursor-pointer"
             style={{ transform: 'rotate(-1.5deg)' }}
             id="keypad-btn-C"
           >
             C
-          </button>
+          </RoughBox>
           {opKey('+', '+', 9)}
         </div>
 
         <div className="grid grid-cols-4 gap-1.5 shrink-0">
-          <button
+          <RoughBox
+            shape="ellipse"
+            stroke="#5a4014"
+            strokeWidth={1.6}
+            roughness={2}
             onClick={() => {
               triggerHapticFeedback('light');
               playClickSound(700);
               clearFeedback();
               calc.pressBackspace();
             }}
-            className="font-hand h-9 nb-ring-photo nb-ring-5 flex items-center justify-center font-bold text-[#5a4014] text-xs active:scale-95 transition-transform"
+            className="font-hand h-9 flex items-center justify-center font-bold text-[#5a4014] cursor-pointer"
             style={{ transform: 'rotate(-1deg)' }}
             id="keypad-btn-backspace"
           >
             <Delete className="w-4 h-4 mx-auto" />
-          </button>
-          <button
+          </RoughBox>
+          <RoughBox
+            shape="rectangle"
+            stroke="#2e5c26"
+            strokeWidth={2}
+            roughness={1.8}
+            fill="#2e5c2622"
+            fillStyle="hachure"
+            hachureGap={4}
             onClick={() => {
               triggerHapticFeedback('medium');
               playClickSound(1000);
               clearFeedback();
               calc.pressEquals();
             }}
-            className="font-hand nb-tag-photo nb-tag-1 col-span-3 h-9 flex items-center justify-center font-bold text-[#3a2410] text-sm active:scale-95 transition-transform"
+            className="font-hand pencil-text col-span-3 h-9 flex items-center justify-center font-bold text-[#2e5c26] text-sm cursor-pointer"
             id="keypad-btn-equals"
           >
             = 算一算
-          </button>
+          </RoughBox>
         </div>
 
-        {/* 2x2 Quadrant sticky notes + a dedicated lump-sum button */}
         <div className="grid grid-cols-2 gap-1.5 shrink-0">
-          {QUADRANT_LIST.map((qKey) => {
+          {QUADRANT_LIST.map((qKey, i) => {
             const q = QUADRANT_CONFIGS[qKey];
-            const s = QUADRANT_STICKY_STYLE[qKey];
+            const ink = QUADRANT_INK[qKey];
+            const rotate = ['-1.2deg', '1deg', '1.2deg', '-1deg'][i];
             return (
-              <motion.button
+              <RoughBox
                 key={qKey}
-                whileTap={{ scale: 0.95 }}
+                shape="rectangle"
+                stroke={ink}
+                strokeWidth={2}
+                roughness={1.8}
+                fill={`${ink}22`}
+                fillStyle="hachure"
+                hachureGap={4}
+                hachureAngle={i % 2 === 0 ? 45 : -45}
                 onClick={() => handleQuadrantDirectClick(qKey)}
-                className={`font-hand nb-sticky-photo ${s.photoClass} relative h-11 text-center transition-all flex items-center justify-center`}
-                style={{ transform: `rotate(${s.rotate})` }}
+                className="font-hand pencil-text relative h-11 text-center flex items-center justify-center cursor-pointer"
+                style={{ transform: `rotate(${rotate})` }}
                 id={`quadrant-direct-btn-${qKey}`}
               >
-                <span className="text-xs font-bold" style={{ color: s.text }}>
+                <span className="text-xs font-bold" style={{ color: ink }}>
                   {q.title}
                 </span>
-              </motion.button>
+              </RoughBox>
             );
           })}
         </div>
 
         <div className="flex gap-1.5 shrink-0">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
+          <RoughBox
+            shape="rectangle"
+            stroke="#5a4a2a"
+            strokeWidth={1.6}
+            roughness={1.8}
             onClick={handleLumpSumClick}
-            className="font-hand nb-tag-photo nb-tag-1 flex-1 h-11 flex items-center justify-center text-[#4a3010]"
+            className="font-hand pencil-text flex-1 h-11 flex items-center justify-center text-[#5a4a2a] cursor-pointer"
             id="lump-sum-confirm-btn"
           >
             <span className="text-[11px] font-bold">模糊概算</span>
-          </motion.button>
+          </RoughBox>
 
-          {/* Recent-reuse: a single button — tapping opens a picker instead of always
-              showing the full list, so this doesn't compete for space day-to-day. */}
           {recentCandidates.length > 0 && (
-            <button
+            <RoughBox
+              shape="rectangle"
+              stroke="#3a2e18"
+              strokeWidth={1.6}
+              roughness={1.8}
               onClick={() => setShowRecentPicker(true)}
-              className="font-hand nb-tag-photo nb-tag-2 flex-1 h-11 flex items-center justify-center gap-1 text-[#4a3010]"
+              className="font-hand pencil-text flex-1 h-11 flex items-center justify-center gap-1 text-[#3a2e18] cursor-pointer"
               id="open-recent-reuse-picker-btn"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span className="text-[11px] font-bold">昨日複用（{recentCandidates.length}）</span>
-            </button>
+            </RoughBox>
           )}
         </div>
       </div>
 
-      {/* Recent-reuse picker (popup) */}
       <AnimatePresence>
         {showRecentPicker && (
           <div className="absolute inset-0 z-20 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -447,7 +479,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               className="w-full max-w-xs nb-ruled rounded-3xl p-3 pl-5 relative max-h-[80%] flex flex-col"
             >
               <div className="flex items-center justify-between shrink-0 mb-2">
-                <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#3a2e18]">
+                <div className="font-hand pencil-text flex items-center gap-1.5 text-sm font-bold text-[#3a2e18]">
                   <History className="w-4 h-4" />
                   <span>昨日紀錄快速複用（可多選）</span>
                 </div>
@@ -457,7 +489,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               </div>
 
               <div className="flex flex-col gap-1.5 overflow-y-auto flex-1 min-h-0">
-                {recentCandidates.map((t, i) => {
+                {recentCandidates.map((t) => {
                   const isSelected = selectedRecentIds.has(t.id);
                   const qColor = t.quadrant ? QUADRANT_CONFIGS[t.quadrant].color : '#A8A29E';
                   const label = t.note || (t.quadrant ? QUADRANT_CONFIGS[t.quadrant].title : '模糊概算');
@@ -465,12 +497,9 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                     <button
                       key={t.id}
                       onClick={() => toggleRecentSelect(t.id)}
-                      className={`font-hand w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium border-[1.5px] transition-all shrink-0 ${
-                        isSelected
-                          ? 'bg-amber-400 border-amber-600 text-stone-900 font-bold'
-                          : 'bg-[#fdf8ec] border-[#4a3a20] text-[#3a2e18]'
+                      className={`font-hand pencil-text w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium border-[1.5px] rounded-xl transition-all shrink-0 ${
+                        isSelected ? 'bg-amber-400 border-amber-600 text-stone-900 font-bold' : 'bg-[#fdf8ec] border-[#4a3a20] text-[#3a2e18]'
                       }`}
-                      style={{ borderRadius: i % 2 === 0 ? '4px 12px 4px 12px' : '12px 4px 12px 4px' }}
                       id={`recent-reuse-chip-${t.id}`}
                     >
                       {isSelected ? (
@@ -488,7 +517,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               <button
                 onClick={handleApplySelectedRecent}
                 disabled={selectedRecentTx.length === 0}
-                className="font-hand w-full py-2.5 nb-blob-pill bg-[#f5dca0] border-[1.6px] border-[#8a6a2a] text-[#5a4014] font-bold text-sm shrink-0 mt-2 disabled:opacity-40"
+                className="font-hand pencil-text w-full py-2.5 rounded-full bg-[#f5dca0] border-[1.6px] border-[#8a6a2a] text-[#5a4014] font-bold text-sm shrink-0 mt-2 disabled:opacity-40"
                 id="apply-selected-recent-btn"
               >
                 {selectedRecentTx.length > 0

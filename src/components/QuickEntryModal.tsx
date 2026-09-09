@@ -11,6 +11,7 @@ import {
   getSpeedRankInfo,
 } from '../lib/storage';
 import { useCalculator, CalcOperator } from '../lib/calculator';
+import { RoughBox } from './RoughBox';
 
 interface QuickEntryModalProps {
   isOpen: boolean;
@@ -23,17 +24,12 @@ interface QuickEntryModalProps {
   initialNote?: string;
 }
 
-const QUADRANT_STICKY_STYLE: Record<
-  QuadrantType,
-  { photoClass: string; text: string; rotate: string }
-> = {
-  NECESSARY_DAILY: { photoClass: 'nb-sticky-green', text: '#1e3a17', rotate: '-1.5deg' },
-  NECESSARY_URGENT: { photoClass: 'nb-sticky-blue', text: '#0f2d47', rotate: '1deg' },
-  UNNECESSARY_DAILY: { photoClass: 'nb-sticky-yellow', text: '#5c3d0a', rotate: '1.5deg' },
-  UNNECESSARY_URGENT: { photoClass: 'nb-sticky-red', text: '#5c1414', rotate: '-1deg' },
+const QUADRANT_INK: Record<QuadrantType, string> = {
+  NECESSARY_DAILY: '#2e5c26',
+  NECESSARY_URGENT: '#1e4a78',
+  UNNECESSARY_DAILY: '#7a5314',
+  UNNECESSARY_URGENT: '#7a2020',
 };
-
-const KEYPAD_RING_CLASSES = ['nb-ring-1', 'nb-ring-2', 'nb-ring-3', 'nb-ring-4', 'nb-ring-5', 'nb-ring-6', 'nb-ring-7', 'nb-ring-8'];
 
 const DIGIT_ROTATIONS = ['-2deg', '1.5deg', '-1deg', '1deg', '-1.5deg', '2deg', '-2deg', '1deg', '-1deg', '-1deg', '1.5deg'];
 
@@ -117,35 +113,43 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   };
 
   const digitKey = (label: string, value: Parameters<typeof calc.pressDigit>[0], idx: number) => (
-    <button
+    <RoughBox
       key={label}
+      shape="ellipse"
+      stroke="#3a2e18"
+      strokeWidth={1.5}
+      roughness={2.1}
       onClick={() => {
         triggerHapticFeedback('light');
         playClickSound(900);
         calc.pressDigit(value);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#3a2e18] text-xs`}
+      className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#3a2e18] text-xs cursor-pointer"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-keypad-${label}`}
     >
       {label}
-    </button>
+    </RoughBox>
   );
 
   const opKey = (label: string, op: CalcOperator, idx: number) => (
-    <button
+    <RoughBox
       key={label}
+      shape="ellipse"
+      stroke="#7a4a1a"
+      strokeWidth={1.5}
+      roughness={2.1}
       onClick={() => {
         triggerHapticFeedback('light');
         playClickSound(1000);
         calc.pressOperator(op);
       }}
-      className={`font-hand h-9 nb-ring-photo ${KEYPAD_RING_CLASSES[idx % KEYPAD_RING_CLASSES.length]} flex items-center justify-center font-bold text-[#7a4a1a] text-sm`}
+      className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#7a4a1a] text-sm cursor-pointer"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`quick-modal-op-${label}`}
     >
       {label}
-    </button>
+    </RoughBox>
   );
 
   return (
@@ -169,43 +173,43 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           </div>
 
           <div className="p-3 pl-6 space-y-1 ml-4">
-            {/* Compact header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Zap className="w-4 h-4 text-orange-700 shrink-0" />
-                <h3 className="font-hand text-base font-bold text-[#3a2e18] truncate">極速記帳</h3>
+                <h3 className="font-hand pencil-text text-base font-bold text-[#3a2e18] truncate">極速記帳</h3>
               </div>
               <button
                 onClick={onClose}
-                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18]:text-white transition-colors shrink-0"
+                className="p-1 rounded-full text-[#8a7a5a] hover:text-[#3a2e18] transition-colors shrink-0"
                 id="close-quick-modal-btn"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
             </div>
 
-            {/* Amount display — real note-paper photo */}
-            <div
-              className="nb-note-photo nb-note-white relative px-3 py-1.5 flex items-center justify-between"
+            <RoughBox
+              shape="rectangle"
+              stroke="#3a2e18"
+              strokeWidth={1.8}
+              roughness={1.6}
+              className="relative px-3 py-1.5 flex items-center justify-between"
               style={{ transform: 'rotate(-0.3deg)' }}
             >
-              <span className="text-[#b08d57] font-bold text-sm font-hand">$</span>
-              <span className="flex-1 text-right text-xl font-hand font-bold text-[#3a2e18] tabular-nums truncate">
+              <span className="text-[#b08d57] font-bold text-sm font-hand pencil-text">$</span>
+              <span className="flex-1 text-right text-xl font-hand pencil-text font-bold text-[#3a2e18] tabular-nums truncate">
                 {calc.display || '0'}
               </span>
-            </div>
+            </RoughBox>
 
-            {/* Note */}
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="備註：便當、咖啡..."
-              className="font-hand w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70"
+              className="font-hand pencil-text w-full px-2 py-0.5 bg-transparent text-[#5a4a2a] text-xs border-b-[1.5px] border-dashed border-[#8a7454] focus:border-amber-700 focus:outline-none placeholder:text-[#a08a5c]/70"
               id="quick-modal-note-input"
             />
 
-            {/* Full calculator keypad */}
             <div className="grid grid-cols-4 gap-1 mt-0.5">
               {digitKey('7', '7', 0)}
               {digitKey('8', '8', 1)}
@@ -224,85 +228,114 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
               {digitKey('00', '00', 3)}
               {digitKey('0', '0', 6)}
-              <button
+              <RoughBox
+                shape="ellipse"
+                stroke="#8a1f1f"
+                strokeWidth={1.6}
+                roughness={2.2}
                 onClick={() => {
                   triggerHapticFeedback('medium');
                   playClickSound(500);
                   calc.clear();
                 }}
-                className="font-hand h-9 nb-ring-photo nb-ring-3 flex items-center justify-center font-bold text-[#8a1f1f] text-xs"
+                className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#8a1f1f] text-xs cursor-pointer"
                 style={{ transform: 'rotate(-1.5deg)' }}
                 id="quick-modal-keypad-C"
               >
                 C
-              </button>
+              </RoughBox>
               {opKey('+', '+', 9)}
             </div>
 
             <div className="grid grid-cols-4 gap-1">
-              <button
+              <RoughBox
+                shape="ellipse"
+                stroke="#7a4a1a"
+                strokeWidth={1.5}
+                roughness={2}
                 onClick={() => {
                   triggerHapticFeedback('light');
                   playClickSound(700);
                   calc.pressBackspace();
                 }}
-                className="font-hand h-9 nb-ring-photo nb-ring-7 flex items-center justify-center font-bold text-[#7a4a1a] text-xs"
+                className="font-hand h-9 flex items-center justify-center font-bold text-[#7a4a1a] cursor-pointer"
                 style={{ transform: 'rotate(-1deg)' }}
                 id="quick-modal-backspace"
               >
                 <Delete className="w-3.5 h-3.5 mx-auto" />
-              </button>
-              <button
+              </RoughBox>
+              <RoughBox
+                shape="rectangle"
+                stroke="#2e5c26"
+                strokeWidth={1.8}
+                roughness={1.8}
+                fill="#2e5c2622"
+                fillStyle="hachure"
+                hachureGap={4}
                 onClick={() => {
                   triggerHapticFeedback('medium');
                   playClickSound(1000);
                   calc.pressEquals();
                 }}
-                className="font-hand nb-tag-photo nb-tag-1 col-span-3 h-8 flex items-center justify-center font-bold text-[#3a2410] text-xs"
+                className="font-hand pencil-text col-span-3 h-8 flex items-center justify-center font-bold text-[#2e5c26] text-xs cursor-pointer"
                 id="quick-modal-equals"
               >
                 = 算一算
-              </button>
+              </RoughBox>
             </div>
 
-            {/* 2x2 quadrant sticky notes */}
             <div className="grid grid-cols-2 gap-1.5">
-              {QUADRANT_LIST.map((qKey) => {
+              {QUADRANT_LIST.map((qKey, i) => {
                 const q = QUADRANT_CONFIGS[qKey];
-                const s = QUADRANT_STICKY_STYLE[qKey];
+                const ink = QUADRANT_INK[qKey];
+                const rotate = ['-1.2deg', '1deg', '1.2deg', '-1deg'][i];
                 return (
-                  <button
+                  <RoughBox
                     key={qKey}
+                    shape="rectangle"
+                    stroke={ink}
+                    strokeWidth={1.8}
+                    roughness={1.8}
+                    fill={`${ink}22`}
+                    fillStyle="hachure"
+                    hachureGap={4}
+                    hachureAngle={i % 2 === 0 ? 45 : -45}
                     onClick={() => handleQuadrantClick(qKey)}
-                    className={`font-hand nb-sticky-photo ${s.photoClass} relative h-9 text-center transition-all flex items-center justify-center`}
-                    style={{ transform: `rotate(${s.rotate})` }}
+                    className="font-hand pencil-text relative h-9 text-center flex items-center justify-center cursor-pointer"
+                    style={{ transform: `rotate(${rotate})` }}
                     id={`quick-modal-quadrant-${qKey}`}
                   >
-                    <div className="nb-tape" style={{ transform: `translateX(-50%) rotate(${s.rotate})` }} />
-                    <span className="text-[11px] font-bold" style={{ color: s.text }}>
+                    <span className="text-[11px] font-bold" style={{ color: ink }}>
                       {q.title}
                     </span>
-                  </button>
+                  </RoughBox>
                 );
               })}
             </div>
 
             <div className="flex gap-1.5">
-              <button
+              <RoughBox
+                shape="rectangle"
+                stroke="#5a4a2a"
+                strokeWidth={1.5}
+                roughness={1.8}
                 onClick={handleLumpSumClick}
-                className="font-hand nb-tag-photo nb-tag-1 flex-1 h-9 flex items-center justify-center gap-1 text-[#4a3010] text-[10px] font-bold"
+                className="font-hand pencil-text flex-1 h-9 flex items-center justify-center gap-1 text-[#5a4a2a] text-[10px] font-bold cursor-pointer"
                 id="quick-modal-lump-sum-btn"
               >
                 模糊概算補登
-              </button>
-              <button
+              </RoughBox>
+              <RoughBox
+                shape="rectangle"
+                stroke="#1e4a78"
+                strokeWidth={1.5}
+                roughness={1.8}
                 onClick={handleZeroSpendToday}
-                className="font-hand flex-1 h-8 flex items-center justify-center gap-1 bg-[#bcd8f0] border-[1.6px] border-dashed border-[#1e4a78] text-[#1e4a78] text-[10px] font-bold"
-                style={{ borderRadius: '20px 180px 20px 180px / 180px 20px 180px 20px' }}
+                className="font-hand pencil-text flex-1 h-8 flex items-center justify-center gap-1 text-[#1e4a78] text-[10px] font-bold cursor-pointer"
                 id="quick-modal-zero-spend-btn"
               >
                 <Sparkles className="w-3 h-3" /> 今日 $0 支出
-              </button>
+              </RoughBox>
             </div>
           </div>
 
@@ -312,7 +345,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className={`font-hand absolute left-3 right-3 bottom-3 p-2.5 rounded-2xl text-white text-[11px] font-bold flex items-center justify-between shadow-lg pointer-events-none ${
+                className={`font-hand pencil-text absolute left-3 right-3 bottom-3 p-2.5 rounded-2xl text-white text-[11px] font-bold flex items-center justify-between shadow-lg pointer-events-none ${
                   completedToast.isNewPB ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500' : 'bg-emerald-700'
                 }`}
               >

@@ -30,6 +30,7 @@ import { WidgetDock } from './components/WidgetDock';
 import { QuadrantMatrixView } from './components/QuadrantMatrixView';
 import { TransactionList } from './components/TransactionList';
 import { SettingsView } from './components/SettingsView';
+import { RoughBox } from './components/RoughBox';
 import { findRoutineCandidate } from './lib/routine';
 import {
   requestNotificationPermissions,
@@ -294,6 +295,23 @@ export default function App() {
       className="nb-desk flex flex-col text-[#3a2e18] font-sans transition-colors duration-200 overflow-hidden"
       style={{ height: '100dvh', paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
+      {/* Global hand-drawn text filter — used everywhere via the .pencil-text class */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <filter id="pencilTextSubtle" x="-10%" y="-30%" width="120%" height="160%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.6 0.9" numOctaves="2" seed="4" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.8" xChannelSelector="R" yChannelSelector="G" result="wobbled" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9" result="grain" />
+            <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0" result="grainAlpha" />
+            <feComposite in="wobbled" in2="grainAlpha" operator="out" result="textWithHoles" />
+            <feMerge>
+              <feMergeNode in="wobbled" />
+              <feMergeNode in="textWithHoles" />
+            </feMerge>
+          </filter>
+        </defs>
+      </svg>
+
       {/* Main Container */}
       <main
         className={`flex-1 min-h-0 w-full max-w-5xl mx-auto px-4 pt-3 ${
@@ -388,47 +406,41 @@ export default function App() {
         </div>
       )}
 
-      {/* Bottom Nav — notebook index/divider tabs, each page with its own color identity;
+      {/* Bottom Nav — hand-drawn index/divider tabs, each page with its own color identity;
           the active tab shares the page's paper color and sits raised/fused above the rest. */}
       <nav
-        className="shrink-0 z-30 px-2 pt-1 flex items-end justify-around gap-1"
+        className="shrink-0 z-30 px-2 pt-1 flex items-end justify-around gap-1.5"
         style={{ paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
       >
         {NAV_ITEMS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
-            <button
+            <RoughBox
               key={tab.id}
+              shape="rectangle"
+              stroke={tab.activeText}
+              strokeWidth={isActive ? 2.2 : 1.4}
+              roughness={1.6}
+              fill={isActive ? `${tab.activeText}18` : undefined}
+              fillStyle="hachure"
+              hachureGap={5}
               onClick={() => {
                 setActiveTab(tab.id);
                 triggerHapticFeedback('light');
                 playClickSound(700);
               }}
-              className="font-hand flex-1 flex flex-col items-center gap-0.5 py-1.5 text-[10px] font-bold rounded-t-xl transition-all"
-              style={
-                isActive
-                  ? {
-                      backgroundColor: '#f1e9d2',
-                      color: tab.activeText,
-                      transform: 'translateY(-6px)',
-                      boxShadow: '0 -3px 8px rgba(0,0,0,0.25), 0 6px 10px rgba(0,0,0,0.35)',
-                      zIndex: 3,
-                      paddingTop: '10px',
-                      paddingBottom: '11px',
-                    }
-                  : {
-                      backgroundColor: tab.tabBg,
-                      color: '#4a3420',
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 6px rgba(0,0,0,0.35)',
-                    }
-              }
+              className="font-hand pencil-text flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-bold cursor-pointer transition-transform"
+              style={{
+                color: tab.activeText,
+                backgroundColor: isActive ? '#f1e9d2' : 'transparent',
+                transform: isActive ? 'translateY(-4px)' : 'translateY(0)',
+              }}
               id={`tab-${tab.id}`}
             >
-              <Icon className="w-5 h-5" />
-              <span>{tab.label}</span>
-            </button>
+              <Icon className="w-5 h-5 mx-auto" />
+              <span className="block text-center">{tab.label}</span>
+            </RoughBox>
           );
         })}
       </nav>
