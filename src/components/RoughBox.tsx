@@ -98,7 +98,82 @@ export const RoughBox: React.FC<RoughBoxProps> = ({
         className="absolute inset-0 w-full h-full pointer-events-none"
         preserveAspectRatio="none"
       />
-      <div className="relative z-10 w-full h-full">{children}</div>
+      <div className={`relative z-10 w-full h-full ${className}`}>{children}</div>
+    </div>
+  );
+};
+
+interface RoughCheckboxProps {
+  checked: boolean;
+  onChange: () => void;
+  className?: string;
+  stroke?: string;
+}
+
+/**
+ * A hand-drawn checkbox: a small rough.js square that shows a hand-drawn
+ * checkmark stroke when checked, replacing the native OS checkbox widget
+ * (which renders as smooth modern UI and clashes with the sketch aesthetic).
+ */
+export const RoughCheckbox: React.FC<RoughCheckboxProps> = ({ checked, onChange, className = 'w-4 h-4', stroke = '#3a2e18' }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [seed] = useState(() => Math.floor(Math.random() * 10000));
+  const [size, setSize] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setSize({ w: Math.round(entry.contentRect.width), h: Math.round(entry.contentRect.height) });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || size.w < 4 || size.h < 4) return;
+    svg.innerHTML = '';
+    const rc = rough.svg(svg);
+    const pad = 1.5;
+
+    const box = rc.rectangle(pad, pad, size.w - pad * 2, size.h - pad * 2, {
+      stroke,
+      strokeWidth: 1.5,
+      roughness: 1.7,
+      seed,
+    });
+    svg.appendChild(box);
+
+    if (checked) {
+      const w = size.w;
+      const h = size.h;
+      const check = rc.linearPath(
+        [
+          [w * 0.2, h * 0.52],
+          [w * 0.42, h * 0.76],
+          [w * 0.82, h * 0.24],
+        ],
+        { stroke: '#2e5c26', strokeWidth: 2, roughness: 1.4, seed: seed + 1 }
+      );
+      svg.appendChild(check);
+    }
+  }, [size, checked, stroke, seed]);
+
+  return (
+    <div
+      ref={containerRef}
+      onClick={(e) => {
+        e.stopPropagation();
+        onChange();
+      }}
+      onPointerDownCapture={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      className={`relative shrink-0 cursor-pointer ${className}`}
+    >
+      <svg ref={svgRef} viewBox={`0 0 ${size.w} ${size.h}`} className="w-full h-full" preserveAspectRatio="none" />
     </div>
   );
 };

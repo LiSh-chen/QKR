@@ -1,19 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { LayoutGrid, Info, TrendingUp, Calendar } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { RoughBox } from './RoughBox';
+import { RoughDonut, RoughStackedBarChart } from './RoughCharts';
 
 interface QuadrantMatrixViewProps {
   transactions: Transaction[];
@@ -176,19 +166,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
             <RoughBox shape="rectangle" stroke="#3a2e18" strokeWidth={1.4} roughness={1.4} className="p-3">
               {hasMonthData ? (
                 <div className="w-28 h-28 mx-auto relative mb-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="95%" paddingAngle={2} strokeWidth={1.5} stroke="#3a2e18">
-                        {pieData.map((entry) => (
-                          <Cell key={entry.key} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name]}
-                        contentStyle={{ fontSize: 11, borderRadius: 8, background: '#292524', border: 'none', color: '#fff' }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <RoughDonut data={pieData.map((d) => ({ key: d.key, value: d.value, color: d.color }))} size={112} />
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                     <span className="font-hand pencil-text text-[10px] text-[#8a7a5a]">本月支出</span>
                     <span className="font-hand pencil-text text-lg font-black font-mono text-[#3a2e18]">
@@ -208,16 +186,37 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                       <div key={d.key}>
                         <div className="flex items-center justify-between text-xs mb-1">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                            <RoughBox
+                              shape="ellipse"
+                              stroke={d.color}
+                              strokeWidth={1.2}
+                              roughness={1.8}
+                              fill={d.color}
+                              fillStyle="hachure"
+                              hachureGap={2}
+                              className="w-3 h-3 shrink-0"
+                            />
                             <span className="font-hand pencil-text font-bold text-[#3a2e18]">{d.name}</span>
                           </div>
                           <span className="font-mono font-bold text-[#5a4a2a] shrink-0">
                             ${d.value.toLocaleString()} · {pct}%
                           </span>
                         </div>
-                        <div className="h-2.5 rounded-full bg-[#e8dcc0] overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: d.color }} />
-                        </div>
+                        <RoughBox shape="rectangle" stroke="#a08a5c" strokeWidth={1} roughness={1.5} className="h-3">
+                          {pct > 0 && (
+                            <RoughBox
+                              shape="rectangle"
+                              stroke={d.color}
+                              strokeWidth={1}
+                              roughness={1.6}
+                              fill={d.color}
+                              fillStyle="hachure"
+                              hachureGap={2.5}
+                              className="h-full"
+                              style={{ width: `${pct}%` }}
+                            />
+                          )}
+                        </RoughBox>
                       </div>
                     );
                   })}
@@ -254,36 +253,49 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
 
             {hasHistoryData ? (
               <>
-                <div className="h-32">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyStackedData} margin={{ top: 2, right: 2, left: -22, bottom: 0 }}>
-                      <XAxis dataKey="month" tick={{ fontSize: 9, fill: '#78716c' }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 8, fill: '#78716c' }} axisLine={false} tickLine={false} width={36} />
-                      <Tooltip
-                        cursor={{ fill: 'rgba(120,113,108,0.08)' }}
-                        formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name]}
-                        contentStyle={{ fontSize: 10, borderRadius: 8, background: '#292524', border: 'none', color: '#fff' }}
-                      />
-                      <Bar dataKey="NECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.NECESSARY_DAILY.color} stroke="#3a2e18" strokeWidth={1} />
-                      <Bar dataKey="NECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.NECESSARY_URGENT.color} stroke="#3a2e18" strokeWidth={1} />
-                      <Bar dataKey="UNNECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.UNNECESSARY_DAILY.color} stroke="#3a2e18" strokeWidth={1} />
-                      <Bar dataKey="UNNECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.UNNECESSARY_URGENT.color} stroke="#3a2e18" strokeWidth={1} />
-                      <Bar dataKey="LUMP_SUM" stackId="m" name="模糊概算" fill={LUMP_SUM_COLOR} stroke="#3a2e18" strokeWidth={1} radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+                <RoughStackedBarChart
+                  height={130}
+                  data={monthlyStackedData.map((m) => ({
+                    label: m.month,
+                    segments: [
+                      { key: 'NECESSARY_DAILY', value: m.NECESSARY_DAILY, color: QUADRANT_CONFIGS.NECESSARY_DAILY.color },
+                      { key: 'NECESSARY_URGENT', value: m.NECESSARY_URGENT, color: QUADRANT_CONFIGS.NECESSARY_URGENT.color },
+                      { key: 'UNNECESSARY_DAILY', value: m.UNNECESSARY_DAILY, color: QUADRANT_CONFIGS.UNNECESSARY_DAILY.color },
+                      { key: 'UNNECESSARY_URGENT', value: m.UNNECESSARY_URGENT, color: QUADRANT_CONFIGS.UNNECESSARY_URGENT.color },
+                      { key: 'LUMP_SUM', value: m.LUMP_SUM, color: LUMP_SUM_COLOR },
+                    ],
+                  }))}
+                />
 
                 <div className="pt-2 border-t-[1.5px] border-dashed border-[#a08a5c] grid grid-cols-2 gap-x-2 gap-y-1">
                   {QUADRANT_LIST.map((qKey) => (
                     <div key={qKey} className="flex items-center gap-1 min-w-0 text-[10px]">
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: QUADRANT_CONFIGS[qKey].color }} />
+                      <RoughBox
+                        shape="ellipse"
+                        stroke={QUADRANT_CONFIGS[qKey].color}
+                        strokeWidth={1.1}
+                        roughness={1.8}
+                        fill={QUADRANT_CONFIGS[qKey].color}
+                        fillStyle="hachure"
+                        hachureGap={1.8}
+                        className="w-2.5 h-2.5 shrink-0"
+                      />
                       <span className="font-hand pencil-text font-bold text-[#3a2e18] truncate">{QUADRANT_CONFIGS[qKey].title}</span>
                       <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgByQuadrant[qKey].toLocaleString()}</span>
                     </div>
                   ))}
                   {avgLumpSum > 0 && (
                     <div className="flex items-center gap-1 min-w-0 text-[10px] col-span-2">
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: LUMP_SUM_COLOR }} />
+                      <RoughBox
+                        shape="ellipse"
+                        stroke={LUMP_SUM_COLOR}
+                        strokeWidth={1.1}
+                        roughness={1.8}
+                        fill={LUMP_SUM_COLOR}
+                        fillStyle="hachure"
+                        hachureGap={1.8}
+                        className="w-2.5 h-2.5 shrink-0"
+                      />
                       <span className="font-hand pencil-text font-bold text-[#3a2e18]">模糊概算</span>
                       <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgLumpSum.toLocaleString()}</span>
                     </div>

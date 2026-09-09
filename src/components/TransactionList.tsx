@@ -5,8 +5,6 @@ import {
   Trash2,
   AlertCircle,
   Download,
-  CheckSquare,
-  Square,
   Mic,
   ChevronLeft,
   ChevronRight,
@@ -17,7 +15,7 @@ import {
 } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
-import { RoughBox } from './RoughBox';
+import { RoughBox, RoughCheckbox } from './RoughBox';
 
 const QUADRANT_INK: Record<QuadrantType, string> = {
   NECESSARY_DAILY: '#2e5c26',
@@ -284,11 +282,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           {filteredTx.length > 0 && (
             <div className="flex items-center justify-between pt-1.5 border-t border-[#a08a5c]/50 text-xs text-[#5a4a2a]">
               <button onClick={toggleSelectAll} className="font-hand pencil-text flex items-center gap-1.5 font-semibold">
-                {isAllSelected ? (
-                  <CheckSquare className="w-4 h-4 text-emerald-600" />
-                ) : (
-                  <Square className="w-4 h-4 text-[#8a7a5a]" />
-                )}
+                <RoughCheckbox checked={isAllSelected} onChange={toggleSelectAll} className="w-4 h-4" />
                 <span>{isAllSelected ? '取消全選' : '全選'}</span>
               </button>
 
@@ -366,15 +360,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       style={{ transform: `rotate(${idx % 2 === 0 ? '-0.4deg' : '0.4deg'})` }}
                       id={`tx-row-${tx.id}`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelect(tx.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        onPointerDownCapture={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer shrink-0"
-                      />
+                      <RoughCheckbox checked={isSelected} onChange={() => toggleSelect(tx.id)} className="w-4 h-4" />
 
                       <span className="font-hand pencil-text font-bold text-[#2a2013] text-sm truncate flex-1 min-w-0">
                         {tx.note || (tx.is_zero_spend ? '今日 $0 支出' : qConfig?.title || '未分類')}
