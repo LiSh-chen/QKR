@@ -111,6 +111,15 @@ html, body {
   background-repeat: no-repeat;
   filter: drop-shadow(1px 3px 4px rgba(0,0,0,0.35));
 }
+/* Compact list-row variant: scales the photo taller than the row and anchors
+   it to the bottom, pushing the curled top-right corner mostly out of the
+   visible (short) row so it doesn't dominate/obscure the text. */
+.nb-sticky-row-photo {
+  background-size: 100% 230%;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3));
+}
 .nb-sticky-green  { background-image: url('./assets/notebook/sticky_green.webp'); }
 .nb-sticky-blue   { background-image: url('./assets/notebook/sticky_blue.webp'); }
 .nb-sticky-yellow { background-image: url('./assets/notebook/sticky_yellow.webp'); }

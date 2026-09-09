@@ -275,7 +275,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
             triggerHapticFeedback('light');
             onOpenVoiceModal();
           }}
-          className="font-hand nb-tag-photo nb-tag-stamp-lg w-full h-11 flex items-center justify-center gap-2 text-[#1e4a2e] shrink-0"
+          className="font-hand nb-tag-photo nb-tag-2 w-full h-11 flex items-center justify-center gap-2 text-[#3a2410] shrink-0"
           id="widget-voice-entry-btn"
         >
           <Mic className="w-4 h-4" />
@@ -381,7 +381,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressEquals();
             }}
-            className="font-hand nb-tag-photo nb-tag-stamp-sm col-span-3 h-9 flex items-center justify-center font-bold text-[#1e4a2e] text-sm active:scale-95 transition-transform"
+            className="font-hand nb-tag-photo nb-tag-1 col-span-3 h-9 flex items-center justify-center font-bold text-[#3a2410] text-sm active:scale-95 transition-transform"
             id="keypad-btn-equals"
           >
             = 算一算

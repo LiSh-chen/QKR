@@ -258,7 +258,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   playClickSound(1000);
                   calc.pressEquals();
                 }}
-                className="font-hand nb-tag-photo nb-tag-stamp-sm col-span-3 h-8 flex items-center justify-center font-bold text-[#1e4a2e] text-xs"
+                className="font-hand nb-tag-photo nb-tag-1 col-span-3 h-8 flex items-center justify-center font-bold text-[#3a2410] text-xs"
                 id="quick-modal-equals"
               >
                 = 算一算

@@ -349,7 +349,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.97 }}
                     onClick={() => setDetailTx(tx)}
-                    className={`nb-sticky-photo ${stickyClass} relative w-full px-3 py-2.5 flex items-center gap-2 text-left`}
+                    className={`nb-sticky-row-photo ${stickyClass} relative w-full px-3 py-2.5 flex items-center gap-2 text-left overflow-hidden rounded-sm`}
                     style={{
                       transform: `rotate(${idx % 2 === 0 ? '-0.6deg' : '0.6deg'})`,
                     }}
@@ -546,10 +546,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     <button
                       key={qKey}
                       onClick={() => setDetailTx({ ...detailTx, quadrant: qKey, is_lump_sum: false })}
-                      className="font-hand h-9 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1"
+                      className={`font-hand nb-sticky-photo ${QUADRANT_STICKY_PHOTO[qKey]} relative h-10 text-xs font-bold text-[#2a2013] flex items-center justify-center gap-1`}
                       style={{
-                        backgroundColor: QUADRANT_CONFIGS[qKey].color,
-                        boxShadow: detailTx.quadrant === qKey && !detailTx.is_lump_sum ? '0 0 0 2px #2a2013' : 'none',
+                        outline: detailTx.quadrant === qKey && !detailTx.is_lump_sum ? '2.5px solid #2a2013' : 'none',
+                        outlineOffset: '1px',
                       }}
                     >
                       {detailTx.quadrant === qKey && !detailTx.is_lump_sum && <Check className="w-3 h-3" />}
@@ -561,7 +561,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setDeleteConfirmId(detailTx.id)}
-                    className="flex-1 h-10 rounded-xl bg-rose-600/90 border-[1.6px] border-rose-900 font-bold text-white text-sm flex items-center justify-center gap-1.5"
+                    className="nb-tag-photo nb-tag-2 flex-1 h-10 font-bold text-[#3a2410] text-sm flex items-center justify-center gap-1.5"
                     id="detail-delete-btn"
                   >
                     <Trash2 className="w-4 h-4" /> 刪除
@@ -579,7 +579,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       }
                       setDetailTx(null);
                     }}
-                    className="flex-1 h-10 rounded-xl bg-[#c8e6c0] border-[1.6px] border-[#2e5c26] font-bold text-[#2e5c26] text-sm"
+                    className="nb-tag-photo nb-tag-1 flex-1 h-10 font-bold text-[#3a2410] text-sm"
                     id="detail-save-btn"
                   >
                     儲存變更
@@ -607,7 +607,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <div className="flex gap-2 pt-1">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="flex-1 h-10 rounded-xl bg-white/60 border-[1.5px] border-[#2a2013]/40 font-bold text-[#2a2013] text-sm"
+                  className="flex-1 h-10 rounded-xl bg-white/50 border-[1.5px] border-[#2a2013]/40 font-bold text-[#2a2013] text-sm"
                   id="delete-confirm-cancel-btn"
                 >
                   取消
@@ -618,7 +618,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     setDeleteConfirmId(null);
                     setDetailTx(null);
                   }}
-                  className="flex-1 h-10 rounded-xl bg-rose-600 border-[1.5px] border-rose-900 font-bold text-white text-sm"
+                  className="flex-1 h-10 rounded-xl bg-rose-700/85 border-[1.5px] border-rose-950 font-bold text-white text-sm"
                   id="delete-confirm-ok-btn"
                 >
                   確定刪除

@@ -177,7 +177,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
             {/* Donut chart */}
             <div className="bg-white/8 p-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70">
               {hasMonthData ? (
-                <div className="w-32 h-32 mx-auto relative mb-2">
+                <div className="w-28 h-28 mx-auto relative mb-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={pieData} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="95%" paddingAngle={2} strokeWidth={0}>
@@ -243,53 +243,47 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
           </>
         ) : (
           /* 歷史趨勢 */
-          <div className="bg-white/8 p-3 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-3">
-            <div className="font-hand flex items-center gap-1.5 text-sm font-bold text-[#5a4a2a]">
-              <TrendingUp className="w-4 h-4 text-orange-700" />
+          <div className="bg-white/8 p-2.5 rounded-2xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-2">
+            <div className="font-hand flex items-center gap-1.5 text-xs font-bold text-[#5a4a2a]">
+              <TrendingUp className="w-3.5 h-3.5 text-orange-700" />
               <span>近 8 個月支出趨勢（按象限堆疊）</span>
             </div>
 
             {hasHistoryData ? (
               <>
-                <div className="h-44">
+                <div className="h-32">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={monthlyStackedData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                      <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#78716c' }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 9, fill: '#78716c' }} axisLine={false} tickLine={false} width={40} />
+                    <BarChart data={monthlyStackedData} margin={{ top: 2, right: 2, left: -22, bottom: 0 }}>
+                      <XAxis dataKey="month" tick={{ fontSize: 9, fill: '#78716c' }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 8, fill: '#78716c' }} axisLine={false} tickLine={false} width={36} />
                       <Tooltip
                         cursor={{ fill: 'rgba(120,113,108,0.08)' }}
                         formatter={(value: number, name: string) => [`$${value.toLocaleString()}`, name]}
-                        contentStyle={{ fontSize: 11, borderRadius: 8, background: '#292524', border: 'none', color: '#fff' }}
+                        contentStyle={{ fontSize: 10, borderRadius: 8, background: '#292524', border: 'none', color: '#fff' }}
                       />
-                      <Legend wrapperStyle={{ fontSize: 10 }} />
                       <Bar dataKey="NECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.NECESSARY_DAILY.color} />
                       <Bar dataKey="NECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.NECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.NECESSARY_URGENT.color} />
                       <Bar dataKey="UNNECESSARY_DAILY" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_DAILY.title} fill={QUADRANT_CONFIGS.UNNECESSARY_DAILY.color} />
                       <Bar dataKey="UNNECESSARY_URGENT" stackId="m" name={QUADRANT_CONFIGS.UNNECESSARY_URGENT.title} fill={QUADRANT_CONFIGS.UNNECESSARY_URGENT.color} />
-                      <Bar dataKey="LUMP_SUM" stackId="m" name="模糊概算" fill={LUMP_SUM_COLOR} radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="LUMP_SUM" stackId="m" name="模糊概算" fill={LUMP_SUM_COLOR} radius={[3, 3, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
 
-                {/* 8-month average per quadrant — one full-width row each, no truncation */}
-                <div className="pt-3 border-t-[1.5px] border-dashed border-[#a08a5c] space-y-2">
-                  <div className="font-hand text-xs font-bold text-[#7a6a4a]">近 8 個月平均</div>
+                {/* 8-month average per quadrant — compact 2-col grid instead of stacked rows */}
+                <div className="pt-2 border-t-[1.5px] border-dashed border-[#a08a5c] grid grid-cols-2 gap-x-2 gap-y-1">
                   {QUADRANT_LIST.map((qKey) => (
-                    <div key={qKey} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: QUADRANT_CONFIGS[qKey].color }} />
-                        <span className="font-hand font-bold text-[#3a2e18]">{QUADRANT_CONFIGS[qKey].title}</span>
-                      </div>
-                      <span className="font-mono text-[#5a4a2a] shrink-0">月均 ${avgByQuadrant[qKey].toLocaleString()}</span>
+                    <div key={qKey} className="flex items-center gap-1 min-w-0 text-[10px]">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: QUADRANT_CONFIGS[qKey].color }} />
+                      <span className="font-hand font-bold text-[#3a2e18] truncate">{QUADRANT_CONFIGS[qKey].title}</span>
+                      <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgByQuadrant[qKey].toLocaleString()}</span>
                     </div>
                   ))}
                   {avgLumpSum > 0 && (
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: LUMP_SUM_COLOR }} />
-                        <span className="font-hand font-bold text-[#3a2e18]">模糊概算</span>
-                      </div>
-                      <span className="font-mono text-[#5a4a2a] shrink-0">月均 ${avgLumpSum.toLocaleString()}</span>
+                    <div className="flex items-center gap-1 min-w-0 text-[10px] col-span-2">
+                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: LUMP_SUM_COLOR }} />
+                      <span className="font-hand font-bold text-[#3a2e18]">模糊概算</span>
+                      <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgLumpSum.toLocaleString()}</span>
                     </div>
                   )}
                 </div>
