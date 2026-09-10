@@ -78,7 +78,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     onSave({
       amount,
       quadrant,
-      note: note.trim() || (isLumpSum ? '模糊概算記帳' : ''),
+      note: note.trim() || (isLumpSum ? '不分類記帳' : ''),
       is_lump_sum: isLumpSum,
       is_zero_spend: amount === 0,
       entry_method: (initialSource as any) || 'widget',
@@ -323,7 +323,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 className="font-hand pencil-text flex-1 h-9 flex items-center justify-center gap-1 text-[#5a4a2a] text-[10px] font-bold cursor-pointer"
                 id="quick-modal-lump-sum-btn"
               >
-                模糊概算補登
+                不分類補登
               </RoughBox>
               <RoughBox
                 shape="rectangle"

@@ -131,7 +131,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
     onDirectSave({
       amount: amountNum,
       quadrant: null,
-      note: noteStr.trim() || '模糊概算記帳',
+      note: noteStr.trim() || '不分類記帳',
       is_lump_sum: true,
       is_zero_spend: false,
       entry_method: 'lump_sum',
@@ -139,7 +139,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
       duration_ms: durationMs,
     });
 
-    setLastResult({ label: `$${amountNum} (模糊概算補登)` });
+    setLastResult({ label: `$${amountNum} (不分類補登)` });
     resetEntryState();
   };
 
@@ -193,7 +193,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressDigit(value);
       }}
-      className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#3a2e18] text-sm cursor-pointer"
+      className="font-hand pencil-text h-8 flex items-center justify-center font-bold text-[#3a2e18] text-sm cursor-pointer"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-btn-${label}`}
     >
@@ -215,7 +215,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         clearFeedback();
         calc.pressOperator(op);
       }}
-      className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#7a4a1a] text-base cursor-pointer"
+      className="font-hand pencil-text h-8 flex items-center justify-center font-bold text-[#7a4a1a] text-base cursor-pointer"
       style={{ transform: `rotate(${DIGIT_ROTATIONS[idx]})` }}
       id={`keypad-op-${label}`}
     >
@@ -224,7 +224,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
   );
 
   return (
-    <div className="h-full flex flex-col nb-ruled text-[#3a2e18] rounded-3xl p-3 shadow-xl relative overflow-hidden">
+    <div className="h-full flex flex-col nb-ruled text-[#3a2e18] rounded-3xl p-2.5 shadow-xl relative overflow-hidden">
       <div className="nb-binder" />
       <div className="nb-holes">
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
@@ -264,7 +264,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
         )}
       </AnimatePresence>
 
-      <div className="relative z-10 flex flex-col h-full min-h-0 gap-1.5 ml-4 overflow-y-auto">
+      <div className="relative z-10 flex flex-col h-full min-h-0 gap-1 ml-4 overflow-y-auto">
         <div className="flex items-center justify-between px-0.5 shrink-0">
           <span className="font-hand pencil-text text-[11px] text-[#8a7a5a]">今日支出</span>
           <span className="font-hand pencil-text text-base font-black font-mono text-[#4a3a20]">${todayTotal.toLocaleString()}</span>
@@ -282,11 +282,11 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
             triggerHapticFeedback('light');
             onOpenVoiceModal();
           }}
-          className="font-hand pencil-text w-full h-11 flex items-center justify-center gap-2 text-[#7a3d14] shrink-0 cursor-pointer"
+          className="font-hand pencil-text w-full h-9 flex items-center justify-center gap-2 text-[#7a3d14] shrink-0 cursor-pointer"
           id="widget-voice-entry-btn"
         >
           <Mic className="w-4 h-4" />
-          <span className="text-sm font-bold">語音記帳（用講的）</span>
+          <span className="text-sm font-bold">語音記帳</span>
         </RoughBox>
 
         {pendingClassifyTxs.length > 0 && (
@@ -331,7 +331,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           id="main-direct-note-input"
         />
 
-        <div className="grid grid-cols-4 gap-1.5 shrink-0">
+        <div className="grid grid-cols-4 gap-1 shrink-0">
           {digitKey('7', '7', 0)}
           {digitKey('8', '8', 1)}
           {digitKey('9', '9', 2)}
@@ -361,7 +361,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               calc.clear();
               startTimeRef.current = null;
             }}
-            className="font-hand pencil-text h-9 flex items-center justify-center font-bold text-[#8a1f1f] text-sm cursor-pointer"
+            className="font-hand pencil-text h-8 flex items-center justify-center font-bold text-[#8a1f1f] text-sm cursor-pointer"
             style={{ transform: 'rotate(-1.5deg)' }}
             id="keypad-btn-C"
           >
@@ -370,7 +370,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           {opKey('+', '+', 9)}
         </div>
 
-        <div className="grid grid-cols-4 gap-1.5 shrink-0">
+        <div className="grid grid-cols-4 gap-1 shrink-0">
           <RoughBox
             shape="ellipse"
             stroke="#5a4014"
@@ -382,7 +382,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressBackspace();
             }}
-            className="font-hand h-9 flex items-center justify-center font-bold text-[#5a4014] cursor-pointer"
+            className="font-hand h-8 flex items-center justify-center font-bold text-[#5a4014] cursor-pointer"
             style={{ transform: 'rotate(-1deg)' }}
             id="keypad-btn-backspace"
           >
@@ -402,14 +402,14 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               clearFeedback();
               calc.pressEquals();
             }}
-            className="font-hand pencil-text col-span-3 h-9 flex items-center justify-center font-bold text-[#2e5c26] text-sm cursor-pointer"
+            className="font-hand pencil-text col-span-3 h-8 flex items-center justify-center font-bold text-[#2e5c26] text-sm cursor-pointer"
             id="keypad-btn-equals"
           >
             = 算一算
           </RoughBox>
         </div>
 
-        <div className="grid grid-cols-2 gap-1.5 shrink-0">
+        <div className="grid grid-cols-2 gap-1 shrink-0">
           {QUADRANT_LIST.map((qKey, i) => {
             const q = QUADRANT_CONFIGS[qKey];
             const ink = QUADRANT_INK[qKey];
@@ -426,7 +426,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                 hachureGap={4}
                 hachureAngle={i % 2 === 0 ? 45 : -45}
                 onClick={() => handleQuadrantDirectClick(qKey)}
-                className="font-hand pencil-text relative h-11 text-center flex items-center justify-center cursor-pointer"
+                className="font-hand pencil-text relative h-9 text-center flex items-center justify-center cursor-pointer"
                 style={{ transform: `rotate(${rotate})` }}
                 id={`quadrant-direct-btn-${qKey}`}
               >
@@ -438,17 +438,17 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
           })}
         </div>
 
-        <div className="flex gap-1.5 shrink-0">
+        <div className="flex gap-1 shrink-0">
           <RoughBox
             shape="rectangle"
             stroke="#5a4a2a"
             strokeWidth={1.6}
             roughness={1.8}
             onClick={handleLumpSumClick}
-            className="font-hand pencil-text flex-1 h-11 flex items-center justify-center text-[#5a4a2a] cursor-pointer"
+            className="font-hand pencil-text flex-1 h-9 flex items-center justify-center text-[#5a4a2a] cursor-pointer"
             id="lump-sum-confirm-btn"
           >
-            <span className="text-[11px] font-bold">模糊概算</span>
+            <span className="text-[11px] font-bold">不分類</span>
           </RoughBox>
 
           {recentCandidates.length > 0 && (
@@ -458,11 +458,11 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
               strokeWidth={1.6}
               roughness={1.8}
               onClick={() => setShowRecentPicker(true)}
-              className="font-hand pencil-text flex-1 h-11 flex items-center justify-center gap-1 text-[#3a2e18] cursor-pointer"
+              className="font-hand pencil-text flex-1 h-9 flex items-center justify-center gap-1 text-[#3a2e18] cursor-pointer"
               id="open-recent-reuse-picker-btn"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span className="text-[11px] font-bold">昨日複用（{recentCandidates.length}）</span>
+              <span className="text-[11px] font-bold">抄昨天的（{recentCandidates.length}）</span>
             </RoughBox>
           )}
         </div>
@@ -492,7 +492,7 @@ export const WidgetDock: React.FC<WidgetDockProps> = ({
                 {recentCandidates.map((t) => {
                   const isSelected = selectedRecentIds.has(t.id);
                   const qColor = t.quadrant ? QUADRANT_CONFIGS[t.quadrant].color : '#A8A29E';
-                  const label = t.note || (t.quadrant ? QUADRANT_CONFIGS[t.quadrant].title : '模糊概算');
+                  const label = t.note || (t.quadrant ? QUADRANT_CONFIGS[t.quadrant].title : '不分類');
                   return (
                     <button
                       key={t.id}

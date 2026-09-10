@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { LayoutGrid, Info, TrendingUp, Calendar } from 'lucide-react';
+import { LayoutGrid, TrendingUp, Calendar } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { RoughBox } from './RoughBox';
@@ -8,11 +8,12 @@ import { RoughDonut, RoughStackedBarChart } from './RoughCharts';
 interface QuadrantMatrixViewProps {
   transactions: Transaction[];
   onOpenQuickModalWithQuadrant?: (q: QuadrantType) => void;
+  onNavigateToHistory?: (filter: { month?: string; quadrant?: string }) => void;
 }
 
 const LUMP_SUM_COLOR = '#A8A29E';
 
-export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transactions }) => {
+export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transactions, onNavigateToHistory }) => {
   const [viewMode, setViewMode] = useState<'this_month' | 'history'>('this_month');
 
   const now = new Date();
@@ -53,7 +54,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
       value: quadrantSums[qKey],
       color: QUADRANT_CONFIGS[qKey].color,
     })),
-    ...(lumpSumTotal > 0 ? [{ key: 'LUMP_SUM', name: '模糊概算', value: lumpSumTotal, color: LUMP_SUM_COLOR }] : []),
+    ...(lumpSumTotal > 0 ? [{ key: 'LUMP_SUM', name: '不分類', value: lumpSumTotal, color: LUMP_SUM_COLOR }] : []),
   ].filter((d) => d.value > 0);
 
   const hasMonthData = totalSpend > 0;
@@ -108,28 +109,28 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
   const avgLumpSum = Math.round(monthlyStackedData.reduce((s, m) => s + m.LUMP_SUM, 0) / monthsWithData);
 
   return (
-    <div className="h-full nb-ruled rounded-3xl p-3.5 relative flex flex-col">
+    <div className="h-full nb-ruled rounded-3xl p-2.5 relative flex flex-col">
       <div className="nb-binder" />
       <div className="nb-holes">
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
 
-      <div className="ml-4 space-y-2 overflow-y-auto flex-1 min-h-0">
+      <div className="ml-4 space-y-1.5 overflow-y-auto flex-1 min-h-0">
         <RoughBox
           shape="rectangle"
           stroke="#3a2e18"
           strokeWidth={1.4}
           roughness={1.4}
-          className="flex items-center justify-between gap-2 px-3 py-2"
+          className="flex items-center justify-between gap-1.5 px-2.5 py-2"
         >
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center gap-1 min-w-0">
             <LayoutGrid className="w-4 h-4 text-orange-700 shrink-0" />
-            <h2 className="font-hand pencil-text text-base font-bold text-[#3a2e18] truncate">2x2 四象限數據分析</h2>
+            <h2 className="font-hand pencil-text text-sm font-bold text-[#3a2e18] truncate">四象限分析</h2>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               onClick={() => setViewMode('this_month')}
-              className={`font-hand pencil-text px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
+              className={`font-hand pencil-text px-2 py-1 rounded-full text-[10px] font-bold transition-all border-[1.5px] ${
                 viewMode === 'this_month' ? 'bg-orange-600 border-orange-800 text-white' : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
               }`}
               id="matrix-mode-this-month-btn"
@@ -138,12 +139,12 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
             </button>
             <button
               onClick={() => setViewMode('history')}
-              className={`font-hand pencil-text px-2.5 py-1 rounded-full text-[11px] font-bold transition-all border-[1.5px] ${
+              className={`font-hand pencil-text px-2 py-1 rounded-full text-[10px] font-bold transition-all border-[1.5px] ${
                 viewMode === 'history' ? 'bg-orange-600 border-orange-800 text-white' : 'bg-transparent border-[#a08a5c] text-[#7a6a4a]'
               }`}
               id="matrix-mode-history-btn"
             >
-              歷史趨勢
+              歷史
             </button>
           </div>
         </RoughBox>
@@ -152,10 +153,18 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
           <>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: '本月支出', value: `$${totalSpend.toLocaleString()}`, icon: Calendar },
-                { label: '日均花費', value: `$${avgPerDay.toLocaleString()}`, icon: TrendingUp },
+                { label: '本月支出', value: `$${totalSpend.toLocaleString()}`, icon: Calendar, onClick: () => onNavigateToHistory?.({ month: currentMonthPrefix }) },
+                { label: '日均花費', value: `$${avgPerDay.toLocaleString()}`, icon: TrendingUp, onClick: undefined },
               ].map((s) => (
-                <RoughBox key={s.label} shape="rectangle" stroke="#8a7454" strokeWidth={1.3} roughness={1.6} className="p-2 text-center">
+                <RoughBox
+                  key={s.label}
+                  shape="rectangle"
+                  stroke="#8a7454"
+                  strokeWidth={1.3}
+                  roughness={1.6}
+                  onClick={s.onClick}
+                  className={`p-2 text-center ${s.onClick ? 'cursor-pointer' : ''}`}
+                >
                   <s.icon className="w-4 h-4 mx-auto text-orange-700" />
                   <div className="font-hand pencil-text text-base font-bold text-[#3a2e18] mt-1">{s.value}</div>
                   <div className="font-hand pencil-text text-[10px] text-[#8a7a5a]">{s.label}</div>
@@ -183,7 +192,11 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                   {pieData.map((d) => {
                     const pct = totalSpend > 0 ? Math.round((d.value / totalSpend) * 100) : 0;
                     return (
-                      <div key={d.key}>
+                      <button
+                        key={d.key}
+                        onClick={() => onNavigateToHistory?.({ month: currentMonthPrefix, quadrant: d.key })}
+                        className="block w-full text-left"
+                      >
                         <div className="flex items-center justify-between text-xs mb-1">
                           <div className="flex items-center gap-1.5 min-w-0">
                             <RoughBox
@@ -217,32 +230,12 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                             />
                           )}
                         </RoughBox>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
               )}
             </RoughBox>
-
-            {lumpSumCount > 0 && (
-              <RoughBox
-                shape="rectangle"
-                stroke="#8a6a2a"
-                strokeWidth={1.6}
-                roughness={1.8}
-                fill="#8a6a2a15"
-                fillStyle="hachure"
-                className="flex items-center justify-between gap-2 p-3"
-              >
-                <div className="font-hand pencil-text flex items-center gap-1.5 text-xs text-[#5a4a2a]">
-                  <Info className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                  <span>模糊概算補登（不分象限，已計入總支出）</span>
-                </div>
-                <span className="font-hand pencil-text text-[11px] font-bold text-amber-800 shrink-0">
-                  {lumpSumCount} 筆 · ${lumpSumTotal.toLocaleString()}
-                </span>
-              </RoughBox>
-            )}
           </>
         ) : (
           <RoughBox shape="rectangle" stroke="#3a2e18" strokeWidth={1.4} roughness={1.4} className="p-2.5 space-y-2">
@@ -296,7 +289,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
                         hachureGap={1.8}
                         className="w-2.5 h-2.5 shrink-0"
                       />
-                      <span className="font-hand pencil-text font-bold text-[#3a2e18]">模糊概算</span>
+                      <span className="font-hand pencil-text font-bold text-[#3a2e18]">不分類</span>
                       <span className="font-mono text-[#5a4a2a] shrink-0 ml-auto">${avgLumpSum.toLocaleString()}</span>
                     </div>
                   )}

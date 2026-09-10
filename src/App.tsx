@@ -65,6 +65,13 @@ export default function App() {
     null
   );
 
+  // When the 2x2 view's stat/breakdown boxes are tapped, jump to 明細 pre-filtered
+  const [historyFilterRequest, setHistoryFilterRequest] = useState<{ month?: string; quadrant?: string; nonce: number } | null>(null);
+  const handleNavigateToHistory = (filter: { month?: string; quadrant?: string }) => {
+    setHistoryFilterRequest({ ...filter, nonce: Date.now() });
+    setActiveTab('history');
+  };
+
   // Routine Reminder dismissal / already-notified state (avoid re-firing the same candidate)
   const [dismissedRoutineIds, setDismissedRoutineIds] = useState<string[]>([]);
   const [notifiedRoutineId, setNotifiedRoutineId] = useState<string | null>(null);
@@ -355,6 +362,7 @@ export default function App() {
               <QuadrantMatrixView
                 transactions={transactions}
                 onOpenQuickModalWithQuadrant={(q) => handleOpenQuickModal(`matrix_${q}`)}
+                onNavigateToHistory={handleNavigateToHistory}
               />
             )}
 
@@ -367,6 +375,7 @@ export default function App() {
                 onBatchReclassify={handleBatchReclassify}
                 onUpdateTransaction={(id, updates) => setTransactions(updateTransaction(id, updates))}
                 onOpenQuickModal={() => handleOpenQuickModal('history_page')}
+                initialFilter={historyFilterRequest}
               />
             )}
 

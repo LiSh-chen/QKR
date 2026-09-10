@@ -32,6 +32,8 @@ interface TransactionListProps {
   onBatchReclassify?: (ids: string[], quadrant: QuadrantType) => void;
   onUpdateTransaction?: (id: string, updates: Partial<Transaction>) => void;
   onOpenQuickModal: () => void;
+  /** Set externally (e.g. tapping a stat in the 2x2 view) to jump straight to a filtered view */
+  initialFilter?: { month?: string; quadrant?: string; nonce: number } | null;
 }
 
 const WEEKDAY_LABELS = ['日', '一', '二', '三', '四', '五', '六'];
@@ -44,6 +46,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   onBatchReclassify,
   onUpdateTransaction,
   onOpenQuickModal,
+  initialFilter,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedQuadrantFilter, setSelectedQuadrantFilter] = useState<string>('ALL');
@@ -54,10 +57,24 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     return { year: now.getFullYear(), month: now.getMonth() };
   });
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [monthFilter, setMonthFilter] = useState<string | null>(null);
   const [detailTx, setDetailTx] = useState<Transaction | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [showDuplicatePicker, setShowDuplicatePicker] = useState(false);
   const [duplicateTargetDate, setDuplicateTargetDate] = useState('');
+
+  // Apply a filter request coming from elsewhere in the app (e.g. the 2x2 view)
+  React.useEffect(() => {
+    if (!initialFilter) return;
+    setSelectedQuadrantFilter(initialFilter.quadrant || 'ALL');
+    setMonthFilter(initialFilter.month || null);
+    setSelectedDate(null);
+    if (initialFilter.month) {
+      const [y, m] = initialFilter.month.split('-').map(Number);
+      setCalendarMonth({ year: y, month: m - 1 });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialFilter?.nonce]);
 
   const txDateSet = useMemo(() => {
     const set = new Set<string>();
@@ -95,8 +112,9 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       tx.quadrant === selectedQuadrantFilter;
 
     const matchesDate = !selectedDate || tx.entry_date === selectedDate;
+    const matchesMonth = !monthFilter || (tx.entry_date && tx.entry_date.startsWith(monthFilter));
 
-    return matchesSearch && matchesQuadrant && matchesDate;
+    return matchesSearch && matchesQuadrant && matchesDate && matchesMonth;
   });
 
   const isAllSelected = filteredTx.length > 0 && filteredTx.every((tx) => selectedIds.includes(tx.id));
@@ -135,7 +153,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
   const exportToCsv = () => {
     const exportData = selectedIds.length > 0 ? filteredTx.filter((tx) => selectedIds.includes(tx.id)) : filteredTx;
-    const headers = ['日期', '金額(NTD)', '象限分類', '備註', '模糊概算', '$0支出'];
+    const headers = ['日期', '金額(NTD)', '象限分類', '備註', '不分類', '$0支出'];
     const rows = exportData.map((tx) => [
       tx.entry_date,
       tx.amount,
@@ -216,7 +234,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 return (
                   <button
                     key={day.dateStr}
-                    onClick={() => setSelectedDate(isSelected ? null : day.dateStr)}
+                    onClick={() => {
+                      setSelectedDate(isSelected ? null : day.dateStr);
+                      setMonthFilter(null);
+                    }}
                     className="font-hand pencil-text aspect-square rounded-lg flex flex-col items-center justify-center relative text-[11px]"
                     style={{
                       backgroundColor: isSelected ? '#ea580c' : hasTx ? 'rgba(200,230,192,0.25)' : 'transparent',
@@ -243,6 +264,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 className="font-hand pencil-text w-full mt-1.5 text-[10px] text-orange-700 font-bold underline"
               >
                 清除日期篩選（目前：{selectedDate}）
+              </button>
+            )}
+            {monthFilter && !selectedDate && (
+              <button
+                onClick={() => setMonthFilter(null)}
+                className="font-hand pencil-text w-full mt-1.5 text-[10px] text-orange-700 font-bold underline"
+              >
+                清除月份篩選（目前：{monthFilter}）
               </button>
             )}
           </RoughBox>

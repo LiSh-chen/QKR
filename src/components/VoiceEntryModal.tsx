@@ -152,7 +152,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
     onSaveNew({
       amount: amountNum,
       quadrant: null,
-      note: note.trim() || '模糊概算記帳',
+      note: note.trim() || '不分類記帳',
       is_lump_sum: true,
       is_zero_spend: false,
       entry_method: 'voice',
@@ -222,33 +222,43 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
 
             {stage === 'idle' && (
               <div className="flex flex-col items-center gap-3 py-4">
-                <p className="font-hand text-xs text-[#7a6a4a] text-center">
+                <p className="font-hand pencil-text text-sm text-[#7a6a4a] text-center">
                   按下麥克風開始錄音，說出品項跟金額
                   <br />
                   例如「買牛奶90塊」或「花90塊買牛奶」
                   <br />
                   說完後再按一次麥克風結束
                 </p>
-                <p className="font-hand text-[10px] text-rose-700 font-bold text-center">
+                <p className="font-hand pencil-text text-sm text-rose-700 font-bold text-center">
                   ⚠️ 一次錄音請只說一筆品項，多筆請分開錄
                 </p>
-                <motion.button
-                  whileTap={{ scale: 0.92 }}
+                <RoughBox
+                  shape="ellipse"
+                  stroke="#c9683c"
+                  strokeWidth={2.2}
+                  roughness={2}
+                  fill="#e8935a"
+                  fillStyle="solid"
                   onClick={beginListening}
-                  className="w-16 h-16 rounded-full bg-gradient-to-b from-orange-400 to-orange-600 border-[2px] border-orange-800 flex items-center justify-center shadow-lg"
+                  className="w-16 h-16 flex items-center justify-center cursor-pointer"
                   id="start-voice-listening-btn"
                 >
                   <Mic className="w-7 h-7 text-white" />
-                </motion.button>
+                </RoughBox>
               </div>
             )}
 
             {stage === 'listening' && (
               <div className="flex flex-col items-center gap-3 py-4">
-                <motion.button
-                  whileTap={{ scale: 0.92 }}
+                <RoughBox
+                  shape="ellipse"
+                  stroke="#7a2020"
+                  strokeWidth={2.2}
+                  roughness={2}
+                  fill="#e07070"
+                  fillStyle="solid"
                   onClick={handleStopListening}
-                  className="relative w-16 h-16 rounded-full bg-gradient-to-b from-rose-400 to-rose-600 border-[2px] border-rose-800 flex items-center justify-center shadow-lg"
+                  className="relative w-16 h-16 flex items-center justify-center cursor-pointer"
                   id="stop-voice-listening-btn"
                 >
                   <motion.span
@@ -257,7 +267,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                     transition={{ repeat: Infinity, duration: 1.4, ease: 'easeOut' }}
                   />
                   <Mic className="w-7 h-7 text-white" />
-                </motion.button>
+                </RoughBox>
 
                 {/* Listening indicator (not a literal mic-level meter — just shows "I'm actively listening") */}
                 <div className="flex items-end gap-1 h-5">
@@ -271,22 +281,22 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   ))}
                 </div>
 
-                <p className="font-hand text-sm text-[#3a2e18] text-center min-h-[20px] px-2">
+                <p className="font-hand pencil-text text-sm text-[#3a2e18] text-center min-h-[20px] px-2">
                   {liveText || '聆聽中...請說話'}
                 </p>
-                <p className="font-hand text-[10px] text-[#8a7a5a]">說完了嗎？點一下麥克風結束錄音</p>
+                <p className="font-hand pencil-text text-xs text-[#8a7a5a]">說完了嗎？點一下麥克風結束錄音</p>
               </div>
             )}
 
             {stage === 'error' && (
               <div className="flex flex-col items-center gap-2 py-4">
-                <p className="font-hand text-xs text-rose-700 text-center">{errorMsg}</p>
+                <p className="font-hand pencil-text text-sm text-rose-700 text-center">{errorMsg}</p>
                 <button
                   onClick={() => {
                     setStage('idle');
                     setErrorMsg('');
                   }}
-                  className="font-hand text-xs font-bold text-orange-700 underline"
+                  className="font-hand pencil-text text-xs font-bold text-orange-700 underline"
                 >
                   重新再試一次
                 </button>
@@ -296,7 +306,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
             {stage === 'review' && (
               <>
                 {!isClassifyMode && liveText && (
-                  <div className="font-hand text-[10px] text-[#8a7a5a] italic">
+                  <div className="font-hand pencil-text text-xs text-[#8a7a5a] italic">
                     聽到：「{liveText}」
                   </div>
                 )}
@@ -333,7 +343,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                   id="voice-modal-note-input"
                 />
 
-                <div className="font-hand text-xs font-bold text-[#7a6a4a] pt-1">請選擇分類：</div>
+                <div className="font-hand pencil-text text-sm font-bold text-[#7a6a4a] pt-1">請選擇分類：</div>
 
                 <div className="grid grid-cols-2 gap-1.5">
                   {QUADRANT_LIST.map((qKey, i) => {
@@ -375,7 +385,7 @@ export const VoiceEntryModal: React.FC<VoiceEntryModalProps> = ({
                       className="font-hand pencil-text flex-1 h-9 flex items-center justify-center gap-1 text-[#5a4a2a] text-[10px] font-bold cursor-pointer"
                       id="voice-modal-lump-sum-btn"
                     >
-                      模糊概算
+                      不分類
                     </RoughBox>
                     <RoughBox
                       shape="rectangle"
