@@ -16,6 +16,9 @@ import {
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { RoughBox, RoughCheckbox } from './RoughBox';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 
 const QUADRANT_INK: Record<QuadrantType, string> = {
   NECESSARY_DAILY: '#2e5c26',
@@ -151,8 +154,15 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     setDuplicateTargetDate('');
   };
 
-  const exportToCsv = () => {
+  const [exportStatusMsg, setExportStatusMsg] = useState<string | null>(null);
+
+  const exportToCsv = async () => {
     const exportData = selectedIds.length > 0 ? filteredTx.filter((tx) => selectedIds.includes(tx.id)) : filteredTx;
+    if (exportData.length === 0) {
+      setExportStatusMsg('沒有可匯出的紀錄');
+      setTimeout(() => setExportStatusMsg(null), 2500);
+      return;
+    }
     const headers = ['日期', '金額(NTD)', '象限分類', '備註', '不分類', '$0支出'];
     const rows = exportData.map((tx) => [
       tx.entry_date,
@@ -163,13 +173,38 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       tx.is_zero_spend ? '是' : '否',
     ]);
     const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `QuickLedger_Export_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const fileName = `QuickLedger_Export_${new Date().toISOString().split('T')[0]}.csv`;
+
+    if (Capacitor.isNativePlatform()) {
+      // On-device: write a real file, then hand it to the OS share sheet so the
+      // user can save it to Drive/Files or send it anywhere — a blob <a download>
+      // link (the old approach) silently does nothing inside an Android WebView.
+      try {
+        const written = await Filesystem.writeFile({
+          path: fileName,
+          data: csvContent,
+          directory: Directory.Cache,
+          encoding: Encoding.UTF8,
+        });
+        await Share.share({
+          title: 'QuickLedger 記帳紀錄匯出',
+          url: written.uri,
+          dialogTitle: '儲存或分享 CSV 檔案',
+        });
+      } catch (err) {
+        setExportStatusMsg('匯出失敗，請再試一次');
+        setTimeout(() => setExportStatusMsg(null), 2500);
+      }
+    } else {
+      // Browser preview fallback
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   const categoryFilterLabel =
@@ -299,14 +334,22 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <Tag className="w-3.5 h-3.5" />
               {categoryFilterLabel}
             </RoughBox>
-            <button
+            <RoughBox
+              shape="rectangle"
+              stroke="#2e5c26"
+              strokeWidth={1.3}
+              roughness={1.6}
               onClick={exportToCsv}
-              className="flex items-center gap-1 px-3 py-2 bg-emerald-50 border-[1.5px] border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold shrink-0"
-              title="將記帳清單匯出為 CSV"
+              className="flex items-center gap-1 px-3 py-2 text-emerald-700 text-xs font-bold shrink-0 cursor-pointer"
+              id="export-csv-btn"
             >
               <Download className="w-3.5 h-3.5" />
-            </button>
+            </RoughBox>
           </div>
+
+          {exportStatusMsg && (
+            <div className="font-hand pencil-text text-[10px] text-rose-700 font-bold text-center">{exportStatusMsg}</div>
+          )}
 
           {filteredTx.length > 0 && (
             <div className="flex items-center justify-between pt-1.5 border-t border-[#a08a5c]/50 text-xs text-[#5a4a2a]">

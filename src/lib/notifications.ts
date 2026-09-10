@@ -123,6 +123,28 @@ export async function sendTestNotification(): Promise<void> {
   }
 }
 
+/** A 固定支出訂閱 rule came due but isn't set to auto-record — nudge the user to log it themselves. */
+export async function sendRecurringReminder(rule: { id: string; note: string; amount: number }): Promise<void> {
+  try {
+    const idSuffix = Math.abs(
+      [...rule.id].reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0)
+    ) % 10000;
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 30000 + idSuffix,
+          title: '該記固定支出了',
+          body: `[${rule.note} $${rule.amount}] 這筆固定支出到期了，記得手動記一筆。`,
+          schedule: { at: new Date(Date.now() + 800) },
+          actionTypeId: ACTION_TYPE_DAILY,
+        },
+      ],
+    });
+  } catch (e) {
+    console.warn('sendRecurringReminder failed', e);
+  }
+}
+
 /** Push the "過時未記帳" routine-habit reminder as a real notification. */
 export async function scheduleRoutineReminder(candidate: RoutineCandidate): Promise<void> {
   const idSuffix = Math.abs(hashString(candidate.pastTx.id)) % 10000;

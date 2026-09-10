@@ -8,11 +8,24 @@ import {
   Bell,
   Clock,
   Send,
+  Repeat,
+  Plus,
+  Trash2,
 } from 'lucide-react';
-import { UserSettings, Transaction } from '../types';
-import { getSlaLogs, SlaLog } from '../lib/storage';
+import { UserSettings, Transaction, RecurringRule, QuadrantType } from '../types';
+import { getSlaLogs, SlaLog, loadRecurringRules, addRecurringRule, updateRecurringRule, deleteRecurringRule } from '../lib/storage';
 import { sendTestNotification } from '../lib/notifications';
+import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { RoughBox, RoughCheckbox } from './RoughBox';
+
+const QUADRANT_INK: Record<QuadrantType, string> = {
+  NECESSARY_DAILY: '#2e5c26',
+  NECESSARY_URGENT: '#1e4a78',
+  UNNECESSARY_DAILY: '#7a5314',
+  UNNECESSARY_URGENT: '#7a2020',
+};
+
+const WEEKDAY_LABELS = ['日', '一', '二', '三', '四', '五', '六'];
 
 interface SettingsViewProps {
   settings: UserSettings;
@@ -32,6 +45,50 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [slaLogs] = useState<SlaLog[]>(getSlaLogs());
   const [importStatusMsg, setImportStatusMsg] = useState<string | null>(null);
   const [testSentMsg, setTestSentMsg] = useState<string | null>(null);
+
+  const [recurringRules, setRecurringRules] = useState<RecurringRule[]>(loadRecurringRules());
+  const [showAddRule, setShowAddRule] = useState(false);
+  const [newRuleAmount, setNewRuleAmount] = useState('');
+  const [newRuleNote, setNewRuleNote] = useState('');
+  const [newRuleQuadrant, setNewRuleQuadrant] = useState<QuadrantType>('NECESSARY_DAILY');
+  const [newRuleFrequency, setNewRuleFrequency] = useState<'monthly' | 'weekly'>('monthly');
+  const [newRuleDay, setNewRuleDay] = useState(1); // dayOfMonth (1-28) or dayOfWeek (0-6)
+  const [newRuleAutoRecord, setNewRuleAutoRecord] = useState(false);
+
+  const handleAddRule = () => {
+    const amountNum = parseFloat(newRuleAmount);
+    if (isNaN(amountNum) || amountNum <= 0 || !newRuleNote.trim()) return;
+    addRecurringRule({
+      amount: amountNum,
+      note: newRuleNote.trim(),
+      quadrant: newRuleQuadrant,
+      frequency: newRuleFrequency,
+      dayOfMonth: newRuleFrequency === 'monthly' ? newRuleDay : undefined,
+      dayOfWeek: newRuleFrequency === 'weekly' ? newRuleDay : undefined,
+      autoRecord: newRuleAutoRecord,
+      enabled: true,
+    });
+    setRecurringRules(loadRecurringRules());
+    setShowAddRule(false);
+    setNewRuleAmount('');
+    setNewRuleNote('');
+    setNewRuleDay(1);
+    setNewRuleAutoRecord(false);
+  };
+
+  const handleToggleRuleEnabled = (rule: RecurringRule) => {
+    setRecurringRules(updateRecurringRule(rule.id, { enabled: !rule.enabled }));
+  };
+
+  const handleToggleAutoRecord = (rule: RecurringRule) => {
+    setRecurringRules(updateRecurringRule(rule.id, { autoRecord: !rule.autoRecord }));
+  };
+
+  const handleDeleteRule = (id: string) => {
+    if (window.confirm('確定要刪除這筆固定支出訂閱嗎？')) {
+      setRecurringRules(deleteRecurringRule(id));
+    }
+  };
 
   const handleExportJson = () => {
     const dataStr = JSON.stringify({ transactions, settings, export_at: new Date().toISOString() }, null, 2);
@@ -173,6 +230,163 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           {testSentMsg && (
             <div className="font-hand pencil-text p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold text-center">
               {testSentMsg}
+            </div>
+          )}
+        </RoughBox>
+
+        <RoughBox shape="rectangle" stroke="#7a5314" strokeWidth={1.3} roughness={1.5} className="p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-[#a08a5c]/50 pb-2">
+            <div className="flex items-center gap-2">
+              <Repeat className="w-4 h-4 text-amber-700" />
+              <h3 className="font-hand pencil-text text-sm font-bold text-stone-800">固定支出訂閱</h3>
+            </div>
+            <button
+              onClick={() => setShowAddRule((v) => !v)}
+              className="font-hand pencil-text text-xs font-bold text-amber-700 flex items-center gap-1"
+              id="toggle-add-recurring-rule-btn"
+            >
+              <Plus className="w-3.5 h-3.5" /> 新增
+            </button>
+          </div>
+          <p className="font-hand pencil-text text-xs text-stone-500 -mt-1">
+            房租、訂閱服務這類固定花費，設定週期後可以選擇「到期自動記一筆」，或只是「提醒你自己記」。
+          </p>
+
+          {showAddRule && (
+            <div className="space-y-2 p-3 rounded-xl bg-white/10 border-[1.5px] border-dashed border-[#a08a5c]/60">
+              <div className="flex items-center gap-2">
+                <span className="font-hand text-sm text-[#b08d57] font-bold">$</span>
+                <input
+                  type="number"
+                  value={newRuleAmount}
+                  onChange={(e) => setNewRuleAmount(e.target.value)}
+                  placeholder="金額"
+                  className="font-hand flex-1 bg-white/50 border-[1.5px] border-[#3a2e18]/30 rounded-xl px-3 py-1.5 text-sm text-[#3a2e18]"
+                />
+              </div>
+              <input
+                type="text"
+                value={newRuleNote}
+                onChange={(e) => setNewRuleNote(e.target.value)}
+                placeholder="項目名稱，例如：房租、Netflix"
+                className="font-hand w-full bg-white/50 border-[1.5px] border-[#3a2e18]/30 rounded-xl px-3 py-1.5 text-sm text-[#3a2e18]"
+              />
+
+              <div className="grid grid-cols-2 gap-1.5">
+                {QUADRANT_LIST.map((qKey) => (
+                  <button
+                    key={qKey}
+                    onClick={() => setNewRuleQuadrant(qKey)}
+                    className="font-hand h-8 rounded-lg text-[11px] font-bold text-white"
+                    style={{
+                      backgroundColor: QUADRANT_CONFIGS[qKey].color,
+                      boxShadow: newRuleQuadrant === qKey ? '0 0 0 2px #3a2e18' : 'none',
+                    }}
+                  >
+                    {QUADRANT_CONFIGS[qKey].title}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="flex rounded-lg overflow-hidden border-[1.5px] border-[#3a2e18]/30 shrink-0">
+                  <button
+                    onClick={() => { setNewRuleFrequency('monthly'); setNewRuleDay(1); }}
+                    className={`font-hand px-2.5 py-1.5 text-xs font-bold ${newRuleFrequency === 'monthly' ? 'bg-amber-600 text-white' : 'bg-white/40 text-[#5a4a2a]'}`}
+                  >
+                    每月
+                  </button>
+                  <button
+                    onClick={() => { setNewRuleFrequency('weekly'); setNewRuleDay(0); }}
+                    className={`font-hand px-2.5 py-1.5 text-xs font-bold ${newRuleFrequency === 'weekly' ? 'bg-amber-600 text-white' : 'bg-white/40 text-[#5a4a2a]'}`}
+                  >
+                    每週
+                  </button>
+                </div>
+
+                {newRuleFrequency === 'monthly' ? (
+                  <select
+                    value={newRuleDay}
+                    onChange={(e) => setNewRuleDay(Number(e.target.value))}
+                    className="font-hand flex-1 bg-white/50 border-[1.5px] border-[#3a2e18]/30 rounded-lg px-2 py-1.5 text-xs text-[#3a2e18]"
+                  >
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={d}>每月 {d} 號</option>
+                    ))}
+                  </select>
+                ) : (
+                  <select
+                    value={newRuleDay}
+                    onChange={(e) => setNewRuleDay(Number(e.target.value))}
+                    className="font-hand flex-1 bg-white/50 border-[1.5px] border-[#3a2e18]/30 rounded-lg px-2 py-1.5 text-xs text-[#3a2e18]"
+                  >
+                    {WEEKDAY_LABELS.map((label, i) => (
+                      <option key={i} value={i}>每週{label}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <label className="flex items-center justify-between cursor-pointer p-1">
+                <div>
+                  <div className="font-hand text-xs font-bold text-[#3a2e18]">到期自動記錄</div>
+                  <div className="font-hand text-[10px] text-[#8a7a5a]">
+                    {newRuleAutoRecord ? '到期會自動寫入一筆交易' : '到期只會跳通知提醒，你自己手動記'}
+                  </div>
+                </div>
+                <RoughCheckbox checked={newRuleAutoRecord} onChange={() => setNewRuleAutoRecord((v) => !v)} className="w-5 h-5" />
+              </label>
+
+              <RoughBox
+                shape="rectangle"
+                stroke="#2e5c26"
+                strokeWidth={1.6}
+                roughness={1.7}
+                fill="#2e5c2622"
+                fillStyle="hachure"
+                onClick={handleAddRule}
+                className="w-full h-9 font-hand pencil-text font-bold text-[#2e5c26] text-sm flex items-center justify-center cursor-pointer"
+              >
+                儲存這筆訂閱
+              </RoughBox>
+            </div>
+          )}
+
+          {recurringRules.length === 0 ? (
+            <p className="font-hand pencil-text text-xs text-[#8a7a5a]">還沒有設定任何固定支出訂閱。</p>
+          ) : (
+            <div className="space-y-2">
+              {recurringRules.map((rule) => (
+                <div
+                  key={rule.id}
+                  className="flex items-center gap-2 p-2.5 rounded-xl bg-white/10 border-[1.5px]"
+                  style={{ borderColor: QUADRANT_INK[rule.quadrant], opacity: rule.enabled ? 1 : 0.5 }}
+                >
+                  <RoughCheckbox checked={rule.enabled} onChange={() => handleToggleRuleEnabled(rule)} className="w-5 h-5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-hand text-sm font-bold text-[#3a2e18] truncate">
+                      {rule.note} · ${rule.amount.toLocaleString()}
+                    </div>
+                    <div className="font-hand text-[10px] text-[#8a7a5a]">
+                      {rule.frequency === 'monthly' ? `每月 ${rule.dayOfMonth} 號` : `每週${WEEKDAY_LABELS[rule.dayOfWeek || 0]}`}
+                      {' · '}
+                      {QUADRANT_CONFIGS[rule.quadrant].title}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleToggleAutoRecord(rule)}
+                    className={`font-hand text-[10px] font-bold px-2 py-1 rounded-full shrink-0 ${
+                      rule.autoRecord ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'
+                    }`}
+                    title="切換：到期自動記錄 / 只提醒"
+                  >
+                    {rule.autoRecord ? '自動記錄' : '僅提醒'}
+                  </button>
+                  <button onClick={() => handleDeleteRule(rule.id)} className="text-rose-600 shrink-0 p-1">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </RoughBox>

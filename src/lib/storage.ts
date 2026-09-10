@@ -1,4 +1,4 @@
-import { Transaction, UserSettings, StreakStats, QuadrantType } from '../types';
+import { Transaction, UserSettings, StreakStats, QuadrantType, RecurringRule } from '../types';
 import { DEFAULT_USER_SETTINGS, getSeedTransactions } from '../data/seed';
 
 const STORAGE_KEYS = {
@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   SETTINGS: 'quickledger_settings_v1',
   SLA_LOGS: 'quickledger_sla_logs_v1',
   SPEED_PB: 'quickledger_speed_pb_v1',
+  RECURRING_RULES: 'quickledger_recurring_rules_v1',
 };
 
 // --- Transactions CRUD ---
@@ -326,4 +327,46 @@ export function checkAndUpdateSpeedPB(durationMs: number): { isNewPB: boolean; p
     return { isNewPB: true, previousPB: currentPB, newPB: durationMs };
   }
   return { isNewPB: false, previousPB: currentPB, newPB: currentPB };
+}
+
+// --- Recurring Rules CRUD (固定支出訂閱) ---
+export function loadRecurringRules(): RecurringRule[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.RECURRING_RULES);
+    return raw ? JSON.parse(raw) : [];
+  } catch (err) {
+    console.error('Failed to load recurring rules', err);
+    return [];
+  }
+}
+
+export function saveRecurringRules(rules: RecurringRule[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.RECURRING_RULES, JSON.stringify(rules));
+  } catch (err) {
+    console.error('Failed to save recurring rules', err);
+  }
+}
+
+export function addRecurringRule(rule: Omit<RecurringRule, 'id' | 'created_at'>): RecurringRule {
+  const rules = loadRecurringRules();
+  const newRule: RecurringRule = {
+    ...rule,
+    id: `rec_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    created_at: new Date().toISOString(),
+  };
+  saveRecurringRules([newRule, ...rules]);
+  return newRule;
+}
+
+export function updateRecurringRule(id: string, updates: Partial<RecurringRule>): RecurringRule[] {
+  const rules = loadRecurringRules().map((r) => (r.id === id ? { ...r, ...updates } : r));
+  saveRecurringRules(rules);
+  return rules;
+}
+
+export function deleteRecurringRule(id: string): RecurringRule[] {
+  const rules = loadRecurringRules().filter((r) => r.id !== id);
+  saveRecurringRules(rules);
+  return rules;
 }

@@ -19,7 +19,9 @@ import {
   saveUserSettings,
   triggerHapticFeedback,
   playClickSound,
+  loadRecurringRules,
 } from './lib/storage';
+import { processRecurringRules } from './lib/recurring';
 import { getSeedTransactions } from './data/seed';
 import { QUADRANT_LIST } from './constants/quadrants';
 
@@ -40,6 +42,7 @@ import {
   scheduleClassificationReminder,
   cancelClassificationReminder,
   addNotificationActionListener,
+  sendRecurringReminder,
   NotificationTapResult,
 } from './lib/notifications';
 
@@ -80,6 +83,18 @@ export default function App() {
   useEffect(() => {
     const loaded = loadTransactions();
     setTransactions(loaded);
+
+    // 固定支出訂閱: auto-record what's due, remind the user about the rest
+    const rules = loadRecurringRules();
+    if (rules.length > 0) {
+      const { newTransactions, reminders } = processRecurringRules(rules);
+      if (newTransactions.length > 0) {
+        setTransactions((prev) => [...newTransactions, ...prev]);
+      }
+      reminders.forEach((rule) => {
+        sendRecurringReminder({ id: rule.id, note: rule.note, amount: rule.amount });
+      });
+    }
 
     const checkUrlAndOpenModal = (urlString: string) => {
       try {

@@ -13,9 +13,10 @@ export type EntryMethod =
   | 'widget'                   // 桌面/鎖定畫面 Widget 快速喚起
   | 'notification_quick_input' // 推播通知欄快速輸入
   | 'notification_zero'        // 推播通知欄一鍵 $0 支出
-  | 'lump_sum'                 // 模糊概算補登
+  | 'lump_sum'                 // 不分類補登
   | 'voice'                    // 語音記帳
-  | 'recent_reuse'             // 昨日紀錄快速複用
+  | 'recent_reuse'             // 抄昨天的快速複用
+  | 'recurring'                // 固定支出訂閱自動記錄
   | 'manual';                  // 主 App 手動記帳
 
 export interface Transaction {
@@ -74,4 +75,22 @@ export interface StreakStats {
   totalLogDays: number;
   zeroSpendDaysCount: number;
   lumpSumEntriesCount: number;
+}
+
+/**
+ * 固定支出訂閱：使用者設定週期性的固定花費（房租、訂閱服務等），
+ * 到期時可以「自動記錄」直接寫入一筆交易，或只是「提醒」讓使用者手動記。
+ */
+export interface RecurringRule {
+  id: string;
+  amount: number;
+  note: string;
+  quadrant: QuadrantType;
+  frequency: 'monthly' | 'weekly';
+  dayOfMonth?: number;          // 1-28，frequency='monthly' 時使用
+  dayOfWeek?: number;           // 0(日)-6(六)，frequency='weekly' 時使用
+  autoRecord: boolean;          // true = 到期自動記一筆；false = 只跳提醒，使用者自己記
+  enabled: boolean;
+  lastTriggeredPeriod?: string; // 'YYYY-MM'（monthly）或 'YYYY-MM-DD' 當週週日（weekly），避免重複觸發
+  created_at: string;
 }
