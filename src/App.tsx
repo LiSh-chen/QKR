@@ -25,6 +25,29 @@ import { processRecurringRules } from './lib/recurring';
 import { getSeedTransactions } from './data/seed';
 import { QUADRANT_LIST } from './constants/quadrants';
 
+/**
+ * `100dvh` shrinks the moment the on-screen keyboard appears (that's the whole
+ * point of the "dynamic" viewport unit) — that's what was pushing the bottom
+ * nav up above the keyboard, and it happens at the CSS engine level, so no
+ * native Android windowSoftInputMode / Capacitor Keyboard config can prevent
+ * it. Instead: capture the real height once with JS and freeze it, only
+ * re-measuring on an actual orientation change (never on a plain resize,
+ * which is what the keyboard showing/hiding fires).
+ */
+function useFrozenViewportHeight(): number {
+  const [height, setHeight] = useState(() => window.innerHeight);
+
+  useEffect(() => {
+    const measure = () => setHeight(window.innerHeight);
+    // Re-measure shortly after an orientation change settles, not on generic
+    // resize events (which fire when the keyboard shows/hides too).
+    window.addEventListener('orientationchange', () => setTimeout(measure, 200));
+    return () => window.removeEventListener('orientationchange', measure);
+  }, []);
+
+  return height;
+}
+
 // Components
 import { QuickEntryModal } from './components/QuickEntryModal';
 import { VoiceEntryModal } from './components/VoiceEntryModal';
@@ -47,6 +70,7 @@ import {
 } from './lib/notifications';
 
 export default function App() {
+  const frozenViewportHeight = useFrozenViewportHeight();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [userSettings, setUserSettings] = useState<UserSettings>(loadUserSettings());
   const [activeTab, setActiveTab] = useState<'quick' | 'matrix' | 'history' | 'settings'>(
@@ -315,7 +339,7 @@ export default function App() {
   return (
     <div
       className="nb-desk flex flex-col text-[#3a2e18] font-sans transition-colors duration-200 overflow-hidden"
-      style={{ height: '100dvh', paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+      style={{ height: `${frozenViewportHeight}px`, paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
       {/* Global hand-drawn text filter — used everywhere via the .pencil-text class */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>

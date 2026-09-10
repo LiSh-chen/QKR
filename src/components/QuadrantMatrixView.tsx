@@ -4,6 +4,7 @@ import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { RoughBox } from './RoughBox';
 import { RoughDonut, RoughStackedBarChart } from './RoughCharts';
+import { getDailyInsight, InsightResult } from '../lib/insights';
 
 interface QuadrantMatrixViewProps {
   transactions: Transaction[];
@@ -15,6 +16,8 @@ const LUMP_SUM_COLOR = '#A8A29E';
 
 export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transactions, onNavigateToHistory }) => {
   const [viewMode, setViewMode] = useState<'this_month' | 'history'>('this_month');
+  const [insightRedrawKey, setInsightRedrawKey] = useState(0);
+  const [insightForcedRandom, setInsightForcedRandom] = useState(false);
 
   const now = new Date();
   const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -107,6 +110,12 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
     UNNECESSARY_URGENT: Math.round(monthlyStackedData.reduce((s, m) => s + m.UNNECESSARY_URGENT, 0) / monthsWithData),
   };
   const avgLumpSum = Math.round(monthlyStackedData.reduce((s, m) => s + m.LUMP_SUM, 0) / monthsWithData);
+
+  const dailyInsight: InsightResult | null = useMemo(
+    () => getDailyInsight(transactions, insightForcedRandom),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [transactions, insightRedrawKey]
+  );
 
   return (
     <div className="h-full nb-ruled rounded-3xl p-2.5 relative flex flex-col">
@@ -238,6 +247,7 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
             </RoughBox>
           </>
         ) : (
+          <>
           <RoughBox shape="rectangle" stroke="#3a2e18" strokeWidth={1.4} roughness={1.4} className="p-2.5 space-y-2">
             <div className="font-hand pencil-text flex items-center gap-1.5 text-xs font-bold text-[#5a4a2a]">
               <TrendingUp className="w-3.5 h-3.5 text-orange-700" />
@@ -299,6 +309,43 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
               <p className="font-hand pencil-text text-sm text-[#8a7a5a] text-center py-16">尚無足夠的歷史資料</p>
             )}
           </RoughBox>
+
+          {dailyInsight && (
+            <RoughBox
+              shape="rectangle"
+              stroke="#7a5314"
+              strokeWidth={1.6}
+              roughness={1.8}
+              fill="#7a531412"
+              fillStyle="hachure"
+              className="p-3 space-y-1.5"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-hand pencil-text text-sm font-bold text-[#5a4014] flex items-center gap-1.5">
+                  <span>{dailyInsight.emoji}</span>
+                  <span>{dailyInsight.title}</span>
+                </span>
+                <button
+                  onClick={() => {
+                    setInsightForcedRandom(true);
+                    setInsightRedrawKey((k) => k + 1);
+                  }}
+                  className="font-hand pencil-text text-[10px] font-bold text-amber-700 underline shrink-0"
+                  id="redraw-insight-btn"
+                >
+                  🎲 重新抽一次
+                </button>
+              </div>
+              <div className="space-y-0.5">
+                {dailyInsight.lines.map((line, i) => (
+                  <p key={i} className="font-hand pencil-text text-xs text-[#5a4a2a] leading-relaxed whitespace-pre">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            </RoughBox>
+          )}
+          </>
         )}
       </div>
     </div>
