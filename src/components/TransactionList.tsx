@@ -248,7 +248,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </RoughBox>
 
           <div className="flex items-center gap-2">
-            <RoughBox shape="rectangle" stroke="#a08a5c" strokeWidth={1.3} roughness={1.5} className="flex-1 flex items-center gap-1.5 px-3 py-2">
+            <RoughBox shape="rectangle" stroke="#a08a5c" strokeWidth={1.3} roughness={1.5} className="flex-1 min-w-0 flex items-center gap-1.5 px-3 py-2">
               <Search className="w-3.5 h-3.5 text-[#8a7a5a] shrink-0" />
               <input
                 type="text"
@@ -355,7 +355,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                       fill={`${ink}18`}
                       fillStyle="hachure"
                       hachureGap={5}
-                      onClick={() => setDetailTx(tx)}
+                      onClick={() => (selectedIds.length > 0 ? toggleSelect(tx.id) : setDetailTx(tx))}
                       className="relative w-full px-3 py-2.5 flex items-center gap-2 text-left cursor-pointer"
                       style={{ transform: `rotate(${idx % 2 === 0 ? '-0.4deg' : '0.4deg'})` }}
                       id={`tx-row-${tx.id}`}
@@ -518,7 +518,16 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               {(() => {
                 const ink = detailTx.is_zero_spend || detailTx.is_lump_sum || !detailTx.quadrant ? '#6b6259' : QUADRANT_INK[detailTx.quadrant];
                 return (
-                  <RoughBox shape="rectangle" stroke={ink} strokeWidth={2.2} roughness={1.6} fill={`${ink}18`} fillStyle="hachure" className="relative p-5 space-y-3">
+                  <RoughBox
+                    shape="rectangle"
+                    stroke={ink}
+                    strokeWidth={2.2}
+                    roughness={1.6}
+                    fill={`${ink}18`}
+                    fillStyle="hachure"
+                    className="relative p-5 space-y-3"
+                    style={{ backgroundColor: '#f1e9d2' }}
+                  >
                     <div className="flex items-center justify-between">
                       <span className="font-hand pencil-text text-base font-bold text-[#2a2013]">記帳詳情</span>
                       <button onClick={() => setDetailTx(null)} className="text-[#2a2013]/70">

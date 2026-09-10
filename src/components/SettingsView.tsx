@@ -12,6 +12,7 @@ import {
 import { UserSettings, Transaction } from '../types';
 import { getSlaLogs, SlaLog } from '../lib/storage';
 import { sendTestNotification } from '../lib/notifications';
+import { RoughBox, RoughCheckbox } from './RoughBox';
 
 interface SettingsViewProps {
   settings: UserSettings;
@@ -79,170 +80,180 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       <div className="nb-holes">
         <div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" /><div className="nb-hole" />
       </div>
-      <div className="ml-4 space-y-6">
-      {/* Header */}
-      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70">
-        <div className="flex items-center gap-2">
-          <SettingsIcon className="w-5 h-5 text-stone-700" />
-          <h2 className="text-xl font-bold text-[#3a2e18]">系統設定與資料管理</h2>
-        </div>
-        <p className="text-xs text-stone-500 mt-1">
-          Local-First 本地優先架構，所有資料安全儲存於您的裝置。
-        </p>
-      </div>
-
-      {/* Preferences Section (includes Dark Mode) */}
-      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-4">
-        <h3 className="text-sm font-bold text-stone-800 border-b border-[#a08a5c]/50 pb-2">
-          互動偏好設定
-        </h3>
-
-        <div className="space-y-3 text-xs">
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50">
-            <div>
-              <div className="font-bold text-[#3a2e18]">觸覺回饋 (Haptic Feedback)</div>
-              <div className="text-[#8a7a5a]">點擊按鈕或完成記帳時觸發輕微震動</div>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.haptic_feedback_enabled}
-              onChange={(e) => onUpdateSettings({ haptic_feedback_enabled: e.target.checked })}
-              className="w-4 h-4 text-emerald-600 rounded border-stone-300"
-            />
-          </label>
-
-          <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl hover:bg-stone-50">
-            <div>
-              <div className="font-bold text-[#3a2e18]">音效反饋 (Sound Effects)</div>
-              <div className="text-[#8a7a5a]">按鍵音與成功音效提示</div>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.sound_effects_enabled}
-              onChange={(e) => onUpdateSettings({ sound_effects_enabled: e.target.checked })}
-              className="w-4 h-4 text-emerald-600 rounded border-stone-300"
-            />
-          </label>
-        </div>
-      </div>
-
-      {/* Notifications Section (merged from the old 推播通知 tab) */}
-      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-4">
-        <div className="flex items-center gap-2 border-b border-[#a08a5c]/50 pb-2">
-          <Bell className="w-4 h-4 text-indigo-500" />
-          <h3 className="text-sm font-bold text-stone-800">系統通知設定</h3>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">
-            真實系統通知
-          </span>
-        </div>
-        <p className="text-xs text-stone-500 -mt-2">
-          採用手機原生通知，會直接顯示在下拉通知列，不需開啟 App。時段習慣偵測（過時未記帳提醒）也會透過同一組通知管道推播。
-        </p>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#5a4a2a] shrink-0">
-            <Clock className="w-4 h-4 text-emerald-500" />
-            <span>每日結算時間</span>
-          </div>
-          <input
-            type="time"
-            value={settings.daily_reminder_time}
-            onChange={(e) => onUpdateSettings({ daily_reminder_time: e.target.value })}
-            className="bg-white/10 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl px-4 py-2 text-sm font-mono font-bold text-[#3a2e18] focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            id="settings-reminder-time-input"
-          />
-          <label className="flex items-center gap-2 text-xs font-medium text-[#5a4a2a] cursor-pointer ml-auto">
-            <input
-              type="checkbox"
-              checked={settings.reminder_enabled}
-              onChange={(e) => onUpdateSettings({ reminder_enabled: e.target.checked })}
-              className="w-4 h-4 text-emerald-600 rounded border-stone-300"
-              id="settings-reminder-enabled-toggle"
-            />
-            <span>啟用</span>
-          </label>
-        </div>
-
-        <button
-          onClick={handleSendTest}
-          className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98]"
-          id="settings-send-test-notification-btn"
-        >
-          <Send className="w-4 h-4" /> 送出測試通知
-        </button>
-        {testSentMsg && (
-          <div className="p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold text-center">
-            {testSentMsg}
-          </div>
-        )}
-      </div>
-
-      {/* SLA Performance Metrics Monitor */}
-      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-3">
-        <div className="flex items-center justify-between">
+      <div className="ml-4 space-y-4">
+        <RoughBox shape="rectangle" stroke="#3a2e18" strokeWidth={1.4} roughness={1.4} className="p-5">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-emerald-500" />
-            <h3 className="text-sm font-bold text-stone-800">
-              SLA 極速效能監控日誌 (SLA &le; 1.0s)
-            </h3>
+            <SettingsIcon className="w-5 h-5 text-stone-700" />
+            <h2 className="font-hand pencil-text text-xl font-bold text-[#3a2e18]">系統設定與資料管理</h2>
           </div>
-          <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-            實測 Target SLA Passed
-          </span>
-        </div>
+          <p className="font-hand pencil-text text-xs text-stone-500 mt-1">
+            Local-First 本地優先架構，所有資料安全儲存於您的裝置。
+          </p>
+        </RoughBox>
 
-        <div className="max-h-40 overflow-y-auto space-y-1.5 font-mono text-xs pr-1">
-          {slaLogs.length === 0 ? (
-            <p className="text-xs text-[#8a7a5a]">尚無測試紀錄。請試點擊快速記帳發起次數測試。</p>
-          ) : (
-            slaLogs.map((log, idx) => (
-              <div
-                key={idx}
-                className="p-2 rounded-xl bg-white/8 flex items-center justify-between text-[11px]"
-              >
-                <span className="text-stone-500">[{log.timestamp}] 來源: {log.source}</span>
-                <span className={`font-bold ${log.passed ? 'text-emerald-600' : 'text-amber-500'}`}>
-                  耗時 {log.durationMs}ms ({log.passed ? '通關 ✓' : '超時'})
-                </span>
+        <RoughBox shape="rectangle" stroke="#8a7454" strokeWidth={1.3} roughness={1.5} className="p-5 space-y-4">
+          <h3 className="font-hand pencil-text text-sm font-bold text-stone-800 border-b border-[#a08a5c]/50 pb-2">
+            互動偏好設定
+          </h3>
+
+          <div className="space-y-3 text-xs">
+            <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl">
+              <div>
+                <div className="font-hand pencil-text font-bold text-[#3a2e18]">觸覺回饋 (Haptic Feedback)</div>
+                <div className="font-hand pencil-text text-[#8a7a5a]">點擊按鈕或完成記帳時觸發輕微震動</div>
               </div>
-            ))
-          )}
-        </div>
-      </div>
+              <RoughCheckbox
+                checked={settings.haptic_feedback_enabled}
+                onChange={() => onUpdateSettings({ haptic_feedback_enabled: !settings.haptic_feedback_enabled })}
+                className="w-5 h-5"
+              />
+            </label>
 
-      {/* Data Backup & Restore */}
-      <div className="bg-white/8 p-5 rounded-3xl border-[1.5px] border-dashed border-[#4a3a20]/70 space-y-4">
-        <h3 className="text-sm font-bold text-stone-800 border-b border-[#a08a5c]/50 pb-2">
-          資料匯出與備份 (Local-First)
-        </h3>
-
-        {importStatusMsg && (
-          <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold">
-            {importStatusMsg}
+            <label className="flex items-center justify-between cursor-pointer p-2 rounded-xl">
+              <div>
+                <div className="font-hand pencil-text font-bold text-[#3a2e18]">音效反饋 (Sound Effects)</div>
+                <div className="font-hand pencil-text text-[#8a7a5a]">按鍵音與成功音效提示</div>
+              </div>
+              <RoughCheckbox
+                checked={settings.sound_effects_enabled}
+                onChange={() => onUpdateSettings({ sound_effects_enabled: !settings.sound_effects_enabled })}
+                className="w-5 h-5"
+              />
+            </label>
           </div>
-        )}
+        </RoughBox>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button
-            onClick={handleExportJson}
-            className="py-3 px-4 bg-stone-100 hover:bg-[#e8dcc0]:bg-[#4a3f26] text-stone-800 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all"
+        <RoughBox shape="rectangle" stroke="#5a5a9e" strokeWidth={1.3} roughness={1.5} className="p-5 space-y-4">
+          <div className="flex items-center gap-2 border-b border-[#a08a5c]/50 pb-2">
+            <Bell className="w-4 h-4 text-indigo-500" />
+            <h3 className="font-hand pencil-text text-sm font-bold text-stone-800">系統通知設定</h3>
+            <span className="font-hand pencil-text px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">
+              真實系統通知
+            </span>
+          </div>
+          <p className="font-hand pencil-text text-xs text-stone-500 -mt-2">
+            採用手機原生通知，會直接顯示在下拉通知列，不需開啟 App。時段習慣偵測（過時未記帳提醒）也會透過同一組通知管道推播。
+          </p>
+
+          <div className="flex items-center gap-3">
+            <div className="font-hand pencil-text flex items-center gap-2 text-xs font-bold text-[#5a4a2a] shrink-0">
+              <Clock className="w-4 h-4 text-emerald-500" />
+              <span>每日結算時間</span>
+            </div>
+            <input
+              type="time"
+              value={settings.daily_reminder_time}
+              onChange={(e) => onUpdateSettings({ daily_reminder_time: e.target.value })}
+              className="font-hand bg-white/40 border-[1.5px] border-dashed border-[#a08a5c]/60 rounded-xl px-4 py-2 text-sm font-mono font-bold text-[#3a2e18] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              id="settings-reminder-time-input"
+            />
+            <label className="font-hand pencil-text flex items-center gap-2 text-xs font-medium text-[#5a4a2a] cursor-pointer ml-auto">
+              <RoughCheckbox
+                checked={settings.reminder_enabled}
+                onChange={() => onUpdateSettings({ reminder_enabled: !settings.reminder_enabled })}
+                className="w-5 h-5"
+              />
+              <span>啟用</span>
+            </label>
+          </div>
+
+          <RoughBox
+            shape="rectangle"
+            stroke="#3730a3"
+            strokeWidth={1.8}
+            roughness={1.7}
+            fill="#4338ca"
+            fillStyle="solid"
+            onClick={handleSendTest}
+            className="w-full py-3 font-hand pencil-text text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+            id="settings-send-test-notification-btn"
           >
-            <Download className="w-4 h-4" /> 匯出 JSON 備份
-          </button>
+            <Send className="w-4 h-4" /> 送出測試通知
+          </RoughBox>
+          {testSentMsg && (
+            <div className="font-hand pencil-text p-2.5 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold text-center">
+              {testSentMsg}
+            </div>
+          )}
+        </RoughBox>
 
-          <label className="py-3 px-4 bg-stone-100 hover:bg-[#e8dcc0]:bg-[#4a3f26] text-stone-800 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all">
-            <Upload className="w-4 h-4" /> 匯入 JSON 資料
-            <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
-          </label>
+        <RoughBox shape="rectangle" stroke="#2e5c26" strokeWidth={1.3} roughness={1.5} className="p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-emerald-500" />
+              <h3 className="font-hand pencil-text text-sm font-bold text-stone-800">
+                SLA 極速效能監控日誌 (SLA &le; 1.0s)
+              </h3>
+            </div>
+            <span className="font-hand pencil-text text-[10px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+              實測 Target SLA Passed
+            </span>
+          </div>
 
-          <button
-            onClick={onResetToSeed}
-            className="py-3 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition-all"
-          >
-            <RotateCcw className="w-4 h-4" /> 重設預設示範資料
-          </button>
-        </div>
-      </div>
+          <div className="max-h-40 overflow-y-auto space-y-1.5 font-mono text-xs pr-1">
+            {slaLogs.length === 0 ? (
+              <p className="font-hand pencil-text text-xs text-[#8a7a5a]">尚無測試紀錄。請試點擊快速記帳發起次數測試。</p>
+            ) : (
+              slaLogs.map((log, idx) => (
+                <div key={idx} className="p-2 rounded-xl bg-white/8 flex items-center justify-between text-[11px]">
+                  <span className="text-stone-500">[{log.timestamp}] 來源: {log.source}</span>
+                  <span className={`font-bold ${log.passed ? 'text-emerald-600' : 'text-amber-500'}`}>
+                    耗時 {log.durationMs}ms ({log.passed ? '通關 ✓' : '超時'})
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </RoughBox>
+
+        <RoughBox shape="rectangle" stroke="#8a7454" strokeWidth={1.3} roughness={1.5} className="p-5 space-y-4">
+          <h3 className="font-hand pencil-text text-sm font-bold text-stone-800 border-b border-[#a08a5c]/50 pb-2">
+            資料匯出與備份 (Local-First)
+          </h3>
+
+          {importStatusMsg && (
+            <div className="font-hand pencil-text p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl font-bold">
+              {importStatusMsg}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <RoughBox
+              shape="rectangle"
+              stroke="#3a2e18"
+              strokeWidth={1.4}
+              roughness={1.6}
+              onClick={handleExportJson}
+              className="py-3 px-4 font-hand pencil-text text-stone-800 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Download className="w-4 h-4" /> 匯出 JSON 備份
+            </RoughBox>
+
+            <label className="relative">
+              <RoughBox
+                shape="rectangle"
+                stroke="#3a2e18"
+                strokeWidth={1.4}
+                roughness={1.6}
+                className="py-3 px-4 font-hand pencil-text text-stone-800 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Upload className="w-4 h-4" /> 匯入 JSON 資料
+              </RoughBox>
+              <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
+            </label>
+
+            <RoughBox
+              shape="rectangle"
+              stroke="#7a2020"
+              strokeWidth={1.4}
+              roughness={1.6}
+              onClick={onResetToSeed}
+              className="py-3 px-4 font-hand pencil-text text-rose-700 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <RotateCcw className="w-4 h-4" /> 重設預設示範資料
+            </RoughBox>
+          </div>
+        </RoughBox>
       </div>
     </div>
   );
