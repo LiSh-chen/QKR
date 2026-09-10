@@ -184,6 +184,10 @@ const mostSimilarMonth: InsightFn = (transactions) => {
 
 const ALL_INSIGHTS: InsightFn[] = [impulseIndexTrend, extremeDays, weekdayHotspot, yearlyProjection, mostSimilarMonth];
 
+/** Short labels for each wedge of the lottery wheel, same order as ALL_INSIGHTS. */
+export const INSIGHT_WHEEL_LABELS = ['衝動指數', '最貴/省日', '星期熱點', '年度推算', '最像哪月'];
+export const INSIGHT_WHEEL_COLORS = ['#7a2020', '#1e4a78', '#2e5c26', '#7a5314', '#5a3d78'];
+
 function seededIndex(seed: string, mod: number): number {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -193,13 +197,18 @@ function seededIndex(seed: string, mod: number): number {
   return Math.abs(hash) % mod;
 }
 
+export interface DailyInsightPick {
+  index: number;
+  result: InsightResult;
+}
+
 /**
- * Returns today's insight (same pick all day, changes tomorrow), or a fresh
- * random one if forceRandom is set (the manual "重新抽一次" button). Falls
- * back through the other modules in rotation if the first pick has no usable
- * data, so the user isn't shown a blank card.
+ * Picks today's insight index (same pick all day, changes tomorrow), or a
+ * fresh random one if forceRandom is set. Falls back through the other
+ * modules in rotation if the first pick has no usable data, so the wheel
+ * never lands on a segment with nothing to show.
  */
-export function getDailyInsight(transactions: Transaction[], forceRandom = false): InsightResult | null {
+export function pickDailyInsight(transactions: Transaction[], forceRandom = false): DailyInsightPick | null {
   const startIdx = forceRandom
     ? Math.floor(Math.random() * ALL_INSIGHTS.length)
     : seededIndex(dayKey(new Date()), ALL_INSIGHTS.length);
@@ -207,7 +216,8 @@ export function getDailyInsight(transactions: Transaction[], forceRandom = false
   for (let offset = 0; offset < ALL_INSIGHTS.length; offset++) {
     const idx = (startIdx + offset) % ALL_INSIGHTS.length;
     const result = ALL_INSIGHTS[idx](transactions);
-    if (result) return result;
+    if (result) return { index: idx, result };
   }
   return null;
 }
+

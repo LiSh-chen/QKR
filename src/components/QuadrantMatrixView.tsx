@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import { LayoutGrid, TrendingUp, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { LayoutGrid, TrendingUp, Calendar, X } from 'lucide-react';
 import { Transaction, QuadrantType } from '../types';
 import { QUADRANT_CONFIGS, QUADRANT_LIST } from '../constants/quadrants';
 import { RoughBox } from './RoughBox';
 import { RoughDonut, RoughStackedBarChart } from './RoughCharts';
-import { getDailyInsight, InsightResult } from '../lib/insights';
+import { RoughWheel } from './RoughWheel';
+import { pickDailyInsight, DailyInsightPick, INSIGHT_WHEEL_LABELS, INSIGHT_WHEEL_COLORS } from '../lib/insights';
 
 interface QuadrantMatrixViewProps {
   transactions: Transaction[];
@@ -16,8 +18,10 @@ const LUMP_SUM_COLOR = '#A8A29E';
 
 export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transactions, onNavigateToHistory }) => {
   const [viewMode, setViewMode] = useState<'this_month' | 'history'>('this_month');
-  const [insightRedrawKey, setInsightRedrawKey] = useState(0);
-  const [insightForcedRandom, setInsightForcedRandom] = useState(false);
+  const [spinKey, setSpinKey] = useState(0);
+  const [pendingPick, setPendingPick] = useState<DailyInsightPick | null>(null);
+  const [revealedPick, setRevealedPick] = useState<DailyInsightPick | null>(null);
+  const [showResultNote, setShowResultNote] = useState(false);
 
   const now = new Date();
   const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -111,11 +115,25 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
   };
   const avgLumpSum = Math.round(monthlyStackedData.reduce((s, m) => s + m.LUMP_SUM, 0) / monthsWithData);
 
-  const dailyInsight: InsightResult | null = useMemo(
-    () => getDailyInsight(transactions, insightForcedRandom),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [transactions, insightRedrawKey]
+  const dailyInsight: DailyInsightPick | null = useMemo(
+    () => pickDailyInsight(transactions, false),
+    [transactions]
   );
+
+  const handleSpin = (forceRandom: boolean) => {
+    const pick = pickDailyInsight(transactions, forceRandom);
+    if (!pick) return;
+    setPendingPick(pick);
+    setShowResultNote(false);
+    setSpinKey((k) => k + 1);
+  };
+
+  const handleSpinEnd = () => {
+    if (pendingPick) {
+      setRevealedPick(pendingPick);
+      setShowResultNote(true);
+    }
+  };
 
   return (
     <div className="h-full nb-ruled rounded-3xl p-2.5 relative flex flex-col">
@@ -311,40 +329,66 @@ export const QuadrantMatrixView: React.FC<QuadrantMatrixViewProps> = ({ transact
           </RoughBox>
 
           {dailyInsight && (
-            <RoughBox
-              shape="rectangle"
-              stroke="#7a5314"
-              strokeWidth={1.6}
-              roughness={1.8}
-              fill="#7a531412"
-              fillStyle="hachure"
-              className="p-3 space-y-1.5"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-hand pencil-text text-sm font-bold text-[#5a4014] flex items-center gap-1.5">
-                  <span>{dailyInsight.emoji}</span>
-                  <span>{dailyInsight.title}</span>
-                </span>
-                <button
-                  onClick={() => {
-                    setInsightForcedRandom(true);
-                    setInsightRedrawKey((k) => k + 1);
-                  }}
-                  className="font-hand pencil-text text-[10px] font-bold text-amber-700 underline shrink-0"
-                  id="redraw-insight-btn"
-                >
-                  🎲 重新抽一次
-                </button>
-              </div>
-              <div className="space-y-0.5">
-                {dailyInsight.lines.map((line, i) => (
-                  <p key={i} className="font-hand pencil-text text-xs text-[#5a4a2a] leading-relaxed whitespace-pre">
-                    {line}
-                  </p>
-                ))}
-              </div>
+            <RoughBox shape="rectangle" stroke="#7a5314" strokeWidth={1.6} roughness={1.8} className="p-3 flex flex-col items-center gap-2">
+              <span className="font-hand pencil-text text-xs font-bold text-[#5a4014]">今日特別分析抽籤</span>
+              <RoughWheel
+                labels={INSIGHT_WHEEL_LABELS}
+                colors={INSIGHT_WHEEL_COLORS}
+                targetIndex={(pendingPick ?? dailyInsight).index}
+                spinKey={spinKey}
+                onSpinEnd={handleSpinEnd}
+                size={150}
+              />
+              <button
+                onClick={() => handleSpin(spinKey > 0)}
+                className="font-hand pencil-text text-xs font-bold text-amber-700 underline"
+                id="spin-insight-wheel-btn"
+              >
+                {spinKey === 0 ? '👆 點我抽今日分析' : '🎲 再抽一次'}
+              </button>
             </RoughBox>
           )}
+
+          {/* Result — pops up as a hand-drawn note strip, same visual language as the rest of the app */}
+          <AnimatePresence>
+            {showResultNote && revealedPick && (
+              <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm px-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 40, rotate: -3, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, rotate: -1, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                  className="w-full max-w-xs"
+                >
+                  <RoughBox
+                    shape="rectangle"
+                    stroke={INSIGHT_WHEEL_COLORS[revealedPick.index]}
+                    strokeWidth={2}
+                    roughness={1.8}
+                    fill="#f1e9d2"
+                    fillStyle="solid"
+                    className="relative p-5 space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-hand pencil-text text-base font-bold text-[#3a2e18] flex items-center gap-1.5">
+                        <span>{revealedPick.result.emoji}</span>
+                        <span>{revealedPick.result.title}</span>
+                      </span>
+                      <button onClick={() => setShowResultNote(false)} className="text-[#3a2e18]/60">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="space-y-1 pt-1">
+                      {revealedPick.result.lines.map((line, i) => (
+                        <p key={i} className="font-hand pencil-text text-sm text-[#5a4a2a] leading-relaxed whitespace-pre">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </RoughBox>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
           </>
         )}
       </div>
